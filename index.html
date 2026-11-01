@@ -1247,10 +1247,18 @@
     ]).finally(() => clearTimeout(timer));
   }
 
-  async function fetchPushApi(url, options, timeoutMessage) {
+  async function fetchPushApi(
+    url,
+    options,
+    timeoutMessage,
+    timeoutDuration = 90000
+  ) {
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 90000);
+      const timer = setTimeout(
+        () => controller.abort(),
+        timeoutDuration
+      );
       try {
         const response = await fetch(url, {
           ...options,
@@ -1278,6 +1286,20 @@
   }
 
   async function savePushSubscription(subscription, settings) {
+    setPushStatus("Пробуждаем сервер уведомлений…");
+    const healthResponse = await fetchPushApi(
+      "https://my-garage-push.onrender.com/api/push/public-key",
+      {},
+      "Сервер уведомлений не запустился за 2 минуты. Попробуй ещё раз.",
+      120000
+    );
+    if (!healthResponse.ok) {
+      throw new Error(
+        `Сервер уведомлений не ответил (ошибка ${healthResponse.status}).`
+      );
+    }
+
+    setPushStatus("Сохраняем подписку на сервере…");
     const response = await fetchPushApi(
       "https://my-garage-push.onrender.com/api/push/subscribe",
       {
@@ -1285,7 +1307,8 @@
         headers: { "Content-Type": "text/plain;charset=UTF-8" },
         body: JSON.stringify({ subscription: subscription.toJSON(), settings })
       },
-      "Сервер не ответил за 90 секунд. Проверь интернет и попробуй ещё раз."
+      "Сервер не сохранил подписку за 2 минуты. Попробуй ещё раз.",
+      120000
     );
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
@@ -1396,7 +1419,6 @@
           "iPhone не завершил создание подписки за 45 секунд. Проверь разрешение уведомлений в настройках iPhone и попробуй ещё раз."
         );
       }
-      setPushStatus("Сохраняем подписку на сервере…");
       await savePushSubscription(pushSubscription, getCurrentPushSettings());
       pushSettingsPanel.hidden = false;
       pushEnableButton.hidden = true;
