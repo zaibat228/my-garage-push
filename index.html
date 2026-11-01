@@ -630,12 +630,6 @@
 
     .push-setting label { flex: 1; }
 
-    .push-setting input[type="time"] {
-      width: auto;
-      min-width: 118px;
-      padding: 8px;
-    }
-
     .push-disable {
       justify-self: start;
       padding: 9px 12px;
@@ -779,7 +773,6 @@
       .push-card { grid-template-columns: 1fr; gap: 12px; }
       .push-card > button { justify-self: start; }
       .push-setting { flex-wrap: wrap; }
-      .push-setting input[type="time"] { margin-left: 28px; }
       .amount { font-size: 27px; }
       .card { padding: 17px; }
       #carForm { grid-template-columns: 1fr; }
@@ -852,7 +845,7 @@
     <section class="card push-card" aria-labelledby="pushTitle">
       <div>
         <h2 id="pushTitle">Push-уведомления</h2>
-        <p class="muted">Напоминания о записях, уходе за авто и обновлениях.</p>
+        <p class="muted">Напоминания каждые 3 часа и сообщения о новых версиях.</p>
       </div>
       <button id="pushEnableButton" type="button">Включить</button>
       <div class="push-card-status muted" id="pushStatus" role="status"
@@ -861,18 +854,12 @@
       </div>
       <div class="push-settings" id="pushSettings" hidden>
         <div class="push-setting">
-          <input id="dailyReminder" type="checkbox" checked>
-          <label for="dailyReminder">Напоминать внести расходы и заправки</label>
-          <input id="dailyReminderTime" type="time" value="19:00"
-            aria-label="Время ежедневного напоминания">
-        </div>
-        <div class="push-setting">
-          <input id="weeklyTip" type="checkbox" checked>
-          <label for="weeklyTip">Еженедельная подсказка по уходу за автомобилем</label>
+          <input id="reminderNotifications" type="checkbox" checked>
+          <label for="reminderNotifications">Напоминать каждые 3 часа</label>
         </div>
         <div class="push-setting">
           <input id="updateNotices" type="checkbox" checked>
-          <label for="updateNotices">Сообщать об обновлениях приложения</label>
+          <label for="updateNotices">Сообщать о новых версиях и обновлениях</label>
         </div>
         <button class="push-disable" id="pushDisableButton" type="button">
           Отключить уведомления
@@ -1156,14 +1143,11 @@
   const pushDisableButton = document.getElementById("pushDisableButton");
   const pushStatus = document.getElementById("pushStatus");
   const pushSettingsPanel = document.getElementById("pushSettings");
-  const dailyReminderInput = document.getElementById("dailyReminder");
-  const dailyReminderTimeInput = document.getElementById("dailyReminderTime");
-  const weeklyTipInput = document.getElementById("weeklyTip");
+  const reminderNotificationsInput =
+    document.getElementById("reminderNotifications");
   const updateNoticesInput = document.getElementById("updateNotices");
   const defaultPushSettings = {
-    daily: true,
-    dailyTime: "19:00",
-    weekly: true,
+    reminders: true,
     updates: true
   };
   let pushSettings = { ...defaultPushSettings };
@@ -1210,11 +1194,9 @@
       );
       if (saved && typeof saved === "object") {
         pushSettings = {
-          daily: saved.daily !== false,
-          dailyTime: /^\d{2}:\d{2}$/.test(saved.dailyTime)
-            ? saved.dailyTime
-            : defaultPushSettings.dailyTime,
-          weekly: saved.weekly !== false,
+          reminders: typeof saved.reminders === "boolean"
+            ? saved.reminders
+            : saved.daily !== false || saved.weekly !== false,
           updates: saved.updates !== false
         };
       }
@@ -1225,10 +1207,7 @@
   }
 
   function renderPushSettings() {
-    dailyReminderInput.checked = pushSettings.daily;
-    dailyReminderTimeInput.value = pushSettings.dailyTime;
-    dailyReminderTimeInput.disabled = !pushSettings.daily;
-    weeklyTipInput.checked = pushSettings.weekly;
+    reminderNotificationsInput.checked = pushSettings.reminders;
     updateNoticesInput.checked = pushSettings.updates;
   }
 
@@ -1251,23 +1230,44 @@
 
   function getCurrentPushSettings() {
     return {
-      daily: dailyReminderInput.checked,
-      dailyTime: dailyReminderTimeInput.value || "19:00",
-      weekly: weeklyTipInput.checked,
+      reminders: reminderNotificationsInput.checked,
       updates: updateNoticesInput.checked
     };
   }
 
-  async function savePushSubscription(subscription, settings) {
-    const response = await fetch("https://my-garage-push.onrender.com/api/push/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        subscription: subscription.toJSON(),
-        settings,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  function withPushTimeout(operation, message, timeout = 45000) {
+    let timer;
+    return Promise.race([
+      operation,
+      new Promise((resolve, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), timeout);
       })
-    });
+    ]).finally(() => clearTimeout(timer));
+  }
+
+  async function fetchPushApi(url, options, timeoutMessage) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } catch (error) {
+      if (error.name === "AbortError") throw new Error(timeoutMessage);
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function savePushSubscription(subscription, settings) {
+    const response = await fetchPushApi(
+      "https://my-garage-push.onrender.com/api/push/subscribe",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription: subscription.toJSON(), settings })
+      },
+      "Сервер не ответил за 45 секунд. Проверь интернет и попробуй ещё раз."
+    );
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
       throw new Error(result.error || "Не удалось сохранить подписку.");
@@ -1278,6 +1278,7 @@
   }
 
   async function initializePushNotifications() {
+    pushEnableButton.disabled = true;
     readPushSettings();
 
     if (!window.isSecureContext) {
@@ -1299,13 +1300,19 @@
       setPushStatus(
         "На iPhone сначала добавь сайт на экран «Домой», затем открой его оттуда."
       );
+      pushEnableButton.disabled = false;
       return;
     }
-    pushEnableButton.disabled = true;
     setPushStatus("Проверяем настройки push-уведомлений…");
     try {
-      pushRegistration = await navigator.serviceWorker.register("./sw.js");
-      await navigator.serviceWorker.ready;
+      pushRegistration = await withPushTimeout(
+        navigator.serviceWorker.register("./sw.js"),
+        "Не удалось зарегистрировать службу уведомлений за 45 секунд."
+      );
+      await withPushTimeout(
+        navigator.serviceWorker.ready,
+        "Служба уведомлений не запустилась за 45 секунд."
+      );
       pushSubscription = await pushRegistration.pushManager.getSubscription();
       if (pushSubscription && Notification.permission === "granted") {
         await savePushSubscription(pushSubscription, pushSettings);
@@ -1317,7 +1324,7 @@
       }
     } catch (error) {
       console.warn("Не удалось подготовить push-уведомления", error);
-      setPushStatus("Не удалось подключить службу уведомлений.", "error");
+      setPushStatus(error.message, "error");
     } finally {
       pushEnableButton.disabled = false;
     }
@@ -1344,11 +1351,22 @@
         throw new Error("Разрешение на push-уведомления не выдано.");
       }
 
-      setPushStatus("Настраиваем push-уведомления…");
-      pushRegistration = pushRegistration ||
-        await navigator.serviceWorker.register("./sw.js");
-      await navigator.serviceWorker.ready;
-      const keyResponse = await fetch("https://my-garage-push.onrender.com/api/push/public-key");
+      setPushStatus("Подключаем службу уведомлений…");
+      pushRegistration = pushRegistration || await withPushTimeout(
+        navigator.serviceWorker.register("./sw.js"),
+        "Не удалось зарегистрировать службу уведомлений за 45 секунд."
+      );
+      await withPushTimeout(
+        navigator.serviceWorker.ready,
+        "Служба уведомлений не запустилась за 45 секунд."
+      );
+
+      setPushStatus("Связываемся с сервером уведомлений…");
+      const keyResponse = await fetchPushApi(
+        "https://my-garage-push.onrender.com/api/push/public-key",
+        {},
+        "Сервер уведомлений не ответил за 45 секунд. Попробуй ещё раз."
+      );
       if (!keyResponse.ok) {
         throw new Error(
           "Сервер push-уведомлений не настроен или недоступен."
@@ -1357,17 +1375,41 @@
       const { publicKey } = await keyResponse.json();
       if (!publicKey) throw new Error("На сервере не настроен VAPID-ключ.");
 
+      setPushStatus("Создаём подписку на уведомления…");
       pushSubscription = await pushRegistration.pushManager.getSubscription();
       if (!pushSubscription) {
-        pushSubscription = await pushRegistration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: base64UrlToBytes(publicKey)
-        });
+        pushSubscription = await withPushTimeout(
+          pushRegistration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: base64UrlToBytes(publicKey)
+          }),
+          "iPhone не завершил создание подписки за 45 секунд. Проверь разрешение уведомлений в настройках iPhone и попробуй ещё раз."
+        );
       }
+      setPushStatus("Сохраняем подписку на сервере…");
       await savePushSubscription(pushSubscription, getCurrentPushSettings());
       pushSettingsPanel.hidden = false;
       pushEnableButton.hidden = true;
-      setPushStatus("Готово! Настройки напоминаний сохранены.");
+      try {
+        await pushRegistration.showNotification(
+          "Уведомления включены",
+          {
+            body: "Теперь My Garage будет присылать напоминания и сообщения об обновлениях.",
+            icon: "./icon-192.png",
+            badge: "./icon-192.png",
+            data: { url: "./" }
+          }
+        );
+        setPushStatus(
+          "Готово! Настройки сохранены, отправили тестовое уведомление."
+        );
+      } catch (error) {
+        console.warn("Не удалось показать подтверждение уведомлений", error);
+        setPushStatus(
+          "Уведомления включены, но iPhone не показал тестовое уведомление. Проверь настройки уведомлений приложения.",
+          "error"
+        );
+      }
     } catch (error) {
       console.warn("Не удалось включить push-уведомления", error);
       setPushStatus(error.message, "error");
@@ -1378,7 +1420,6 @@
 
   async function updatePushPreferences() {
     const nextSettings = getCurrentPushSettings();
-    dailyReminderTimeInput.disabled = !nextSettings.daily;
     if (!pushSubscription) {
       pushSettings = nextSettings;
       try {
@@ -1403,9 +1444,7 @@
   }
 
   [
-    dailyReminderInput,
-    dailyReminderTimeInput,
-    weeklyTipInput,
+    reminderNotificationsInput,
     updateNoticesInput
   ].forEach(input => {
     input.addEventListener("change", updatePushPreferences);
@@ -1415,11 +1454,15 @@
     if (!pushSubscription) return;
     pushDisableButton.disabled = true;
     try {
-      const response = await fetch("https://my-garage-push.onrender.com/api/push/subscribe", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ endpoint: pushSubscription.endpoint })
-      });
+      const response = await fetchPushApi(
+        "https://my-garage-push.onrender.com/api/push/subscribe",
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: pushSubscription.endpoint })
+        },
+        "Сервер не ответил за 45 секунд. Попробуй ещё раз."
+      );
       if (!response.ok) {
         throw new Error("Не удалось отключить уведомления на сервере.");
       }

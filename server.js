@@ -18,12 +18,7 @@ const privateKey = process.env.VAPID_PRIVATE_KEY;
 const vapidSubject = process.env.VAPID_SUBJECT;
 const adminToken = process.env.ADMIN_TOKEN;
 const maxRequestBytes = 64 * 1024;
-const weeklyTips = [
-  "Проверь давление в шинах: правильное давление помогает экономить топливо.",
-  "Осмотри уровень моторного масла и обрати внимание на возможные утечки.",
-  "Проверь состояние щёток стеклоочистителя и уровень омывающей жидкости.",
-  "Убедись, что фары и указатели поворота работают исправно."
-];
+const reminderInterval = 3 * 60 * 60 * 1000;
 
 if (!publicKey || !privateKey || !vapidSubject ||
     !/^(mailto:.+|https:\/\/.+)$/.test(vapidSubject)) {
@@ -87,31 +82,17 @@ function validateSettings(value) {
   if (!value || typeof value !== "object") {
     throw new HttpError(400, "Не заданы настройки уведомлений.");
   }
-  if (typeof value.daily !== "boolean" ||
-      typeof value.weekly !== "boolean" ||
-      typeof value.updates !== "boolean" ||
-      typeof value.dailyTime !== "string" ||
-      !/^([01]\d|2[0-3]):[0-5]\d$/.test(value.dailyTime)) {
+  const hasReminderSetting = typeof value.reminders === "boolean" ||
+    (typeof value.daily === "boolean" && typeof value.weekly === "boolean");
+  if (!hasReminderSetting || typeof value.updates !== "boolean") {
     throw new HttpError(400, "Некорректные настройки уведомлений.");
   }
   return {
-    daily: value.daily,
-    dailyTime: value.dailyTime,
-    weekly: value.weekly,
+    reminders: typeof value.reminders === "boolean"
+      ? value.reminders
+      : value.daily || value.weekly,
     updates: value.updates
   };
-}
-
-function validateTimeZone(value) {
-  if (typeof value !== "string" || value.length > 100) {
-    throw new HttpError(400, "Не задан часовой пояс устройства.");
-  }
-  try {
-    new Intl.DateTimeFormat("en-US", { timeZone: value });
-  } catch {
-    throw new HttpError(400, "Указан некорректный часовой пояс.");
-  }
-  return value;
 }
 
 function saveSubscriptions() {
@@ -135,32 +116,24 @@ async function loadSubscriptions() {
     if (!Array.isArray(value)) {
       throw new Error("subscriptions.json должен содержать массив.");
     }
-    subscriptions = value;
+    const now = Date.now();
+    let changed = false;
+    subscriptions = value.map(entry => {
+      const settings = validateSettings(entry.settings);
+      const lastReminderAt = Number.isFinite(entry.lastReminderAt)
+        ? entry.lastReminderAt
+        : now;
+      if (JSON.stringify(settings) !== JSON.stringify(entry.settings) ||
+          lastReminderAt !== entry.lastReminderAt) {
+        changed = true;
+      }
+      return { ...entry, settings, lastReminderAt };
+    });
+    if (changed) await saveSubscriptions();
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
     subscriptions = [];
   }
-}
-
-function getLocalParts(date, timeZone) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-    weekday: "short"
-  }).formatToParts(date);
-  const values = Object.fromEntries(
-    parts.map(part => [part.type, part.value])
-  );
-  return {
-    date: `${values.year}-${values.month}-${values.day}`,
-    time: `${values.hour}:${values.minute}`,
-    weekday: values.weekday
-  };
 }
 
 function isExpiredPushError(error) {
@@ -200,33 +173,17 @@ async function runReminderCycle() {
   if (reminderCycleRunning) return;
   reminderCycleRunning = true;
   try {
-    const now = new Date();
+    const now = Date.now();
     const reminders = [];
     for (const entry of [...subscriptions]) {
-      const local = getLocalParts(now, entry.timeZone);
-      if (entry.settings.daily &&
-          local.time === entry.settings.dailyTime &&
-          entry.lastDailyDate !== local.date) {
-        entry.lastDailyDate = local.date;
+      if (entry.settings.reminders &&
+          now - entry.lastReminderAt >= reminderInterval) {
+        entry.lastReminderAt = now;
         reminders.push([
           entry,
           {
-            title: "Время заглянуть в My Garage",
-            body: "Добавь расходы и заправки, чтобы история автомобиля была актуальной."
-          }
-        ]);
-      }
-      if (entry.settings.weekly &&
-          local.weekday === "Sun" &&
-          local.time === "10:00" &&
-          entry.lastWeeklyDate !== local.date) {
-        entry.lastWeeklyDate = local.date;
-        const weekNumber = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000));
-        reminders.push([
-          entry,
-          {
-            title: "Еженедельный уход за автомобилем",
-            body: weeklyTips[weekNumber % weeklyTips.length]
+            title: "Напоминание My Garage",
+            body: "Загляни в гараж: добавь расходы, заправки или записи об обслуживании."
           }
         ]);
       }
@@ -279,9 +236,7 @@ async function handleApi(request, response, pathname) {
         typeof subscription.keys.auth !== "string") {
       throw new HttpError(400, "Некорректная push-подписка.");
     }
-
     const settings = validateSettings(body.settings);
-    const timeZone = validateTimeZone(body.timeZone);
     const existing = subscriptions.find(
       entry => entry.subscription.endpoint === subscription.endpoint
     );
@@ -295,9 +250,7 @@ async function handleApi(request, response, pathname) {
         }
       },
       settings,
-      timeZone,
-      lastDailyDate: existing?.lastDailyDate || "",
-      lastWeeklyDate: existing?.lastWeeklyDate || ""
+      lastReminderAt: existing?.lastReminderAt || Date.now()
     };
     subscriptions = subscriptions.filter(
       item => item.subscription.endpoint !== subscription.endpoint
