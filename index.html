@@ -1,0 +1,2230 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мой гараж</title>
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <link rel="manifest" href="./site.webmanifest">
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      color-scheme: light;
+      --page-bg: #f5f2eb;
+      --surface: #fffefa;
+      --surface-alt: #f3eee6;
+      --text: #292b27;
+      --muted: #77786f;
+      --label: #55574f;
+      --border: #e8e1d5;
+      --border-strong: #e2d6c3;
+      --border-hover: #d7c8b3;
+      --accent: #a45b42;
+      --accent-hover: #864832;
+      --accent-soft: #f3e7dd;
+      --accent-contrast: #fffefa;
+      --secondary-bg: #eee8dd;
+      --secondary-text: #51463e;
+      --secondary-hover: #e2d7c8;
+      --shadow: rgb(65 53 37 / 4%);
+      --shadow-hover: rgb(65 53 37 / 9%);
+      --focus-ring: rgb(164 91 66 / 18%);
+      --backdrop: rgb(41 43 39 / 42%);
+    }
+
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --page-bg: #17191c;
+      --surface: #24272b;
+      --surface-alt: #30343a;
+      --text: #f1f3f5;
+      --muted: #a8afb8;
+      --label: #c2c8ce;
+      --border: #3a3f46;
+      --border-strong: #454b53;
+      --border-hover: #5b636d;
+      --accent: #d17a5b;
+      --accent-hover: #b96143;
+      --accent-soft: #3a2e2a;
+      --accent-contrast: #fff;
+      --secondary-bg: #353a41;
+      --secondary-text: #e2e6ea;
+      --secondary-hover: #454b53;
+      --shadow: rgb(0 0 0 / 15%);
+      --shadow-hover: rgb(0 0 0 / 28%);
+      --focus-ring: rgb(209 122 91 / 24%);
+      --backdrop: rgb(0 0 0 / 68%);
+    }
+
+    body[data-theme="blue"] {
+      color-scheme: light;
+      --page-bg: #eaf1f8;
+      --surface: #fff;
+      --surface-alt: #e7eef6;
+      --text: #1c2a38;
+      --muted: #64778b;
+      --label: #40576d;
+      --border: #d5e0eb;
+      --border-strong: #c7d7e7;
+      --border-hover: #abc2d9;
+      --accent: #28679d;
+      --accent-hover: #1d527f;
+      --accent-soft: #dceaf6;
+      --accent-contrast: #fff;
+      --secondary-bg: #e1eaf3;
+      --secondary-text: #344d65;
+      --secondary-hover: #d1dfed;
+      --shadow: rgb(35 65 93 / 6%);
+      --shadow-hover: rgb(35 65 93 / 12%);
+      --focus-ring: rgb(40 103 157 / 20%);
+      --backdrop: rgb(19 37 56 / 48%);
+    }
+
+    body {
+      margin: 0;
+      padding: 48px 28px 72px;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      transition: background-color 220ms ease, color 220ms ease;
+    }
+
+    main { max-width: 1080px; margin: auto; }
+
+    .page-header {
+      display: flex;
+      position: relative;
+      z-index: 10;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .page-heading { min-width: 0; }
+
+    .page-heading .tag {
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1 { font-size: clamp(30px, 4vw, 42px); margin: 0 0 8px; }
+
+    .page-heading > p { margin: 0; }
+
+    @keyframes rise-in {
+      from { opacity: 0; translate: 0 14px; }
+      to { opacity: 1; translate: 0 0; }
+    }
+
+    main > .page-header, main > .summary-grid,
+    main > .action-grid, main > .car-summary, main > .history-grid {
+      animation: rise-in 520ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+
+    main > .page-header { animation-delay: 40ms; }
+    main > .car-summary { animation-delay: 240ms; }
+    main > .action-grid { animation-delay: 300ms; }
+    main > .history-grid { animation-delay: 360ms; }
+    main > .summary-grid { animation-delay: 300ms; }
+
+    .tag {
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+
+    h2 { margin: 0; font-size: 20px; }
+
+    .muted { color: var(--muted); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-top: 18px;
+      box-shadow: 0 5px 18px var(--shadow);
+      transition: transform 220ms ease, box-shadow 220ms ease,
+        border-color 220ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px var(--shadow-hover);
+      border-color: var(--border-hover);
+    }
+
+    .car {
+      background: linear-gradient(125deg, var(--surface), var(--surface-alt));
+      border-color: var(--border-strong);
+    }
+
+    .car h2 { margin: 10px 0; font-size: 25px; }
+
+    .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .amount {
+      color: var(--accent);
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .action-tile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      min-height: 104px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 5px 18px var(--shadow);
+    }
+
+    .action-tile:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-hover);
+      background: var(--surface);
+      box-shadow: 0 12px 28px var(--shadow-hover);
+    }
+
+    .action-icon {
+      display: grid;
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 21px;
+    }
+
+    .action-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .action-copy strong { font-size: 16px; }
+
+    .action-copy span { color: var(--muted); font-size: 13px; }
+
+    .action-arrow {
+      margin-left: auto;
+      color: var(--accent);
+      transition: transform 180ms ease;
+    }
+
+    .action-tile:hover .action-arrow { transform: translate(2px, -2px); }
+
+    .entry-dialog {
+      width: min(540px, calc(100% - 28px));
+      max-height: min(86vh, 760px);
+      overflow: auto;
+      margin: auto;
+      padding: 24px;
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 24px 80px var(--shadow-hover);
+    }
+
+    .entry-dialog[open] { animation: dialog-in 220ms ease-out both; }
+
+    @keyframes dialog-in {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .entry-dialog::backdrop {
+      background: var(--backdrop);
+      backdrop-filter: blur(3px);
+    }
+
+    .confirm-dialog {
+      width: min(420px, calc(100% - 28px));
+    }
+
+    .confirm-dialog > p {
+      margin: 14px 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .confirm-actions button { min-width: 108px; }
+
+    .confirm-cancel {
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+    }
+
+    .confirm-cancel:hover { background: var(--secondary-hover); }
+
+    .confirm-delete { background: #b54747; }
+
+    .confirm-delete:hover { background: #963838; }
+
+    .dialog-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .dialog-heading h2 { margin: 0; }
+
+    .dialog-close {
+      display: grid;
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--surface-alt);
+      color: var(--secondary-text);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .dialog-close:hover { background: var(--secondary-hover); }
+
+    form {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    input, button {
+      font: inherit;
+      border-radius: 9px;
+      padding: 13px;
+    }
+
+    input {
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      width: 100%;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    label {
+      color: var(--label);
+      font-size: 14px;
+    }
+
+    .car-field { display: grid; gap: 7px; }
+
+    .car-field[hidden] { display: none; }
+
+    .car-color-field {
+      grid-template-columns: minmax(0, 1fr) 54px;
+      align-items: center;
+    }
+
+    .car-color-field input[type="color"] {
+      grid-column: 2;
+      grid-row: 1;
+      height: 42px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .car-crop-editor {
+      grid-column: 1 / -1;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .car-crop-editor:not([hidden]) { display: grid; }
+
+    .car-crop-canvas {
+      display: block;
+      width: 100%;
+      max-height: 340px;
+      aspect-ratio: 3 / 2;
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      background: var(--surface-alt);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .car-crop-canvas:active { cursor: grabbing; }
+
+    .car-crop-zoom {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    .car-crop-zoom input { accent-color: var(--accent); }
+
+    #carForm {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: end;
+    }
+
+    #carForm button { grid-column: 2; }
+
+    #fuelForm {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .fuel-date-field, .fuel-price-field { grid-column: 1 / -1; }
+
+    .fuel-field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .fuel-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .fuel-slider {
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .fuel-slider::-webkit-slider-thumb {
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .fuel-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 5px var(--focus-ring);
+    }
+
+    .fuel-slider::-moz-range-thumb {
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .fuel-slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 5px var(--focus-ring);
+    }
+
+    .fuel-number { min-width: 0; padding: 9px 7px; }
+
+    #fuelForm button {
+      grid-column: 1 / -1;
+      padding: 11px;
+    }
+
+    button {
+      border: 0;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 180ms ease, transform 180ms ease,
+        box-shadow 180ms ease;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px var(--shadow-hover);
+    }
+
+    button:active { transform: translateY(0) scale(.98); }
+
+    button:focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    .car-summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      width: 100%;
+      gap: 7px;
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      background: linear-gradient(125deg, var(--surface), var(--surface-alt));
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 5px 18px var(--shadow);
+      transition: transform 220ms ease, box-shadow 220ms ease,
+        border-color 220ms ease;
+    }
+
+    .car-summary:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-hover);
+      background: linear-gradient(125deg, var(--surface), var(--surface-alt));
+      box-shadow: 0 12px 28px var(--shadow-hover);
+    }
+
+    .car-summary-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 25px;
+    }
+
+    .car-summary-title .action-arrow { font-size: 17px; }
+
+    .car-summary-note { color: var(--muted); font-size: 13px; }
+
+    .car-summary-name { overflow-wrap: anywhere; }
+
+    .car-illustration {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      align-self: center;
+      width: 100%;
+      max-width: 250px;
+      overflow: visible;
+      transition: transform 240ms ease;
+    }
+
+    .car-illustration[hidden],
+    .car-photo[hidden] { display: none; }
+
+    .car-summary:hover .car-illustration { transform: translateX(-3px) scale(1.03); }
+
+    .car-photo {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      align-self: center;
+      width: 100%;
+      max-width: 250px;
+      max-height: 170px;
+      aspect-ratio: 3 / 2;
+      border-radius: 9px;
+      object-fit: cover;
+      transition: transform 240ms ease;
+    }
+
+    .car-summary:hover .car-photo { transform: translateX(-3px) scale(1.03); }
+
+    .car-body { fill: var(--car-color, #6d8790); }
+
+    .car-photo-help {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .theme-menu { position: relative; z-index: 5; }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      white-space: nowrap;
+      box-shadow: 0 5px 18px var(--shadow);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border-hover);
+      background: var(--surface);
+    }
+
+    .theme-toggle-icon { color: var(--accent); font-size: 18px; }
+
+    .push-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      margin-top: 0;
+      margin-bottom: 18px;
+    }
+
+    .push-card h2 { margin-bottom: 6px; }
+
+    .push-card p { margin: 0; line-height: 1.5; }
+
+    .push-card-status {
+      grid-column: 1 / -1;
+      font-size: 14px;
+    }
+
+    .push-card-status[data-state="error"] { color: #b54747; }
+
+    .push-settings {
+      display: grid;
+      grid-column: 1 / -1;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .push-settings[hidden] { display: none; }
+
+    .push-setting {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .push-setting input[type="checkbox"] {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .push-setting label { flex: 1; }
+
+    .push-setting input[type="time"] {
+      width: auto;
+      min-width: 118px;
+      padding: 8px;
+    }
+
+    .push-disable {
+      justify-self: start;
+      padding: 9px 12px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+    }
+
+    .push-disable:hover { background: var(--secondary-hover); }
+
+    .theme-options {
+      display: grid;
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 240px;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 16px 36px var(--shadow-hover);
+    }
+
+    .theme-options[hidden] { display: none; }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      box-shadow: none;
+    }
+
+    .theme-option:hover {
+      background: var(--surface-alt);
+      border-color: var(--border-hover);
+      box-shadow: none;
+    }
+
+    .theme-option[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--focus-ring);
+    }
+
+    .theme-swatches {
+      display: flex;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 26px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .theme-swatches span { flex: 1; }
+
+    .theme-option strong { font-size: 14px; }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .summary-grid .card { margin-top: 0; }
+
+    .history-grid .card { min-width: 0; margin-top: 0; }
+
+    .history-grid h2 { margin-bottom: 12px; }
+
+    .car-photo-remove {
+      grid-column: 1 / -1;
+      padding: 10px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+    }
+
+    .car-photo-remove:hover { background: var(--secondary-hover); }
+
+    .expense {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      padding: 16px 0;
+      animation: rise-in 320ms ease both;
+    }
+
+    .expense > div { min-width: 0; overflow-wrap: anywhere; }
+
+    .expense button {
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      flex: 0 0 auto;
+      padding: 8px 12px;
+    }
+
+    .expense button:hover { background: var(--secondary-hover); }
+
+    .empty { color: var(--muted); padding: 16px 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+
+      .card:hover, button:hover, button:active,
+      .action-tile:hover .action-arrow,
+      .fuel-slider::-webkit-slider-thumb:hover,
+      .fuel-slider::-moz-range-thumb:hover,
+      .car-summary:hover .car-illustration,
+      .car-summary:hover .car-photo {
+        transform: none;
+      }
+
+      .entry-dialog[open] { animation: none; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 28px 14px 42px; }
+      .page-header { align-items: flex-start; gap: 10px; }
+      .page-heading .tag { font-size: 10px; }
+      .theme-toggle { min-height: 42px; padding: 9px 10px; font-size: 13px; }
+      .push-card { grid-template-columns: 1fr; gap: 12px; }
+      .push-card > button { justify-self: start; }
+      .push-setting { flex-wrap: wrap; }
+      .push-setting input[type="time"] { margin-left: 28px; }
+      .amount { font-size: 27px; }
+      .card { padding: 17px; }
+      #carForm { grid-template-columns: 1fr; }
+      #carForm button { grid-column: 1; }
+      .fuel-input-row { grid-template-columns: 1fr; gap: 4px; }
+      .entry-dialog { padding: 18px; }
+      .action-grid { grid-template-columns: 1fr; gap: 10px; }
+      .action-tile { min-height: 82px; }
+      .car-summary { grid-template-columns: minmax(0, 1fr) 120px; padding: 17px; }
+      .car-photo { max-height: 100px; }
+      .summary-grid { grid-template-columns: 1fr; gap: 0; }
+      .history-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media (min-width: 481px) and (max-width: 760px) {
+      body { padding: 34px 20px 52px; }
+      .summary-grid { grid-template-columns: 1fr; gap: 0; }
+      .history-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <div class="page-heading">
+        <div class="tag">ZAIBAT GARAGE</div>
+        <h1>Мой гараж</h1>
+        <p class="muted">История обслуживания твоего автомобиля</p>
+      </div>
+      <div class="theme-menu">
+        <button class="theme-toggle" id="themeToggle" type="button"
+          aria-expanded="false" aria-controls="themeOptions">
+          <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+          <span id="themeLabel">Тема</span>
+          <span aria-hidden="true">⌄</span>
+        </button>
+        <div class="theme-options" id="themeOptions" role="group"
+          aria-label="Выбор темы сайта" hidden>
+        <button class="theme-option" type="button" data-theme-option="warm"
+          aria-pressed="true">
+          <span class="theme-swatches" aria-hidden="true">
+            <span style="background:#f5f2eb"></span>
+            <span style="background:#fffefa"></span>
+            <span style="background:#a45b42"></span>
+          </span>
+          <strong>Светлая</strong>
+        </button>
+        <button class="theme-option" type="button" data-theme-option="dark"
+          aria-pressed="false">
+          <span class="theme-swatches" aria-hidden="true">
+            <span style="background:#17191c"></span>
+            <span style="background:#30343a"></span>
+            <span style="background:#f1f3f5"></span>
+          </span>
+          <strong>Тёмная</strong>
+        </button>
+        <button class="theme-option" type="button" data-theme-option="blue"
+          aria-pressed="false">
+          <span class="theme-swatches" aria-hidden="true">
+            <span style="background:#eaf1f8"></span>
+            <span style="background:#fff"></span>
+            <span style="background:#28679d"></span>
+          </span>
+          <strong>Синяя</strong>
+        </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="card push-card" aria-labelledby="pushTitle">
+      <div>
+        <h2 id="pushTitle">Push-уведомления</h2>
+        <p class="muted">Напоминания о записях, уходе за авто и обновлениях.</p>
+      </div>
+      <button id="pushEnableButton" type="button">Включить</button>
+      <div class="push-card-status muted" id="pushStatus" role="status"
+        aria-live="polite">
+        Проверяем поддержку уведомлений…
+      </div>
+      <div class="push-settings" id="pushSettings" hidden>
+        <div class="push-setting">
+          <input id="dailyReminder" type="checkbox" checked>
+          <label for="dailyReminder">Напоминать внести расходы и заправки</label>
+          <input id="dailyReminderTime" type="time" value="19:00"
+            aria-label="Время ежедневного напоминания">
+        </div>
+        <div class="push-setting">
+          <input id="weeklyTip" type="checkbox" checked>
+          <label for="weeklyTip">Еженедельная подсказка по уходу за автомобилем</label>
+        </div>
+        <div class="push-setting">
+          <input id="updateNotices" type="checkbox" checked>
+          <label for="updateNotices">Сообщать об обновлениях приложения</label>
+        </div>
+        <button class="push-disable" id="pushDisableButton" type="button">
+          Отключить уведомления
+        </button>
+      </div>
+    </section>
+
+    <button class="car-summary" id="openCarDialog" type="button"
+      aria-haspopup="dialog" aria-controls="carDialog">
+      <span class="label">МОЙ АВТОМОБИЛЬ</span>
+      <span class="car-summary-title">
+        <span id="carTitle">Volkswagen</span>
+        <span class="action-arrow" aria-hidden="true">↗</span>
+      </span>
+      <span class="car-summary-note">Нажми, чтобы изменить автомобиль</span>
+      <img class="car-photo" id="carPhoto" alt="" hidden>
+      <svg class="car-illustration" id="carIllustration"
+        viewBox="0 0 240 160" aria-hidden="true">
+        <ellipse cx="120" cy="150" rx="78" ry="5" fill="#cfc3b4"></ellipse>
+        <circle cx="48" cy="122" r="18" fill="#252825"></circle>
+        <circle cx="192" cy="122" r="18" fill="#252825"></circle>
+        <path d="m49 56-20-5q-7-1-9 6l-1 8 27 5zm142 0 20-5q7-1 9 6l1 8-27 5z" fill="#343a3b"></path>
+        <path class="car-body" d="M120 13c-28 0-49 8-64 24L41 58c-6 9-10 21-13 36l-5 22q-2 10 7 17l14 9h1a17 17 0 0 1 34 0h82a17 17 0 0 1 34 0h1l14-9q9-7 7-17l-5-22c-3-15-7-27-13-36l-15-21c-15-16-36-24-64-24z"></path>
+        <path d="m64 55 15-21q13-12 41-12t41 12l15 21q-27 8-56 8t-56-8z" fill="#202b31"></path>
+        <path d="M120 23v39" fill="none" stroke="#dce4e1" stroke-width="2"></path>
+        <path d="M46 69q31-10 58-8m32 0q27-2 58 8" fill="none" stroke="#f4eee3" stroke-width="2"></path>
+        <path d="m38 78 38-7 8 16-43 6zm164 0-38-7-8 16 43 6z" fill="#f2d18e"></path>
+        <path d="M88 82h64v31H88z" fill="#252b2a"></path>
+        <path d="M96 90h48m-48 8h48m-48 8h48" fill="none" stroke="#87908a" stroke-width="2"></path>
+        <path d="M31 116h178v13H31z" fill="#343a3b"></path>
+        <path d="M38 132h164v8H38z" fill="#252825"></path>
+        <rect x="103" y="117" width="34" height="7" fill="#e6e1d8"></rect>
+      </svg>
+    </button>
+
+    <div class="summary-grid">
+      <section class="card">
+        <div class="label">ВСЕГО ПОТРАЧЕНО</div>
+        <div class="amount" id="total">0 ₽</div>
+        <p class="muted" id="count">Расходов пока нет</p>
+      </section>
+      <section class="card fuel-summary">
+        <div class="label">РАСХОД ТОПЛИВА</div>
+        <div class="amount" id="fuelConsumption">—</div>
+        <p class="muted" id="fuelHint">
+          Добавь две заправки с известным пробегом.
+        </p>
+      </section>
+    </div>
+
+    <div class="action-grid" aria-label="Добавить запись">
+      <button class="action-tile" id="openExpenseDialog" type="button">
+        <span class="action-icon" aria-hidden="true">₽</span>
+        <span class="action-copy">
+          <strong>Добавить расход</strong>
+          <span>Обслуживание, ремонт, детали</span>
+        </span>
+        <span class="action-arrow" aria-hidden="true">↗</span>
+      </button>
+      <button class="action-tile" id="openFuelDialog" type="button">
+        <span class="action-icon" aria-hidden="true">⛽</span>
+        <span class="action-copy">
+          <strong>Записать заправку</strong>
+          <span>Дата, пробег, литры и цена</span>
+        </span>
+        <span class="action-arrow" aria-hidden="true">↗</span>
+      </button>
+    </div>
+
+    <div class="history-grid">
+      <section class="card">
+        <h2>История заправок</h2>
+        <div id="fuelHistory"></div>
+      </section>
+      <section class="card">
+        <h2>История расходов</h2>
+        <div id="history"></div>
+      </section>
+    </div>
+  </main>
+
+  <dialog class="entry-dialog" id="carDialog"
+    aria-labelledby="carDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="carDialogTitle">Мой автомобиль</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <form id="carForm">
+      <div class="car-field">
+        <label for="carMakeInput">Марка автомобиля</label>
+        <input id="carMakeInput" list="carMakes" maxlength="60"
+          placeholder="Введите или выберите марку" required>
+        <datalist id="carMakes">
+          <option value="Toyota"></option>
+          <option value="Volkswagen"></option>
+          <option value="Hyundai"></option>
+          <option value="Kia"></option>
+          <option value="Lada"></option>
+          <option value="Renault"></option>
+          <option value="Nissan"></option>
+          <option value="Honda"></option>
+          <option value="BMW"></option>
+          <option value="Mercedes-Benz"></option>
+          <option value="Audi"></option>
+          <option value="Skoda"></option>
+          <option value="Mazda"></option>
+          <option value="Ford"></option>
+          <option value="Chevrolet"></option>
+          <option value="Mitsubishi"></option>
+          <option value="Subaru"></option>
+          <option value="Volvo"></option>
+          <option value="Lexus"></option>
+          <option value="Chery"></option>
+          <option value="Geely"></option>
+          <option value="Haval"></option>
+          <option value="BYD"></option>
+          <option value="Omoda"></option>
+          <option value="Jaecoo"></option>
+          <option value="Москвич"></option>
+          <option value="УАЗ"></option>
+          <option value="ГАЗ"></option>
+          <option value="Porsche"></option>
+          <option value="Peugeot"></option>
+          <option value="Citroen"></option>
+          <option value="Opel"></option>
+          <option value="Suzuki"></option>
+          <option value="Infiniti"></option>
+          <option value="Genesis"></option>
+          <option value="Tesla"></option>
+        </datalist>
+      </div>
+      <div class="car-field">
+        <label for="carModelInput">Модель автомобиля</label>
+        <input id="carModelInput" maxlength="80"
+          placeholder="Например, Passat B6">
+      </div>
+      <div class="car-field car-color-field" id="carColorField">
+        <label for="carColorInput">Цвет автомобиля</label>
+        <input id="carColorInput" type="color" value="#6d8790">
+      </div>
+      <div class="car-field">
+        <label for="carPhotoInput">Фотография автомобиля</label>
+        <input id="carPhotoInput" type="file" accept="image/*">
+      </div>
+      <button class="car-photo-remove" id="editCarPhoto" type="button" hidden>
+        Изменить кадрирование
+      </button>
+      <p class="muted car-photo-help">
+        Фото сохранится в этом браузере. Можно загрузить JPG, PNG или другое изображение.
+      </p>
+      <div class="car-crop-editor" id="carCropEditor" hidden>
+        <label for="carCropZoom">Обрезка фото · перетащи изображение, чтобы выбрать центр</label>
+        <canvas class="car-crop-canvas" id="carCropCanvas"
+          width="600" height="400" aria-label="Область обрезки фотографии"></canvas>
+        <div class="car-crop-zoom">
+          <label for="carCropZoom">Масштаб</label>
+          <input id="carCropZoom" type="range" min="1" max="3"
+            step="0.05" value="1">
+        </div>
+      </div>
+      <button class="car-photo-remove" id="removeCarPhoto" type="button">
+        Убрать фотографию
+      </button>
+      <button type="submit">Сохранить авто</button>
+    </form>
+  </dialog>
+
+  <dialog class="entry-dialog" id="expenseDialog"
+    aria-labelledby="expenseDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="expenseDialogTitle">Добавить расход</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <form id="expenseForm">
+      <label for="name">На что потрачено</label>
+      <input id="name" placeholder="Например, замена масла"
+        maxlength="100" required>
+      <label for="price">Сумма, ₽</label>
+      <input id="price" type="number" min="0.01"
+        max="100000000" step="0.01"
+        placeholder="Сумма в рублях" required>
+      <button type="submit">Сохранить расход</button>
+    </form>
+  </dialog>
+
+  <dialog class="entry-dialog" id="fuelDialog"
+    aria-labelledby="fuelDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="fuelDialogTitle">Учёт заправки</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <p class="muted">Запиши дату, пробег, объём и цену топлива.</p>
+    <form id="fuelForm">
+      <div class="fuel-field fuel-date-field">
+        <label for="fuelDate">Дата заправки</label>
+        <input id="fuelDate" type="date" required>
+      </div>
+
+      <div class="fuel-field">
+        <label for="odometer">Пробег, км</label>
+        <div class="fuel-input-row">
+          <input class="fuel-slider" id="odometerRange" type="range"
+            min="0" max="500000" step="1000" value="270000"
+            aria-label="Пробег на одометре, ползунок">
+          <input class="fuel-number" id="odometer" type="number" min="0"
+            max="10000000" step="1" placeholder="270000" required>
+        </div>
+      </div>
+
+      <div class="fuel-field">
+        <label for="liters">Литры</label>
+        <div class="fuel-input-row">
+          <input class="fuel-slider" id="litersRange" type="range"
+            min="0.1" max="100" step="0.1" value="30"
+            aria-label="Количество литров, ползунок">
+          <input class="fuel-number" id="liters" type="number" min="0.01"
+            max="500" step="0.01" placeholder="30" required>
+        </div>
+      </div>
+
+      <div class="fuel-field fuel-price-field">
+        <label for="fuelPrice">Цена за литр, ₽</label>
+        <div class="fuel-input-row">
+          <input class="fuel-slider" id="fuelPriceRange" type="range"
+            min="20" max="200" step="0.5" value="65.5"
+            aria-label="Цена за литр, ползунок">
+          <input class="fuel-number" id="fuelPrice" type="number" min="0.01"
+            max="100000" step="0.01" placeholder="65.50" required>
+        </div>
+      </div>
+
+      <button type="submit">Сохранить заправку</button>
+    </form>
+  </dialog>
+
+  <dialog class="entry-dialog confirm-dialog" id="deleteConfirmDialog"
+    aria-labelledby="deleteConfirmTitle" aria-describedby="deleteConfirmMessage">
+    <div class="dialog-heading">
+      <h2 id="deleteConfirmTitle">Удалить запись?</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <p id="deleteConfirmMessage"></p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="cancelDelete" type="button">
+        Отмена
+      </button>
+      <button class="confirm-delete" id="confirmDelete" type="button">
+        Удалить
+      </button>
+    </div>
+  </dialog>
+
+
+<script>
+  // 1. Получаем элементы страницы
+  const storageKey = "my-garage-expenses-v1";
+  const fuelStorageKey = "my-garage-fuel-v1";
+  const carMakeStorageKey = "my-garage-car-make-v1";
+  const carModelStorageKey = "my-garage-car-model-v1";
+  const carColorStorageKey = "my-garage-car-color-v1";
+  const carPhotoStorageKey = "my-garage-car-photo-v1";
+  const carPhotoSourceStorageKey = "my-garage-car-photo-source-v1";
+  const carPhotoCropStorageKey = "my-garage-car-photo-crop-v1";
+  const themeStorageKey = "my-garage-theme-v1";
+  const themeOptions = [...document.querySelectorAll("[data-theme-option]")];
+  const availableThemes = ["warm", "dark", "blue"];
+  const themeToggle = document.getElementById("themeToggle");
+  const themeOptionsMenu = document.getElementById("themeOptions");
+  const themeLabel = document.getElementById("themeLabel");
+  const themeNames = {
+    warm: "Светлая",
+    dark: "Тёмная",
+    blue: "Синяя"
+  };
+  const pushSettingsStorageKey = "my-garage-push-settings-v1";
+  const pushEnableButton = document.getElementById("pushEnableButton");
+  const pushDisableButton = document.getElementById("pushDisableButton");
+  const pushStatus = document.getElementById("pushStatus");
+  const pushSettingsPanel = document.getElementById("pushSettings");
+  const dailyReminderInput = document.getElementById("dailyReminder");
+  const dailyReminderTimeInput = document.getElementById("dailyReminderTime");
+  const weeklyTipInput = document.getElementById("weeklyTip");
+  const updateNoticesInput = document.getElementById("updateNotices");
+  const defaultPushSettings = {
+    daily: true,
+    dailyTime: "19:00",
+    weekly: true,
+    updates: true
+  };
+  let pushSettings = { ...defaultPushSettings };
+  let pushRegistration = null;
+  let pushSubscription = null;
+
+  const form = document.getElementById("expenseForm");
+  const nameInput = document.getElementById("name");
+  const priceInput = document.getElementById("price");
+  const carDialog = document.getElementById("carDialog");
+  const expenseDialog = document.getElementById("expenseDialog");
+  const fuelDialog = document.getElementById("fuelDialog");
+  const deleteConfirmDialog = document.getElementById("deleteConfirmDialog");
+  const deleteConfirmMessage = document.getElementById("deleteConfirmMessage");
+  let pendingDeleteAction = null;
+  const carForm = document.getElementById("carForm");
+  const carMakeInput = document.getElementById("carMakeInput");
+  const carModelInput = document.getElementById("carModelInput");
+  const carColorInput = document.getElementById("carColorInput");
+  const carPhotoInput = document.getElementById("carPhotoInput");
+  const carPhotoElement = document.getElementById("carPhoto");
+  const carIllustration = document.getElementById("carIllustration");
+  const carColorField = document.getElementById("carColorField");
+  const carCropEditor = document.getElementById("carCropEditor");
+  const carCropCanvas = document.getElementById("carCropCanvas");
+  const carCropContext = carCropCanvas.getContext("2d");
+  const carCropZoomInput = document.getElementById("carCropZoom");
+  const removeCarPhotoButton = document.getElementById("removeCarPhoto");
+  const editCarPhotoButton = document.getElementById("editCarPhoto");
+  const saveCarButton = carForm.querySelector('button[type="submit"]');
+
+  const fuelForm = document.getElementById("fuelForm");
+  const fuelDate = document.getElementById("fuelDate");
+
+  function setPushStatus(message, state = "") {
+    pushStatus.textContent = message;
+    pushStatus.dataset.state = state;
+  }
+
+  function readPushSettings() {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(pushSettingsStorageKey) || "null"
+      );
+      if (saved && typeof saved === "object") {
+        pushSettings = {
+          daily: saved.daily !== false,
+          dailyTime: /^\d{2}:\d{2}$/.test(saved.dailyTime)
+            ? saved.dailyTime
+            : defaultPushSettings.dailyTime,
+          weekly: saved.weekly !== false,
+          updates: saved.updates !== false
+        };
+      }
+    } catch (error) {
+      console.warn("Не удалось загрузить настройки push-уведомлений", error);
+    }
+    renderPushSettings();
+  }
+
+  function renderPushSettings() {
+    dailyReminderInput.checked = pushSettings.daily;
+    dailyReminderTimeInput.value = pushSettings.dailyTime;
+    dailyReminderTimeInput.disabled = !pushSettings.daily;
+    weeklyTipInput.checked = pushSettings.weekly;
+    updateNoticesInput.checked = pushSettings.updates;
+  }
+
+  function isIosDevice() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function isInstalledApp() {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+      navigator.standalone === true;
+  }
+
+  function base64UrlToBytes(value) {
+    const padding = "=".repeat((4 - value.length % 4) % 4);
+    const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = atob(base64);
+    return Uint8Array.from(raw, character => character.charCodeAt(0));
+  }
+
+  function getCurrentPushSettings() {
+    return {
+      daily: dailyReminderInput.checked,
+      dailyTime: dailyReminderTimeInput.value || "19:00",
+      weekly: weeklyTipInput.checked,
+      updates: updateNoticesInput.checked
+    };
+  }
+
+  async function savePushSubscription(subscription, settings) {
+    const response = await fetch("./api/push/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription: subscription.toJSON(),
+        settings,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      })
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Не удалось сохранить подписку.");
+    }
+    localStorage.setItem(pushSettingsStorageKey, JSON.stringify(settings));
+    pushSettings = settings;
+    renderPushSettings();
+  }
+
+  async function initializePushNotifications() {
+    readPushSettings();
+
+    if (!window.isSecureContext) {
+      pushEnableButton.disabled = true;
+      setPushStatus(
+        "Push доступны только на HTTPS-сайте или localhost.",
+        "error"
+      );
+      return;
+    }
+    if (!("serviceWorker" in navigator) ||
+        !("PushManager" in window) ||
+        !("Notification" in window)) {
+      pushEnableButton.disabled = true;
+      setPushStatus("Этот браузер не поддерживает push-уведомления.", "error");
+      return;
+    }
+    if (isIosDevice() && !isInstalledApp()) {
+      setPushStatus(
+        "На iPhone сначала добавь сайт на экран «Домой», затем открой его оттуда."
+      );
+      return;
+    }
+    setPushStatus("Push-уведомления выключены.");
+
+    try {
+      pushRegistration = await navigator.serviceWorker.register("./sw.js");
+      await navigator.serviceWorker.ready;
+      pushSubscription = await pushRegistration.pushManager.getSubscription();
+      if (pushSubscription && Notification.permission === "granted") {
+        await savePushSubscription(pushSubscription, pushSettings);
+        pushSettingsPanel.hidden = false;
+        pushEnableButton.hidden = true;
+        setPushStatus("Уведомления включены и синхронизированы с сервером.");
+      }
+    } catch (error) {
+      console.warn("Не удалось подготовить push-уведомления", error);
+      setPushStatus("Не удалось подключить службу уведомлений.", "error");
+    }
+  }
+
+  pushEnableButton.addEventListener("click", async () => {
+    pushEnableButton.disabled = true;
+    try {
+      if (isIosDevice() && !isInstalledApp()) {
+        setPushStatus(
+          "Открой сайт в Safari, нажми «Поделиться» → «На экран Домой», затем запусти его с экрана."
+        );
+        return;
+      }
+      if (Notification.permission === "denied") {
+        throw new Error(
+          "Разреши уведомления для сайта в настройках браузера."
+        );
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        throw new Error("Разрешение на push-уведомления не выдано.");
+      }
+
+      pushRegistration = pushRegistration ||
+        await navigator.serviceWorker.register("./sw.js");
+      await navigator.serviceWorker.ready;
+      const keyResponse = await fetch("./api/push/public-key");
+      if (!keyResponse.ok) {
+        throw new Error(
+          "Сервер push-уведомлений не настроен или недоступен."
+        );
+      }
+      const { publicKey } = await keyResponse.json();
+      if (!publicKey) throw new Error("На сервере не настроен VAPID-ключ.");
+
+      pushSubscription = await pushRegistration.pushManager.getSubscription();
+      if (!pushSubscription) {
+        pushSubscription = await pushRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: base64UrlToBytes(publicKey)
+        });
+      }
+      await savePushSubscription(pushSubscription, getCurrentPushSettings());
+      pushSettingsPanel.hidden = false;
+      pushEnableButton.hidden = true;
+      setPushStatus("Готово! Настройки напоминаний сохранены.");
+    } catch (error) {
+      console.warn("Не удалось включить push-уведомления", error);
+      setPushStatus(error.message, "error");
+    } finally {
+      pushEnableButton.disabled = false;
+    }
+  });
+
+  async function updatePushPreferences() {
+    const nextSettings = getCurrentPushSettings();
+    dailyReminderTimeInput.disabled = !nextSettings.daily;
+    if (!pushSubscription) {
+      pushSettings = nextSettings;
+      try {
+        localStorage.setItem(
+          pushSettingsStorageKey,
+          JSON.stringify(pushSettings)
+        );
+      } catch (error) {
+        console.warn("Не удалось сохранить настройки уведомлений", error);
+      }
+      return;
+    }
+
+    try {
+      await savePushSubscription(pushSubscription, nextSettings);
+      setPushStatus("Настройки напоминаний обновлены.");
+    } catch (error) {
+      console.warn("Не удалось обновить настройки push-уведомлений", error);
+      renderPushSettings();
+      setPushStatus(error.message, "error");
+    }
+  }
+
+  [
+    dailyReminderInput,
+    dailyReminderTimeInput,
+    weeklyTipInput,
+    updateNoticesInput
+  ].forEach(input => {
+    input.addEventListener("change", updatePushPreferences);
+  });
+
+  pushDisableButton.addEventListener("click", async () => {
+    if (!pushSubscription) return;
+    pushDisableButton.disabled = true;
+    try {
+      const response = await fetch("./api/push/subscribe", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: pushSubscription.endpoint })
+      });
+      if (!response.ok) {
+        throw new Error("Не удалось отключить уведомления на сервере.");
+      }
+      await pushSubscription.unsubscribe();
+      pushSubscription = null;
+      pushSettingsPanel.hidden = true;
+      pushEnableButton.hidden = false;
+      localStorage.removeItem(pushSettingsStorageKey);
+      pushSettings = { ...defaultPushSettings };
+      renderPushSettings();
+      setPushStatus("Push-уведомления отключены.");
+    } catch (error) {
+      console.warn("Не удалось отключить push-уведомления", error);
+      setPushStatus(error.message, "error");
+    } finally {
+      pushDisableButton.disabled = false;
+    }
+  });
+
+  initializePushNotifications();
+
+  function applyTheme(theme) {
+    if (!availableThemes.includes(theme)) return;
+    document.body.dataset.theme = theme;
+    themeLabel.textContent = themeNames[theme];
+    themeOptions.forEach(button => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.themeOption === theme)
+      );
+    });
+  }
+
+  let selectedTheme = "warm";
+  try {
+    const savedTheme = localStorage.getItem(themeStorageKey);
+    if (availableThemes.includes(savedTheme)) selectedTheme = savedTheme;
+  } catch (error) {
+    console.warn("Не удалось загрузить тему оформления", error);
+  }
+  applyTheme(selectedTheme);
+
+  themeToggle.addEventListener("click", () => {
+    const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
+    themeToggle.setAttribute("aria-expanded", String(!isOpen));
+    themeOptionsMenu.hidden = isOpen;
+  });
+
+  themeOptions.forEach(button => {
+    button.addEventListener("click", () => {
+      const nextTheme = button.dataset.themeOption;
+      const previousTheme = selectedTheme;
+      applyTheme(nextTheme);
+      try {
+        localStorage.setItem(themeStorageKey, nextTheme);
+        selectedTheme = nextTheme;
+      } catch (error) {
+        applyTheme(previousTheme);
+        alert("Не удалось сохранить тему оформления.");
+      }
+      themeOptionsMenu.hidden = true;
+      themeToggle.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  document.addEventListener("click", event => {
+    if (!event.target.closest(".theme-menu")) {
+      themeOptionsMenu.hidden = true;
+      themeToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !themeOptionsMenu.hidden) {
+      themeOptionsMenu.hidden = true;
+      themeToggle.setAttribute("aria-expanded", "false");
+      themeToggle.focus();
+    }
+  });
+
+  document.getElementById("openExpenseDialog").addEventListener(
+    "click", () => expenseDialog.showModal()
+  );
+  document.getElementById("openCarDialog").addEventListener(
+    "click", () => carDialog.showModal()
+  );
+  document.getElementById("openFuelDialog").addEventListener(
+    "click", () => fuelDialog.showModal()
+  );
+  document.getElementById("cancelDelete").addEventListener(
+    "click", () => deleteConfirmDialog.close()
+  );
+  document.getElementById("confirmDelete").addEventListener("click", () => {
+    const action = pendingDeleteAction;
+    pendingDeleteAction = null;
+    deleteConfirmDialog.close();
+    if (action) action();
+  });
+  document.querySelectorAll("[data-close-dialog]").forEach(button => {
+    button.addEventListener("click", () => button.closest("dialog").close());
+  });
+  [carDialog, expenseDialog, fuelDialog, deleteConfirmDialog].forEach(dialog => {
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+  deleteConfirmDialog.addEventListener("close", () => {
+    pendingDeleteAction = null;
+  });
+
+  function confirmDelete(message, action) {
+    deleteConfirmMessage.textContent = message;
+    pendingDeleteAction = action;
+    deleteConfirmDialog.showModal();
+  }
+
+  carDialog.addEventListener("close", renderCar);
+  carColorInput.addEventListener("input", () => {
+    carIllustration.style.setProperty("--car-color", carColorInput.value);
+  });
+  carCropZoomInput.addEventListener("input", () => {
+    cropZoom = Number(carCropZoomInput.value);
+    renderCarCrop();
+  });
+  carCropCanvas.addEventListener("pointerdown", event => {
+    if (!pendingCarImage) return;
+    cropDrag = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY
+    };
+    carCropCanvas.setPointerCapture(event.pointerId);
+  });
+  carCropCanvas.addEventListener("pointermove", event => {
+    if (!cropDrag || cropDrag.pointerId !== event.pointerId) return;
+    const bounds = carCropCanvas.getBoundingClientRect();
+    const crop = getCarCrop();
+    cropCenterX -= (event.clientX - cropDrag.x) * crop.width / bounds.width;
+    cropCenterY -= (event.clientY - cropDrag.y) * crop.height / bounds.height;
+    cropDrag.x = event.clientX;
+    cropDrag.y = event.clientY;
+    renderCarCrop();
+  });
+  carCropCanvas.addEventListener("pointerup", () => {
+    cropDrag = null;
+  });
+  carCropCanvas.addEventListener("pointercancel", () => {
+    cropDrag = null;
+  });
+  editCarPhotoButton.addEventListener("click", async () => {
+    if (!carPhoto) return;
+
+    const selectionId = ++photoSelectionId;
+    editCarPhotoButton.disabled = true;
+    saveCarButton.disabled = true;
+    try {
+      const source = carPhotoSource || carPhoto;
+      const image = await loadCarImageSource(source);
+      if (selectionId !== photoSelectionId) return;
+      pendingCarImage = image;
+      pendingCarImageSource = source;
+      pendingCarPhoto = undefined;
+      cropZoom = carPhotoCrop ? carPhotoCrop.zoom : 1;
+      cropCenterX = image.naturalWidth *
+        (carPhotoCrop ? carPhotoCrop.centerX : 0.5);
+      cropCenterY = image.naturalHeight *
+        (carPhotoCrop ? carPhotoCrop.centerY : 0.5);
+      carCropZoomInput.value = String(cropZoom);
+      carCropEditor.hidden = false;
+      renderCarCrop();
+    } catch (error) {
+      if (selectionId !== photoSelectionId) return;
+      console.warn("Не удалось открыть кадрирование фотографии", error);
+      alert("Не удалось открыть фотографию для кадрирования.");
+    } finally {
+      if (selectionId === photoSelectionId) {
+        editCarPhotoButton.disabled = false;
+        saveCarButton.disabled = false;
+      }
+    }
+  });
+  carPhotoInput.addEventListener("change", async () => {
+    const file = carPhotoInput.files[0];
+    if (!file) return;
+
+    const selectionId = ++photoSelectionId;
+    carPhotoInput.disabled = true;
+    saveCarButton.disabled = true;
+    try {
+      const image = await loadCarImage(file);
+      if (selectionId !== photoSelectionId) return;
+      pendingCarImageSource = createCarPhotoSource(image);
+      pendingCarImage = await loadCarImageSource(pendingCarImageSource);
+      if (selectionId !== photoSelectionId) return;
+      pendingCarPhoto = undefined;
+      cropZoom = 1;
+      cropCenterX = image.naturalWidth / 2;
+      cropCenterY = image.naturalHeight / 2;
+      carCropZoomInput.value = String(cropZoom);
+      carCropEditor.hidden = false;
+      renderCarCrop();
+    } catch (error) {
+      if (selectionId !== photoSelectionId) return;
+      console.warn("Не удалось обработать фотографию автомобиля", error);
+      alert(error.message || "Не удалось загрузить фотографию автомобиля.");
+      carPhotoInput.value = "";
+    } finally {
+      if (selectionId === photoSelectionId) {
+        carPhotoInput.disabled = false;
+        saveCarButton.disabled = false;
+      }
+    }
+  });
+  removeCarPhotoButton.addEventListener("click", () => {
+    photoSelectionId++;
+    pendingCarImage = null;
+    pendingCarImageSource = "";
+    pendingCarPhoto = null;
+    carPhotoInput.value = "";
+    carCropEditor.hidden = true;
+    showCarPhoto("");
+  });
+
+  // 2. Загружаем сохранённые данные
+  let expenses = [];
+  let fuelEntries = [];
+  let carMake = "Volkswagen";
+  let carModel = "";
+  let carColor = "#6d8790";
+  let carPhoto = "";
+  let carPhotoSource = "";
+  let carPhotoCrop = null;
+  let pendingCarPhoto;
+  let pendingCarImage = null;
+  let pendingCarImageSource = "";
+  let cropZoom = 1;
+  let cropCenterX = 0;
+  let cropCenterY = 0;
+  let cropDrag = null;
+  let photoSelectionId = 0;
+
+  try {
+    const savedCarMake = localStorage.getItem(carMakeStorageKey);
+    if (savedCarMake && savedCarMake.trim()) {
+      carMake = savedCarMake.trim().slice(0, 60);
+    }
+    const savedCarModel = localStorage.getItem(carModelStorageKey);
+    if (savedCarModel) carModel = savedCarModel.trim().slice(0, 80);
+    const savedCarColor = localStorage.getItem(carColorStorageKey);
+    if (savedCarColor && /^#[0-9a-f]{6}$/i.test(savedCarColor)) {
+      carColor = savedCarColor;
+    }
+    const savedCarPhoto = localStorage.getItem(carPhotoStorageKey);
+    if (savedCarPhoto && /^data:image\/jpeg;base64,/i.test(savedCarPhoto)) {
+      carPhoto = savedCarPhoto;
+    }
+    const savedCarPhotoSource = localStorage.getItem(
+      carPhotoSourceStorageKey
+    );
+    if (
+      savedCarPhotoSource &&
+      /^data:image\/jpeg;base64,/i.test(savedCarPhotoSource)
+    ) {
+      carPhotoSource = savedCarPhotoSource;
+    }
+    const savedCarPhotoCrop = JSON.parse(
+      localStorage.getItem(carPhotoCropStorageKey) || "null"
+    );
+    if (
+      savedCarPhotoCrop &&
+      Number.isFinite(savedCarPhotoCrop.zoom) &&
+      savedCarPhotoCrop.zoom >= 1 &&
+      savedCarPhotoCrop.zoom <= 3 &&
+      Number.isFinite(savedCarPhotoCrop.centerX) &&
+      savedCarPhotoCrop.centerX >= 0 &&
+      savedCarPhotoCrop.centerX <= 1 &&
+      Number.isFinite(savedCarPhotoCrop.centerY) &&
+      savedCarPhotoCrop.centerY >= 0 &&
+      savedCarPhotoCrop.centerY <= 1
+    ) {
+      carPhotoCrop = savedCarPhotoCrop;
+    }
+  } catch (error) {
+    console.warn("Не удалось загрузить данные автомобиля", error);
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    if (Array.isArray(saved)) expenses = saved;
+  } catch (error) {
+    console.warn("Не удалось загрузить расходы", error);
+  }
+
+  try {
+    const savedFuel = JSON.parse(
+      localStorage.getItem(fuelStorageKey) || "[]"
+    );
+    if (Array.isArray(savedFuel)) fuelEntries = savedFuel;
+  } catch (error) {
+    console.warn("Не удалось загрузить заправки", error);
+  }
+
+  // 3. Форматируем деньги
+  function money(value) {
+    return value.toLocaleString("ru-RU", {
+      maximumFractionDigits: 2
+    }) + " ₽";
+  }
+
+  // 4. Сохраняем расходы и заправки
+  function save() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(expenses));
+      return true;
+    } catch (error) {
+      alert("Не удалось сохранить расходы.");
+      return false;
+    }
+  }
+
+  function saveFuel() {
+    try {
+      localStorage.setItem(
+        fuelStorageKey,
+        JSON.stringify(fuelEntries)
+      );
+      return true;
+    } catch (error) {
+      alert("Не удалось сохранить заправки.");
+      return false;
+    }
+  }
+
+  function renderCar() {
+    photoSelectionId++;
+    document.getElementById("carTitle").textContent =
+      [carMake, carModel].filter(Boolean).join(" ");
+    carMakeInput.value = carMake;
+    carModelInput.value = carModel;
+    carColorInput.value = carColor;
+    carPhotoInput.value = "";
+    carPhotoInput.disabled = false;
+    saveCarButton.disabled = false;
+    editCarPhotoButton.disabled = false;
+    pendingCarImage = null;
+    pendingCarImageSource = "";
+    pendingCarPhoto = undefined;
+    cropZoom = 1;
+    cropDrag = null;
+    carCropEditor.hidden = true;
+    carCropZoomInput.value = "1";
+    showCarPhoto(carPhoto);
+    editCarPhotoButton.hidden = !carPhoto;
+    carIllustration.style.setProperty("--car-color", carColor);
+  }
+
+  function showCarPhoto(photo) {
+    carPhotoElement.hidden = !photo;
+    carIllustration.toggleAttribute("hidden", Boolean(photo));
+    carColorField.hidden = Boolean(photo);
+    if (photo) carPhotoElement.src = photo;
+    else carPhotoElement.removeAttribute("src");
+  }
+
+  async function loadCarImage(file) {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Выбери файл изображения.");
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      throw new Error("Размер фотографии не должен превышать 20 МБ.");
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(
+          new Error("Не удалось открыть выбранное изображение.")
+        );
+        image.src = imageUrl;
+      });
+      return image;
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+  }
+
+  function loadCarImageSource(source) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(
+        new Error("Не удалось открыть фотографию автомобиля.")
+      );
+      image.src = source;
+    });
+  }
+
+  function createCarPhotoSource(image) {
+    const maxDimension = 1600;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(image.naturalWidth, image.naturalHeight)
+    );
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Не удалось обработать фотографию.");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.86);
+  }
+
+  function getCarCrop() {
+    const imageWidth = pendingCarImage.naturalWidth;
+    const imageHeight = pendingCarImage.naturalHeight;
+    const baseWidth = Math.min(imageWidth, imageHeight * 1.5);
+    const width = baseWidth / cropZoom;
+    const height = width / 1.5;
+    cropCenterX = Math.min(
+      imageWidth - width / 2,
+      Math.max(width / 2, cropCenterX)
+    );
+    cropCenterY = Math.min(
+      imageHeight - height / 2,
+      Math.max(height / 2, cropCenterY)
+    );
+    return {
+      x: cropCenterX - width / 2,
+      y: cropCenterY - height / 2,
+      width,
+      height
+    };
+  }
+
+  function renderCarCrop() {
+    if (!pendingCarImage) return;
+    const crop = getCarCrop();
+    carCropContext.clearRect(0, 0, carCropCanvas.width, carCropCanvas.height);
+    carCropContext.drawImage(
+      pendingCarImage,
+      crop.x, crop.y, crop.width, crop.height,
+      0, 0, carCropCanvas.width, carCropCanvas.height
+    );
+    showCarPhoto(carCropCanvas.toDataURL("image/jpeg", 0.82));
+    editCarPhotoButton.hidden = true;
+  }
+
+  function createCroppedCarPhoto() {
+    const crop = getCarCrop();
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 800;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Не удалось обработать фотографию.");
+    context.drawImage(
+      pendingCarImage,
+      crop.x, crop.y, crop.width, crop.height,
+      0, 0, canvas.width, canvas.height
+    );
+    return canvas.toDataURL("image/jpeg", 0.82);
+  }
+
+  carForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const nextMake = carMakeInput.value.trim();
+    const nextModel = carModelInput.value.trim();
+    if (!nextMake) {
+      alert("Введи или выбери марку автомобиля.");
+      return;
+    }
+
+    const previousMake = carMake;
+    const previousModel = carModel;
+    const previousColor = carColor;
+    const previousPhoto = carPhoto;
+    const previousPhotoSource = carPhotoSource;
+    const previousPhotoCrop = carPhotoCrop;
+    let nextPhoto;
+    let nextPhotoSource;
+    let nextPhotoCrop;
+
+    try {
+      nextPhoto = pendingCarImage
+        ? createCroppedCarPhoto()
+        : pendingCarPhoto === undefined
+          ? carPhoto
+          : pendingCarPhoto;
+      nextPhotoSource = pendingCarImage
+        ? pendingCarImageSource
+        : pendingCarPhoto === null
+          ? ""
+          : carPhotoSource;
+      nextPhotoCrop = pendingCarImage
+        ? {
+            zoom: cropZoom,
+            centerX: cropCenterX / pendingCarImage.naturalWidth,
+            centerY: cropCenterY / pendingCarImage.naturalHeight
+          }
+        : pendingCarPhoto === null
+          ? null
+          : carPhotoCrop;
+      localStorage.setItem(carMakeStorageKey, nextMake.slice(0, 60));
+      localStorage.setItem(carModelStorageKey, nextModel.slice(0, 80));
+      localStorage.setItem(carColorStorageKey, carColorInput.value);
+      if (nextPhoto) {
+        localStorage.setItem(carPhotoStorageKey, nextPhoto);
+        localStorage.setItem(carPhotoSourceStorageKey, nextPhotoSource);
+        localStorage.setItem(
+          carPhotoCropStorageKey,
+          JSON.stringify(nextPhotoCrop)
+        );
+      } else {
+        localStorage.removeItem(carPhotoStorageKey);
+        localStorage.removeItem(carPhotoSourceStorageKey);
+        localStorage.removeItem(carPhotoCropStorageKey);
+      }
+      carMake = nextMake.slice(0, 60);
+      carModel = nextModel.slice(0, 80);
+      carColor = carColorInput.value;
+      carPhoto = nextPhoto;
+      carPhotoSource = nextPhotoSource;
+      carPhotoCrop = nextPhotoCrop;
+      renderCar();
+      carDialog.close();
+    } catch (error) {
+      carMake = previousMake;
+      carModel = previousModel;
+      carColor = previousColor;
+      carPhoto = previousPhoto;
+      carPhotoSource = previousPhotoSource;
+      carPhotoCrop = previousPhotoCrop;
+      alert("Не удалось сохранить данные автомобиля.");
+      renderCar();
+    }
+  });
+
+  renderCar();
+
+  // 5. Показываем историю расходов и общую сумму
+  function render() {
+    const expenseTotal = expenses.reduce(
+      (sum, item) => sum + item.price, 0
+    );
+
+    const fuelTotal = fuelEntries.reduce(
+      (sum, item) => sum + item.liters * item.pricePerLiter, 0
+    );
+
+    document.getElementById("total").textContent =
+      money(expenseTotal + fuelTotal);
+
+    document.getElementById("count").textContent =
+      "Расходов на обслуживание: " + expenses.length +
+      " · Заправок: " + fuelEntries.length;
+
+    const history = document.getElementById("history");
+    history.replaceChildren();
+
+    if (expenses.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Пока пусто. Добавь первый расход!";
+      history.append(empty);
+    }
+
+    [...expenses].reverse().forEach(item => {
+      const row = document.createElement("div");
+      row.className = "expense";
+
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.name;
+
+      const price = document.createElement("div");
+      price.className = "muted";
+      price.textContent = money(item.price);
+
+      info.append(title, price);
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "Удалить";
+
+      remove.addEventListener("click", () => {
+        confirmDelete(`Расход «${item.name}» будет удалён из истории.`, () => {
+          const previous = expenses;
+          expenses = expenses.filter(exp => exp.id !== item.id);
+
+          if (save()) {
+            render();
+          } else {
+            expenses = previous;
+          }
+        });
+      });
+
+      row.append(info, remove);
+      history.append(row);
+    });
+
+    renderFuel();
+  }
+
+  // 6. Показываем историю заправок и расход топлива
+  function renderFuel() {
+    const history = document.getElementById("fuelHistory");
+    const consumption = document.getElementById("fuelConsumption");
+    const hint = document.getElementById("fuelHint");
+
+    history.replaceChildren();
+
+    const sorted = [...fuelEntries].sort(
+      (a, b) => a.odometer - b.odometer
+    );
+
+    const latest = sorted[sorted.length - 1];
+    const previous = sorted[sorted.length - 2];
+
+    if (latest && previous) {
+      const distance = latest.odometer - previous.odometer;
+
+      if (distance > 0) {
+        consumption.textContent =
+          (latest.liters / distance * 100).toFixed(2) + " л/100 км";
+        hint.textContent = "По последнему интервалу: " + distance + " км.";
+      } else {
+        consumption.textContent = "—";
+        hint.textContent = "Проверь пробег заправок.";
+      }
+    } else {
+      consumption.textContent = "—";
+      hint.textContent =
+        "Для расчёта нужны две заправки с разным пробегом.";
+    }
+
+    if (fuelEntries.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Заправок пока нет.";
+      history.append(empty);
+    }
+
+    [...fuelEntries].sort(
+      (a, b) => b.odometer - a.odometer
+    ).forEach(item => {
+      const row = document.createElement("div");
+      row.className = "expense";
+
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.date + " · " + item.odometer + " км";
+
+      const details = document.createElement("div");
+      details.className = "muted";
+      details.textContent =
+        item.liters + " л × " + money(item.pricePerLiter) +
+        " = " + money(item.liters * item.pricePerLiter);
+
+      info.append(title, details);
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "Удалить";
+
+      remove.addEventListener("click", () => {
+        confirmDelete(
+          `Заправка от ${item.date} (${item.odometer} км) будет удалена из истории.`,
+          () => {
+            const previousEntries = fuelEntries;
+            fuelEntries = fuelEntries.filter(
+              entry => entry.id !== item.id
+            );
+
+            if (saveFuel()) {
+              render();
+            } else {
+              fuelEntries = previousEntries;
+            }
+          }
+        );
+      });
+
+      row.append(info, remove);
+      history.append(row);
+    });
+  }
+
+  // 7. Добавляем обычный расход
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+    const price = Number(priceInput.value);
+
+    if (!name || !Number.isFinite(price) ||
+        price <= 0 || price > 100000000) {
+      alert("Введи название и корректную сумму больше нуля.");
+      return;
+    }
+
+    const previous = expenses;
+    expenses = [...expenses, {
+      id: crypto.randomUUID(),
+      name,
+      price
+    }];
+
+    if (save()) {
+      form.reset();
+      render();
+      expenseDialog.close();
+    } else {
+      expenses = previous;
+    }
+  });
+
+  // 8. Подставляем сегодняшнюю дату
+  function setToday() {
+    const now = new Date();
+    fuelDate.value = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0")
+    ].join("-");
+  }
+
+  function connectFuelSlider(sliderId, inputId) {
+    const slider = document.getElementById(sliderId);
+    const input = document.getElementById(inputId);
+
+    slider.addEventListener("input", () => {
+      input.value = slider.value;
+    });
+
+    input.addEventListener("input", () => {
+      if (input.value === "") return;
+      const value = Number(input.value);
+      slider.value = Math.min(
+        Number(slider.max),
+        Math.max(Number(slider.min), value)
+      );
+    });
+  }
+
+  connectFuelSlider("odometerRange", "odometer");
+  connectFuelSlider("litersRange", "liters");
+  connectFuelSlider("fuelPriceRange", "fuelPrice");
+
+  setToday();
+
+  // 9. Добавляем заправку
+  fuelForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const date = fuelDate.value;
+    const odometer = Number(
+      document.getElementById("odometer").value
+    );
+    const liters = Number(
+      document.getElementById("liters").value
+    );
+    const pricePerLiter = Number(
+      document.getElementById("fuelPrice").value
+    );
+
+    if (
+      !date ||
+      !Number.isInteger(odometer) ||
+      odometer < 0 ||
+      odometer > 10000000 ||
+      !Number.isFinite(liters) ||
+      liters <= 0 ||
+      liters > 500 ||
+      !Number.isFinite(pricePerLiter) ||
+      pricePerLiter <= 0 ||
+      pricePerLiter > 100000
+    ) {
+      alert("Проверь дату, пробег, литры и цену.");
+      return;
+    }
+
+    if (fuelEntries.some(item => item.odometer === odometer)) {
+      alert("Заправка с таким пробегом уже существует.");
+      return;
+    }
+
+    const previousEntries = fuelEntries;
+
+    fuelEntries = [...fuelEntries, {
+      id: crypto.randomUUID(),
+      date,
+      odometer,
+      liters,
+      pricePerLiter
+    }];
+
+    if (saveFuel()) {
+      fuelForm.reset();
+      setToday();
+      render();
+      fuelDialog.close();
+    } else {
+      fuelEntries = previousEntries;
+    }
+  });
+
+  // 10. Первый показ страницы
+  render();
+</script>
+
+</body>
+</html>
