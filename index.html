@@ -97,6 +97,13 @@
 
     main { max-width: 1080px; margin: auto; }
 
+    .app-version {
+      max-width: 1080px;
+      margin: 24px auto 0;
+      text-align: center;
+      font-size: 12px;
+    }
+
     .page-header {
       display: flex;
       position: relative;
@@ -941,6 +948,8 @@
     </div>
   </main>
 
+  <footer class="app-version muted">test 0.0.002</footer>
+
   <dialog class="entry-dialog" id="carDialog"
     aria-labelledby="carDialogTitle">
     <div class="dialog-heading">
@@ -1254,7 +1263,7 @@
     timeoutDuration = 90000,
     progressMessage = ""
   ) {
-    const maxAttempts = 2;
+    const maxAttempts = 3;
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const controller = new AbortController();
       let timer;
@@ -1388,7 +1397,7 @@
       }
       if (Notification.permission === "denied") {
         throw new Error(
-          "Разреши уведомления для сайта в настройках браузера."
+          "iPhone уже запретил уведомления и не покажет запрос повторно. Открой Настройки iPhone → Уведомления → Мой гараж и разреши уведомления."
         );
       }
 
@@ -1419,6 +1428,11 @@
             applicationServerKey: base64UrlToBytes(pushApplicationServerKey)
           }),
           "iPhone не завершил создание подписки за 45 секунд. Проверь разрешение уведомлений в настройках iPhone и попробуй ещё раз."
+        );
+      }
+      if (Notification.permission !== "granted") {
+        throw new Error(
+          "Подписка создана, но разрешение на уведомления отключено. Разреши уведомления в настройках iPhone."
         );
       }
       await savePushSubscription(pushSubscription, getCurrentPushSettings());
