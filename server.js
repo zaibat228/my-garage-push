@@ -11,7 +11,7 @@ const dataDirectory = path.resolve(
   process.env.DATA_DIR || path.join(root, "data")
 );
 const subscriptionsFile = path.join(dataDirectory, "subscriptions.json");
-const host = process.env.HOST || "127.0.0.1";
+const host = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 3000);
 const publicKey = process.env.VAPID_PUBLIC_KEY;
 const privateKey = process.env.VAPID_PRIVATE_KEY;
