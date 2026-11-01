@@ -783,13 +783,13 @@
       .action-tile { min-height: 82px; }
       .car-summary { grid-template-columns: minmax(0, 1fr) 120px; padding: 17px; }
       .car-photo { max-height: 100px; }
-      .summary-grid { grid-template-columns: 1fr; gap: 0; }
+      .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; gap: 12px; }
     }
 
     @media (min-width: 481px) and (max-width: 760px) {
       body { padding: 34px 20px 52px; }
-      .summary-grid { grid-template-columns: 1fr; gap: 0; }
+      .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -1248,21 +1248,33 @@
   }
 
   async function fetchPushApi(url, options, timeoutMessage) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 90000);
-    try {
-      return await fetch(url, { ...options, signal: controller.signal });
-    } catch (error) {
-      if (error.name === "AbortError") throw new Error(timeoutMessage);
-      if (error instanceof TypeError) {
-        throw new Error(
-          "Не удалось связаться с сервером уведомлений. Проверь интернет и попробуй ещё раз."
-        );
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 90000);
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        if (response.status < 500 || attempt === 2) return response;
+      } catch (error) {
+        if (error.name === "AbortError") throw new Error(timeoutMessage);
+        if (!(error instanceof TypeError) || attempt === 2) {
+          if (error instanceof TypeError) {
+            throw new Error(
+              "Не удалось подключиться к серверу уведомлений. Ошибка браузера: " +
+              (error.message || "сбой сетевого запроса") +
+              ". Проверь подключение и попробуй ещё раз."
+            );
+          }
+          throw error;
+        }
+      } finally {
+        clearTimeout(timer);
       }
-      throw error;
-    } finally {
-      clearTimeout(timer);
+      await new Promise(resolve => setTimeout(resolve, 1500 * (attempt + 1)));
     }
+    throw new Error("Сервер уведомлений временно недоступен.");
   }
 
   async function savePushSubscription(subscription, settings) {
@@ -1277,7 +1289,10 @@
     );
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
-      throw new Error(result.error || "Не удалось сохранить подписку.");
+      throw new Error(
+        result.error ||
+        `Не удалось сохранить подписку (ошибка сервера ${response.status}).`
+      );
     }
     localStorage.setItem(pushSettingsStorageKey, JSON.stringify(settings));
     pushSettings = settings;
@@ -1352,10 +1367,12 @@
         );
       }
 
-      setPushStatus("Запрашиваем разрешение на уведомления…");
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        throw new Error("Разрешение на push-уведомления не выдано.");
+      if (Notification.permission !== "granted") {
+        setPushStatus("Запрашиваем разрешение на уведомления…");
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          throw new Error("Разрешение на push-уведомления не выдано.");
+        }
       }
 
       setPushStatus("Подключаем службу уведомлений…");
