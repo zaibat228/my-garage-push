@@ -1249,11 +1249,16 @@
 
   async function fetchPushApi(url, options, timeoutMessage) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 120000);
+    const timer = setTimeout(() => controller.abort(), 90000);
     try {
       return await fetch(url, { ...options, signal: controller.signal });
     } catch (error) {
       if (error.name === "AbortError") throw new Error(timeoutMessage);
+      if (error instanceof TypeError) {
+        throw new Error(
+          "Не удалось связаться с сервером уведомлений. Проверь интернет и попробуй ещё раз."
+        );
+      }
       throw error;
     } finally {
       clearTimeout(timer);
@@ -1265,10 +1270,10 @@
       "https://my-garage-push.onrender.com/api/push/subscribe",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
         body: JSON.stringify({ subscription: subscription.toJSON(), settings })
       },
-      "Сервер не ответил за 2 минуты. Проверь интернет и попробуй ещё раз."
+      "Сервер не ответил за 90 секунд. Проверь интернет и попробуй ещё раз."
     );
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
