@@ -427,6 +427,27 @@ async function serveStatic(request, response, pathname) {
 }
 
 async function handleRequest(request, response) {
+    const allowedOrigin = "https://zaibat228.github.io";
+  const origin = request.headers.origin;
+
+  if (origin === allowedOrigin) {
+    response.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    response.setHeader("Vary", "Origin");
+    response.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, DELETE, OPTIONS"
+    );
+    response.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type"
+    );
+  }
+
+  if (request.method === "OPTIONS") {
+    response.writeHead(204);
+    response.end();
+    return;
+  }
   try {
     const requestUrl = new URL(
       request.url,
