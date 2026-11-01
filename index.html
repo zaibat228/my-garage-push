@@ -1301,8 +1301,8 @@
       );
       return;
     }
-    setPushStatus("Push-уведомления выключены.");
-
+    pushEnableButton.disabled = true;
+    setPushStatus("Проверяем настройки push-уведомлений…");
     try {
       pushRegistration = await navigator.serviceWorker.register("./sw.js");
       await navigator.serviceWorker.ready;
@@ -1312,10 +1312,14 @@
         pushSettingsPanel.hidden = false;
         pushEnableButton.hidden = true;
         setPushStatus("Уведомления включены и синхронизированы с сервером.");
+      } else {
+        setPushStatus("Push-уведомления выключены.");
       }
     } catch (error) {
       console.warn("Не удалось подготовить push-уведомления", error);
       setPushStatus("Не удалось подключить службу уведомлений.", "error");
+    } finally {
+      pushEnableButton.disabled = false;
     }
   }
 
@@ -1334,11 +1338,13 @@
         );
       }
 
+      setPushStatus("Запрашиваем разрешение на уведомления…");
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         throw new Error("Разрешение на push-уведомления не выдано.");
       }
 
+      setPushStatus("Настраиваем push-уведомления…");
       pushRegistration = pushRegistration ||
         await navigator.serviceWorker.register("./sw.js");
       await navigator.serviceWorker.ready;
