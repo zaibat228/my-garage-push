@@ -1139,6 +1139,8 @@
     blue: "Синяя"
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
+  const pushApplicationServerKey =
+    "BDuhGKaBCYgVF8HvlzAjRp4F12pEYD97j2HPVm_iw0ZSOTscxO9PclxOlsjU_XGEpHzpgKrxXs5pDavqgKoKubk";
   const pushEnableButton = document.getElementById("pushEnableButton");
   const pushDisableButton = document.getElementById("pushDisableButton");
   const pushStatus = document.getElementById("pushStatus");
@@ -1247,7 +1249,7 @@
 
   async function fetchPushApi(url, options, timeoutMessage) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 45000);
+    const timer = setTimeout(() => controller.abort(), 120000);
     try {
       return await fetch(url, { ...options, signal: controller.signal });
     } catch (error) {
@@ -1266,7 +1268,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subscription: subscription.toJSON(), settings })
       },
-      "Сервер не ответил за 45 секунд. Проверь интернет и попробуй ещё раз."
+      "Сервер не ответил за 2 минуты. Проверь интернет и попробуй ещё раз."
     );
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
@@ -1361,27 +1363,13 @@
         "Служба уведомлений не запустилась за 45 секунд."
       );
 
-      setPushStatus("Связываемся с сервером уведомлений…");
-      const keyResponse = await fetchPushApi(
-        "https://my-garage-push.onrender.com/api/push/public-key",
-        {},
-        "Сервер уведомлений не ответил за 45 секунд. Попробуй ещё раз."
-      );
-      if (!keyResponse.ok) {
-        throw new Error(
-          "Сервер push-уведомлений не настроен или недоступен."
-        );
-      }
-      const { publicKey } = await keyResponse.json();
-      if (!publicKey) throw new Error("На сервере не настроен VAPID-ключ.");
-
       setPushStatus("Создаём подписку на уведомления…");
       pushSubscription = await pushRegistration.pushManager.getSubscription();
       if (!pushSubscription) {
         pushSubscription = await withPushTimeout(
           pushRegistration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: base64UrlToBytes(publicKey)
+            applicationServerKey: base64UrlToBytes(pushApplicationServerKey)
           }),
           "iPhone не завершил создание подписки за 45 секунд. Проверь разрешение уведомлений в настройках iPhone и попробуй ещё раз."
         );
@@ -1461,7 +1449,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: pushSubscription.endpoint })
         },
-        "Сервер не ответил за 45 секунд. Попробуй ещё раз."
+        "Сервер не ответил за 2 минуты. Попробуй ещё раз."
       );
       if (!response.ok) {
         throw new Error("Не удалось отключить уведомления на сервере.");

@@ -20,7 +20,9 @@ node -e "console.log(JSON.stringify(require('web-push').generateVAPIDKeys(), nul
 ```
 
 `publicKey` запиши в `VAPID_PUBLIC_KEY`, `privateKey` — в
-`VAPID_PRIVATE_KEY`. Укажи действующий адрес владельца сайта в
+`VAPID_PRIVATE_KEY` и в `pushApplicationServerKey` в `index.html`. Это
+публичный ключ, он нужен приложению для создания подписки. Укажи действующий
+адрес владельца сайта в
 `VAPID_SUBJECT` (например, `mailto:you@example.com`) и создай длинный случайный
 секрет для `ADMIN_TOKEN`. Не публикуй `.env` и приватный VAPID-ключ.
 
