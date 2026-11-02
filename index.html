@@ -104,6 +104,25 @@
       font-size: 12px;
     }
 
+    .version-link {
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+      font-weight: normal;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+      box-shadow: none;
+    }
+
+    .version-link:hover {
+      transform: none;
+      background: transparent;
+      color: var(--accent);
+      box-shadow: none;
+    }
+
     .page-header {
       display: flex;
       position: relative;
@@ -570,6 +589,13 @@
 
     .theme-menu { position: relative; z-index: 5; }
 
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
     .theme-toggle {
       display: flex;
       align-items: center;
@@ -590,13 +616,27 @@
 
     .theme-toggle-icon { color: var(--accent); font-size: 18px; }
 
+    .push-options {
+      display: grid;
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(390px, calc(100vw - 28px));
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 16px 36px var(--shadow-hover);
+    }
+
+    .push-options[hidden] { display: none; }
+
     .push-card {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      gap: 16px;
-      margin-top: 0;
-      margin-bottom: 18px;
+      gap: 12px;
     }
 
     .push-card h2 { margin-bottom: 6px; }
@@ -606,6 +646,7 @@
     .push-card-status {
       grid-column: 1 / -1;
       font-size: 14px;
+      line-height: 1.5;
     }
 
     .push-card-status[data-state="error"] { color: #b54747; }
@@ -645,6 +686,71 @@
     }
 
     .push-disable:hover { background: var(--secondary-hover); }
+
+    .install-prompt {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .install-prompt[hidden] { display: none; }
+
+    .install-prompt-copy { flex: 1; min-width: 0; }
+
+    .install-prompt-copy h2 { margin-bottom: 6px; }
+
+    .install-prompt-copy p { margin: 0; line-height: 1.5; }
+
+    .install-prompt-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .install-prompt-dismiss {
+      padding: 10px 12px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+    }
+
+    .install-prompt-dismiss:hover { background: var(--secondary-hover); }
+
+    .install-dialog { width: min(600px, calc(100% - 28px)); }
+
+    .install-guides {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .install-guide {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-alt);
+    }
+
+    .install-guide h3 { margin: 0 0 8px; font-size: 16px; }
+
+    .install-guide ol {
+      margin: 0;
+      padding-left: 22px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .install-guide li + li { margin-top: 4px; }
+
+    .install-guide button { margin-top: 12px; }
+
+    .install-guide-list {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding-left: 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
 
     .theme-options {
       display: grid;
@@ -774,12 +880,17 @@
 
     @media (max-width: 480px) {
       body { padding: 28px 14px 42px; }
-      .page-header { align-items: flex-start; gap: 10px; }
+      .page-header { align-items: flex-start; flex-wrap: wrap; gap: 14px 10px; }
       .page-heading .tag { font-size: 10px; }
       .theme-toggle { min-height: 42px; padding: 9px 10px; font-size: 13px; }
+      .header-actions { width: 100%; justify-content: flex-start; }
+      .theme-options { left: 0; right: auto; }
+      .push-options { left: 0; right: auto; }
       .push-card { grid-template-columns: 1fr; gap: 12px; }
       .push-card > button { justify-self: start; }
       .push-setting { flex-wrap: wrap; }
+      .install-prompt { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+      .install-prompt-actions { width: 100%; }
       .amount { font-size: 27px; }
       .card { padding: 17px; }
       #carForm { grid-template-columns: 1fr; }
@@ -809,68 +920,98 @@
         <h1>Мой гараж</h1>
         <p class="muted">История обслуживания твоего автомобиля</p>
       </div>
-      <div class="theme-menu">
-        <button class="theme-toggle" id="themeToggle" type="button"
-          aria-expanded="false" aria-controls="themeOptions">
-          <span class="theme-toggle-icon" aria-hidden="true">◐</span>
-          <span id="themeLabel">Тема</span>
-          <span aria-hidden="true">⌄</span>
-        </button>
-        <div class="theme-options" id="themeOptions" role="group"
-          aria-label="Выбор темы сайта" hidden>
-        <button class="theme-option" type="button" data-theme-option="warm"
-          aria-pressed="true">
-          <span class="theme-swatches" aria-hidden="true">
-            <span style="background:#f5f2eb"></span>
-            <span style="background:#fffefa"></span>
-            <span style="background:#a45b42"></span>
-          </span>
-          <strong>Светлая</strong>
-        </button>
-        <button class="theme-option" type="button" data-theme-option="dark"
-          aria-pressed="false">
-          <span class="theme-swatches" aria-hidden="true">
-            <span style="background:#17191c"></span>
-            <span style="background:#30343a"></span>
-            <span style="background:#f1f3f5"></span>
-          </span>
-          <strong>Тёмная</strong>
-        </button>
-        <button class="theme-option" type="button" data-theme-option="blue"
-          aria-pressed="false">
-          <span class="theme-swatches" aria-hidden="true">
-            <span style="background:#eaf1f8"></span>
-            <span style="background:#fff"></span>
-            <span style="background:#28679d"></span>
-          </span>
-          <strong>Синяя</strong>
-        </button>
+      <div class="header-actions">
+        <div class="theme-menu">
+          <button class="theme-toggle" id="themeToggle" type="button"
+            aria-expanded="false" aria-controls="themeOptions">
+            <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+            <span id="themeLabel">Тема</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="theme-options" id="themeOptions" role="group"
+            aria-label="Выбор темы сайта" hidden>
+            <button class="theme-option" type="button" data-theme-option="warm"
+              aria-pressed="true">
+              <span class="theme-swatches" aria-hidden="true">
+                <span style="background:#f5f2eb"></span>
+                <span style="background:#fffefa"></span>
+                <span style="background:#a45b42"></span>
+              </span>
+              <strong>Светлая</strong>
+            </button>
+            <button class="theme-option" type="button" data-theme-option="dark"
+              aria-pressed="false">
+              <span class="theme-swatches" aria-hidden="true">
+                <span style="background:#17191c"></span>
+                <span style="background:#30343a"></span>
+                <span style="background:#f1f3f5"></span>
+              </span>
+              <strong>Тёмная</strong>
+            </button>
+            <button class="theme-option" type="button" data-theme-option="blue"
+              aria-pressed="false">
+              <span class="theme-swatches" aria-hidden="true">
+                <span style="background:#eaf1f8"></span>
+                <span style="background:#fff"></span>
+                <span style="background:#28679d"></span>
+              </span>
+              <strong>Синяя</strong>
+            </button>
+          </div>
+        </div>
+        <div class="theme-menu">
+          <button class="theme-toggle" id="pushToggle" type="button"
+            aria-expanded="false" aria-controls="pushOptions">
+            <svg class="theme-toggle-icon" viewBox="0 0 24 24"
+              width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"
+                stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="1.8"></path>
+            </svg>
+            <span>Уведомления</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <section class="push-options" id="pushOptions"
+            aria-label="Настройки уведомлений" hidden>
+            <div class="push-card">
+              <div>
+                <h2 id="pushTitle">Push-уведомления</h2>
+                <p class="muted">Напоминания каждые 3 часа и сообщения о новых версиях.</p>
+              </div>
+              <button id="pushEnableButton" type="button">Включить</button>
+              <div class="push-card-status muted" id="pushStatus" role="status"
+                aria-live="polite">
+                Проверяем поддержку уведомлений…
+              </div>
+              <div class="push-settings" id="pushSettings" hidden>
+                <div class="push-setting">
+                  <input id="reminderNotifications" type="checkbox" checked>
+                  <label for="reminderNotifications">Напоминать каждые 3 часа</label>
+                </div>
+                <div class="push-setting">
+                  <input id="updateNotices" type="checkbox" checked>
+                  <label for="updateNotices">Сообщать о новых версиях и обновлениях</label>
+                </div>
+                <button class="push-disable" id="pushDisableButton" type="button">
+                  Отключить уведомления
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </header>
 
-    <section class="card push-card" aria-labelledby="pushTitle">
-      <div>
-        <h2 id="pushTitle">Push-уведомления</h2>
-        <p class="muted">Напоминания каждые 3 часа и сообщения о новых версиях.</p>
+    <section class="card install-prompt" id="installPrompt"
+      aria-labelledby="installPromptTitle" hidden>
+      <div class="install-prompt-copy">
+        <h2 id="installPromptTitle">Добавь «Мой гараж» на главный экран</h2>
+        <p class="muted">Открывай приложение одним касанием и не теряй его среди вкладок.</p>
       </div>
-      <button id="pushEnableButton" type="button">Включить</button>
-      <div class="push-card-status muted" id="pushStatus" role="status"
-        aria-live="polite">
-        Проверяем поддержку уведомлений…
-      </div>
-      <div class="push-settings" id="pushSettings" hidden>
-        <div class="push-setting">
-          <input id="reminderNotifications" type="checkbox" checked>
-          <label for="reminderNotifications">Напоминать каждые 3 часа</label>
-        </div>
-        <div class="push-setting">
-          <input id="updateNotices" type="checkbox" checked>
-          <label for="updateNotices">Сообщать о новых версиях и обновлениях</label>
-        </div>
-        <button class="push-disable" id="pushDisableButton" type="button">
-          Отключить уведомления
-        </button>
+      <div class="install-prompt-actions">
+        <button id="openInstallGuide" type="button">Как добавить</button>
+        <button class="install-prompt-dismiss" id="dismissInstallPrompt"
+          type="button" aria-label="Скрыть предложение">×</button>
       </div>
     </section>
 
@@ -948,7 +1089,10 @@
     </div>
   </main>
 
-  <footer class="app-version muted">test 0.0.002</footer>
+  <footer class="app-version muted">
+    <button class="version-link" id="openUpdateDialog" type="button"
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.003</button>
+  </footer>
 
   <dialog class="entry-dialog" id="carDialog"
     aria-labelledby="carDialogTitle">
@@ -1125,6 +1269,54 @@
     </div>
   </dialog>
 
+  <dialog class="entry-dialog install-dialog" id="installDialog"
+    aria-labelledby="installDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="installDialogTitle">Добавить «Мой гараж» на главный экран</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <p class="muted">Выбери инструкцию для своего телефона. После добавления сайт будет открываться как приложение.</p>
+    <div class="install-guides">
+      <section class="install-guide" aria-labelledby="androidInstallTitle">
+        <h3 id="androidInstallTitle">Android</h3>
+        <ol>
+          <li>Открой сайт в Chrome.</li>
+          <li>Нажми меню ⋮ и выбери «Установить приложение» или «Добавить на главный экран».</li>
+          <li>Подтверди установку — значок появится на экране телефона.</li>
+        </ol>
+        <button id="nativeInstallButton" type="button" hidden>
+          Установить приложение
+        </button>
+      </section>
+      <section class="install-guide" aria-labelledby="iosInstallTitle">
+        <h3 id="iosInstallTitle">iPhone и iPad</h3>
+        <ol>
+          <li>Открой сайт именно в Safari и нажми «Поделиться» (значок квадрата со стрелкой).</li>
+          <li>Прокрути список действий и выбери «На экран “Домой”».</li>
+          <li>Нажми «Добавить», затем запускай «Мой гараж» с нового значка.</li>
+        </ol>
+        <p class="muted">Для push-уведомлений на iPhone нужна iOS 16.4 или новее и запуск сайта с экрана «Домой».</p>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog class="entry-dialog" id="updateDialog"
+    aria-labelledby="updateDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="updateDialogTitle">Обновление test 0.0.003</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <p class="muted">В этой версии стало удобнее пользоваться гаражом с телефона:</p>
+    <ul class="install-guide-list">
+      <li>Настройки push-уведомлений теперь открываются отдельной кнопкой рядом с выбором темы.</li>
+      <li>Добавлено предложение установить сайт на главный экран.</li>
+      <li>Добавлены отдельные инструкции по установке для Android и iPhone.</li>
+      <li>Для поддерживаемых браузеров Android доступна установка приложения прямо из инструкции.</li>
+      <li>Информацию об обновлениях можно открыть нажатием на номер версии внизу страницы.</li>
+    </ul>
+  </dialog>
 
 <script>
   // 1. Получаем элементы страницы
@@ -1142,21 +1334,28 @@
   const themeToggle = document.getElementById("themeToggle");
   const themeOptionsMenu = document.getElementById("themeOptions");
   const themeLabel = document.getElementById("themeLabel");
+  const pushToggle = document.getElementById("pushToggle");
+  const pushOptionsMenu = document.getElementById("pushOptions");
   const themeNames = {
     warm: "Светлая",
     dark: "Тёмная",
     blue: "Синяя"
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
+  const installPromptStorageKey = "my-garage-install-prompt-dismissed-v1";
   const pushApplicationServerKey =
     "BDuhGKaBCYgVF8HvlzAjRp4F12pEYD97j2HPVm_iw0ZSOTscxO9PclxOlsjU_XGEpHzpgKrxXs5pDavqgKoKubk";
   const pushEnableButton = document.getElementById("pushEnableButton");
   const pushDisableButton = document.getElementById("pushDisableButton");
   const pushStatus = document.getElementById("pushStatus");
   const pushSettingsPanel = document.getElementById("pushSettings");
+  const installPrompt = document.getElementById("installPrompt");
+  const installDialog = document.getElementById("installDialog");
+  const nativeInstallButton = document.getElementById("nativeInstallButton");
   const reminderNotificationsInput =
     document.getElementById("reminderNotifications");
   const updateNoticesInput = document.getElementById("updateNotices");
+  let deferredInstallPrompt = null;
   const defaultPushSettings = {
     reminders: true,
     updates: true
@@ -1172,6 +1371,7 @@
   const expenseDialog = document.getElementById("expenseDialog");
   const fuelDialog = document.getElementById("fuelDialog");
   const deleteConfirmDialog = document.getElementById("deleteConfirmDialog");
+  const updateDialog = document.getElementById("updateDialog");
   const deleteConfirmMessage = document.getElementById("deleteConfirmMessage");
   let pendingDeleteAction = null;
   const carForm = document.getElementById("carForm");
@@ -1231,6 +1431,33 @@
     return window.matchMedia("(display-mode: standalone)").matches ||
       navigator.standalone === true;
   }
+
+  function isMobileDevice() {
+    return isIosDevice() || /android|mobile/i.test(navigator.userAgent);
+  }
+
+  function initializeHomeScreenPrompt() {
+    let isDismissed = false;
+    try {
+      isDismissed =
+        localStorage.getItem(installPromptStorageKey) === "true";
+    } catch (error) {
+      console.warn("Не удалось загрузить настройку предложения установки", error);
+    }
+    installPrompt.hidden = !isMobileDevice() || isInstalledApp() || isDismissed;
+  }
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    nativeInstallButton.hidden = false;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    installPrompt.hidden = true;
+    nativeInstallButton.hidden = true;
+    if (installDialog.open) installDialog.close();
+  });
 
   function base64UrlToBytes(value) {
     const padding = "=".repeat((4 - value.length % 4) % 4);
@@ -1531,6 +1758,44 @@
   });
 
   initializePushNotifications();
+  initializeHomeScreenPrompt();
+
+  document.getElementById("openInstallGuide").addEventListener(
+    "click", () => installDialog.showModal()
+  );
+  document.getElementById("openUpdateDialog").addEventListener(
+    "click", () => updateDialog.showModal()
+  );
+  document.getElementById("dismissInstallPrompt").addEventListener(
+    "click", () => {
+      installPrompt.hidden = true;
+      try {
+        localStorage.setItem(installPromptStorageKey, "true");
+      } catch (error) {
+        console.warn("Не удалось сохранить настройку предложения установки", error);
+      }
+    }
+  );
+  nativeInstallButton.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      nativeInstallButton.hidden = true;
+      return;
+    }
+
+    try {
+      await deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      nativeInstallButton.hidden = true;
+      if (choice.outcome === "accepted") {
+        installPrompt.hidden = true;
+        installDialog.close();
+      }
+    } catch (error) {
+      console.warn("Не удалось запустить установку приложения", error);
+      alert("Не удалось открыть установку. Добавь сайт на главный экран вручную по инструкции.");
+    }
+  });
 
   function applyTheme(theme) {
     if (!availableThemes.includes(theme)) return;
@@ -1555,8 +1820,18 @@
 
   themeToggle.addEventListener("click", () => {
     const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
+    pushOptionsMenu.hidden = true;
+    pushToggle.setAttribute("aria-expanded", "false");
     themeToggle.setAttribute("aria-expanded", String(!isOpen));
     themeOptionsMenu.hidden = isOpen;
+  });
+
+  pushToggle.addEventListener("click", () => {
+    const isOpen = pushToggle.getAttribute("aria-expanded") === "true";
+    themeOptionsMenu.hidden = true;
+    themeToggle.setAttribute("aria-expanded", "false");
+    pushToggle.setAttribute("aria-expanded", String(!isOpen));
+    pushOptionsMenu.hidden = isOpen;
   });
 
   themeOptions.forEach(button => {
@@ -1577,16 +1852,24 @@
   });
 
   document.addEventListener("click", event => {
-    if (!event.target.closest(".theme-menu")) {
+    if (!event.target.closest(".header-actions")) {
       themeOptionsMenu.hidden = true;
       themeToggle.setAttribute("aria-expanded", "false");
+      pushOptionsMenu.hidden = true;
+      pushToggle.setAttribute("aria-expanded", "false");
     }
   });
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && !themeOptionsMenu.hidden) {
+    if (event.key === "Escape" &&
+        (!themeOptionsMenu.hidden || !pushOptionsMenu.hidden)) {
+      const focusedMenuButton = pushOptionsMenu.hidden
+        ? themeToggle
+        : pushToggle;
       themeOptionsMenu.hidden = true;
       themeToggle.setAttribute("aria-expanded", "false");
-      themeToggle.focus();
+      pushOptionsMenu.hidden = true;
+      pushToggle.setAttribute("aria-expanded", "false");
+      focusedMenuButton.focus();
     }
   });
 
@@ -1611,7 +1894,14 @@
   document.querySelectorAll("[data-close-dialog]").forEach(button => {
     button.addEventListener("click", () => button.closest("dialog").close());
   });
-  [carDialog, expenseDialog, fuelDialog, deleteConfirmDialog].forEach(dialog => {
+  [
+    carDialog,
+    expenseDialog,
+    fuelDialog,
+    deleteConfirmDialog,
+    installDialog,
+    updateDialog
+  ].forEach(dialog => {
     dialog.addEventListener("click", event => {
       if (event.target === dialog) dialog.close();
     });
