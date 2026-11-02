@@ -1432,6 +1432,7 @@
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
   const installPromptStorageKey = "my-garage-install-prompt-dismissed-v1";
+  const pushApiBaseUrl = "https://my-garage-push.onrender.com/api/push";
   const pushApplicationServerKey =
     "BDuhGKaBCYgVF8HvlzAjRp4F12pEYD97j2HPVm_iw0ZSOTscxO9PclxOlsjU_XGEpHzpgKrxXs5pDavqgKoKubk";
   const pushEnableButton = document.getElementById("pushEnableButton");
@@ -1579,7 +1580,7 @@
     timeoutDuration = 90000,
     progressMessage = ""
   ) {
-    const maxAttempts = 3;
+    const maxAttempts = 5;
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const controller = new AbortController();
       let timer;
@@ -1611,7 +1612,7 @@
             throw new Error(
               "Не удалось подключиться к серверу уведомлений. Ошибка браузера: " +
               (error.message || "сбой сетевого запроса") +
-              ". Проверь подключение и попробуй ещё раз."
+              ". Проверь интернет или VPN и попробуй ещё раз."
             );
           }
           throw error;
@@ -1619,7 +1620,10 @@
       } finally {
         clearTimeout(timer);
       }
-      await new Promise(resolve => setTimeout(resolve, 1500 * (attempt + 1)));
+      await new Promise(resolve => setTimeout(
+        resolve,
+        Math.min(2000 * 2 ** attempt, 15000)
+      ));
     }
     throw new Error("Сервер уведомлений временно недоступен.");
   }
@@ -1627,7 +1631,7 @@
   async function savePushSubscription(subscription, settings) {
     setPushStatus("Подключаемся и сохраняем подписку…");
     const response = await fetchPushApi(
-      "https://my-garage-push.onrender.com/api/push/subscribe",
+      `${pushApiBaseUrl}/subscribe`,
       {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=UTF-8" },
@@ -1714,6 +1718,19 @@
       if (Notification.permission === "denied") {
         throw new Error(
           "iPhone уже запретил уведомления и не покажет запрос повторно. Открой Настройки iPhone → Уведомления → Мой гараж и разреши уведомления."
+        );
+      }
+
+      const serverResponse = await fetchPushApi(
+        `${pushApiBaseUrl}/public-key`,
+        {},
+        "Не удалось проверить связь с сервером уведомлений.",
+        45000,
+        "Проверяем связь с сервером уведомлений"
+      );
+      if (!serverResponse.ok) {
+        throw new Error(
+          `Сервер уведомлений ответил с ошибкой ${serverResponse.status}. Попробуй ещё раз позже.`
         );
       }
 
@@ -1819,7 +1836,7 @@
     pushDisableButton.disabled = true;
     try {
       const response = await fetchPushApi(
-        "https://my-garage-push.onrender.com/api/push/subscribe",
+        `${pushApiBaseUrl}/subscribe`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
