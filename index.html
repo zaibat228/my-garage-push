@@ -490,6 +490,90 @@
 
     .fuel-date-field, .fuel-price-field { grid-column: 1 / -1; }
 
+    .fuel-date-picker {
+      display: grid;
+      gap: 8px;
+    }
+
+    .date-wheel-labels,
+    .date-wheel-picker {
+      display: grid;
+      grid-template-columns: 56px minmax(78px, 1fr) 64px;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .date-wheel-labels {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .date-wheel {
+      height: 132px;
+      overflow-y: auto;
+      padding-block: 44px;
+      border-radius: 10px;
+      background: var(--surface-alt);
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      scroll-snap-type: y mandatory;
+      scroll-padding-block: 44px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .date-wheel::-webkit-scrollbar { display: none; }
+
+    .date-wheel-option {
+      display: grid;
+      width: 100%;
+      height: 44px;
+      padding: 0 4px;
+      place-items: center;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: normal;
+      scroll-snap-align: center;
+      box-shadow: none;
+    }
+
+    .date-wheel-option:hover {
+      transform: none;
+      background: transparent;
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .date-wheel-option[aria-selected="true"] {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .date-wheel-option:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -3px;
+    }
+
+    .date-wheel-help {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .date-wheel-value {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
     .fuel-field {
       display: grid;
       gap: 7px;
@@ -532,7 +616,7 @@
 
     .fuel-number { min-width: 0; padding: 9px 7px; }
 
-    #fuelForm button {
+    #fuelForm > button[type="submit"] {
       grid-column: 1 / -1;
       padding: 11px;
     }
@@ -1110,12 +1194,11 @@
       <div class="install-prompt-copy">
         <h2 id="installPromptTitle">Добавь «Мой гараж» на главный экран</h2>
         <p class="muted" id="installPromptDescription">
-          Открывай приложение одним касанием и включи уведомления о расходах и заправках.
+          Открывай приложение одним касанием.
         </p>
       </div>
       <div class="install-prompt-actions">
         <button id="openInstallGuide" type="button">Как добавить</button>
-        <button id="openPushSettings" type="button">Настроить уведомления</button>
         <button class="install-prompt-dismiss" id="dismissInstallPrompt"
           type="button" aria-label="Скрыть предложение">×</button>
       </div>
@@ -1197,7 +1280,7 @@
 
   <footer class="app-version muted">
     <button class="version-link" id="openUpdateDialog" type="button"
-      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.004</button>
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.005</button>
   </footer>
 
   <dialog class="entry-dialog" id="carDialog"
@@ -1316,8 +1399,24 @@
     <p class="muted">Запиши дату, пробег, объём и цену топлива.</p>
     <form id="fuelForm">
       <div class="fuel-field fuel-date-field">
-        <label for="fuelDate">Дата заправки</label>
-        <input id="fuelDate" type="date" required>
+        <label id="fuelDateLabel">Дата заправки</label>
+        <input class="date-wheel-value" id="fuelDate" type="date"
+          aria-hidden="true" tabindex="-1" required>
+        <div class="fuel-date-picker">
+          <div class="date-wheel-labels" aria-hidden="true">
+            <span>День</span><span>Месяц</span><span>Год</span>
+          </div>
+          <div class="date-wheel-picker" id="fuelDatePicker"
+            aria-label="Выбор даты заправки">
+            <div class="date-wheel" data-date-wheel="day" role="listbox"
+              aria-label="День"></div>
+            <div class="date-wheel" data-date-wheel="month" role="listbox"
+              aria-label="Месяц"></div>
+            <div class="date-wheel" data-date-wheel="year" role="listbox"
+              aria-label="Год"></div>
+          </div>
+          <p class="date-wheel-help">Прокрути колонки или нажми на нужное значение</p>
+        </div>
       </div>
 
       <div class="fuel-field">
@@ -1410,7 +1509,7 @@
   <dialog class="entry-dialog" id="updateDialog"
     aria-labelledby="updateDialogTitle">
     <div class="dialog-heading">
-      <h2 id="updateDialogTitle">Обновление test 0.0.004</h2>
+      <h2 id="updateDialogTitle">Обновление test 0.0.005</h2>
       <button class="dialog-close" type="button" data-close-dialog
         aria-label="Закрыть окно">×</button>
     </div>
@@ -1424,6 +1523,7 @@
       <li>Добавлены зелёная и лавандовая темы с более насыщенными цветами.</li>
       <li>На телефоне можно сразу открыть инструкции по установке и настройки уведомлений.</li>
       <li>Подключение уведомлений на Android повторяет запросы при временных сбоях сети.</li>
+      <li>Дата заправки выбирается прокручиваемыми колёсами дня, месяца и года.</li>
     </ul>
   </dialog>
 
@@ -1453,7 +1553,6 @@
     lavender: "Лавандовая"
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
-  const installPromptStorageKey = "my-garage-install-prompt-dismissed-v2";
   const pushApiBaseUrl = "https://my-garage-push.onrender.com/api/push";
   const pushApplicationServerKey =
     "BDuhGKaBCYgVF8HvlzAjRp4F12pEYD97j2HPVm_iw0ZSOTscxO9PclxOlsjU_XGEpHzpgKrxXs5pDavqgKoKubk";
@@ -1463,9 +1562,6 @@
   const pushServerCheck = document.getElementById("pushServerCheck");
   const pushSettingsPanel = document.getElementById("pushSettings");
   const installPrompt = document.getElementById("installPrompt");
-  const installPromptTitle = document.getElementById("installPromptTitle");
-  const installPromptDescription =
-    document.getElementById("installPromptDescription");
   const openInstallGuideButton = document.getElementById("openInstallGuide");
   const installDialog = document.getElementById("installDialog");
   const nativeInstallButton = document.getElementById("nativeInstallButton");
@@ -1509,6 +1605,9 @@
 
   const fuelForm = document.getElementById("fuelForm");
   const fuelDate = document.getElementById("fuelDate");
+  const fuelDateWheels = [
+    ...document.querySelectorAll("[data-date-wheel]")
+  ];
 
   function setPushStatus(message, state = "") {
     pushStatus.textContent = message;
@@ -1557,30 +1656,8 @@
   }
 
   function initializeHomeScreenPrompt() {
-    let isDismissed = false;
-    try {
-      isDismissed =
-        sessionStorage.getItem(installPromptStorageKey) === "true";
-    } catch (error) {
-      console.warn("Не удалось загрузить настройку предложения установки", error);
-    }
-    const installed = isInstalledApp();
-    const notificationsNeedSetup =
-      !("Notification" in window) ||
-      Notification.permission !== "granted" ||
-      !pushSubscription;
-    const showInstallGuide = !installed;
-    const showNotificationSettings = notificationsNeedSetup;
-    installPrompt.hidden = !isMobileDevice() ||
-      isDismissed ||
-      (!showInstallGuide && !showNotificationSettings);
-    openInstallGuideButton.hidden = !showInstallGuide;
-    installPromptTitle.textContent = showInstallGuide
-      ? "Добавь «Мой гараж» на главный экран"
-      : "Включи уведомления «Моего гаража»";
-    installPromptDescription.textContent = showInstallGuide
-      ? "Открывай приложение одним касанием и включи уведомления о расходах и заправках."
-      : "Получай напоминания о расходах, заправках и обслуживании автомобиля.";
+    installPrompt.hidden = !isMobileDevice() || isInstalledApp();
+    openInstallGuideButton.hidden = false;
   }
 
   window.addEventListener("beforeinstallprompt", event => {
@@ -1927,23 +2004,12 @@
   document.getElementById("openInstallGuide").addEventListener(
     "click", () => installDialog.showModal()
   );
-  document.getElementById("openPushSettings").addEventListener(
-    "click", () => {
-      if (pushOptionsMenu.hidden) pushToggle.click();
-      pushEnableButton.focus();
-    }
-  );
   document.getElementById("openUpdateDialog").addEventListener(
     "click", () => updateDialog.showModal()
   );
   document.getElementById("dismissInstallPrompt").addEventListener(
     "click", () => {
       installPrompt.hidden = true;
-      try {
-        sessionStorage.setItem(installPromptStorageKey, "true");
-      } catch (error) {
-        console.warn("Не удалось сохранить настройку предложения установки", error);
-      }
     }
   );
   nativeInstallButton.addEventListener("click", async () => {
@@ -2699,7 +2765,131 @@
       String(now.getMonth() + 1).padStart(2, "0"),
       String(now.getDate()).padStart(2, "0")
     ].join("-");
+    renderFuelDatePicker();
   }
+
+  function getFuelDateParts() {
+    const [year, month, day] = fuelDate.value.split("-").map(Number);
+    return { year, month, day };
+  }
+
+  function getFuelDateWheelOptions(unit, parts) {
+    if (unit === "day") {
+      const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
+      return Array.from({ length: daysInMonth }, (_, index) => ({
+        value: index + 1,
+        label: String(index + 1).padStart(2, "0")
+      }));
+    }
+    if (unit === "month") {
+      const monthNames = [
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+      ];
+      return monthNames.map((label, index) => ({
+        value: index + 1,
+        label
+      }));
+    }
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: currentYear - 1898 }, (_, index) => ({
+      value: 1900 + index,
+      label: String(1900 + index)
+    }));
+  }
+
+  function setFuelDatePart(unit, value) {
+    const parts = getFuelDateParts();
+    parts[unit] = value;
+    const lastDay = new Date(parts.year, parts.month, 0).getDate();
+    parts.day = Math.min(parts.day, lastDay);
+    fuelDate.value = [
+      parts.year,
+      String(parts.month).padStart(2, "0"),
+      String(parts.day).padStart(2, "0")
+    ].join("-");
+    renderFuelDatePicker();
+  }
+
+  function renderFuelDatePicker() {
+    if (!fuelDate.value) return;
+    const parts = getFuelDateParts();
+
+    fuelDateWheels.forEach(wheel => {
+      const unit = wheel.dataset.dateWheel;
+      const options = getFuelDateWheelOptions(unit, parts);
+      const selectedIndex = options.findIndex(
+        option => option.value === parts[unit]
+      );
+      wheel.replaceChildren(...options.map(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "date-wheel-option";
+        button.id = `fuelDate-${unit}-${option.value}`;
+        button.dataset.dateValue = String(option.value);
+        button.setAttribute("role", "option");
+        button.setAttribute(
+          "aria-selected",
+          String(option.value === parts[unit])
+        );
+        button.tabIndex = -1;
+        button.textContent = option.label;
+        return button;
+      }));
+      wheel.setAttribute(
+        "aria-activedescendant",
+        `fuelDate-${unit}-${parts[unit]}`
+      );
+      wheel.scrollTop = selectedIndex * 44;
+    });
+  }
+
+  function changeFuelDateWheel(wheel, value) {
+    const unit = wheel.dataset.dateWheel;
+    const parts = getFuelDateParts();
+    const options = getFuelDateWheelOptions(unit, parts);
+    const index = options.findIndex(option => option.value === value);
+    if (index < 0) return;
+    setFuelDatePart(unit, value);
+    fuelDateWheels.find(item => item.dataset.dateWheel === unit)
+      .focus({ preventScroll: true });
+  }
+
+  fuelDateWheels.forEach(wheel => {
+    let scrollTimer;
+    wheel.addEventListener("click", event => {
+      const option = event.target.closest("[data-date-value]");
+      if (option) changeFuelDateWheel(wheel, Number(option.dataset.dateValue));
+    });
+    wheel.addEventListener("scroll", () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const options = getFuelDateWheelOptions(
+          wheel.dataset.dateWheel,
+          getFuelDateParts()
+        );
+        const index = Math.max(
+          0,
+          Math.min(options.length - 1, Math.round(wheel.scrollTop / 44))
+        );
+        changeFuelDateWheel(wheel, options[index].value);
+      }, 120);
+    }, { passive: true });
+    wheel.addEventListener("keydown", event => {
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+      event.preventDefault();
+      const parts = getFuelDateParts();
+      const options = getFuelDateWheelOptions(wheel.dataset.dateWheel, parts);
+      const currentIndex = options.findIndex(
+        option => option.value === parts[wheel.dataset.dateWheel]
+      );
+      const offset = event.key === "ArrowUp" ? -1 : 1;
+      const nextOption = options[currentIndex + offset];
+      if (nextOption) {
+        setFuelDatePart(wheel.dataset.dateWheel, nextOption.value);
+      }
+    });
+  });
 
   function connectFuelSlider(sliderId, inputId) {
     const slider = document.getElementById(sliderId);
