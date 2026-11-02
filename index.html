@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Мой гараж</title>
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,6 +28,8 @@
       --accent: #a45b42;
       --accent-hover: #864832;
       --accent-soft: #f3e7dd;
+      --accent-secondary: #c49252;
+      --accent-secondary-soft: #f3eadb;
       --accent-contrast: #fffefa;
       --secondary-bg: #eee8dd;
       --secondary-text: #51463e;
@@ -52,6 +54,8 @@
       --accent: #d17a5b;
       --accent-hover: #b96143;
       --accent-soft: #3a2e2a;
+      --accent-secondary: #8199ba;
+      --accent-secondary-soft: #29313d;
       --accent-contrast: #fff;
       --secondary-bg: #353a41;
       --secondary-text: #e2e6ea;
@@ -76,6 +80,8 @@
       --accent: #28679d;
       --accent-hover: #1d527f;
       --accent-soft: #dceaf6;
+      --accent-secondary: #4a9ca5;
+      --accent-secondary-soft: #dcefed;
       --accent-contrast: #fff;
       --secondary-bg: #e1eaf3;
       --secondary-text: #344d65;
@@ -100,6 +106,8 @@
       --accent: #47764e;
       --accent-hover: #365f3d;
       --accent-soft: #d2e3cf;
+      --accent-secondary: #bd8846;
+      --accent-secondary-soft: #f0e7d8;
       --accent-contrast: #fff;
       --secondary-bg: #d5e3d1;
       --secondary-text: #405744;
@@ -124,6 +132,8 @@
       --accent: #7655a5;
       --accent-hover: #5f4389;
       --accent-soft: #ddd0ed;
+      --accent-secondary: #b66f94;
+      --accent-secondary-soft: #f0dfeb;
       --accent-contrast: #fff;
       --secondary-bg: #ddd3eb;
       --secondary-text: #504365;
@@ -198,13 +208,12 @@
     }
 
     main > .page-header, main > .summary-grid,
-    main > .action-grid, main > .car-summary, main > .history-grid {
+    main > .car-summary, main > .history-grid {
       animation: rise-in 520ms cubic-bezier(.2, .7, .2, 1) both;
     }
 
     main > .page-header { animation-delay: 40ms; }
     main > .car-summary { animation-delay: 240ms; }
-    main > .action-grid { animation-delay: 300ms; }
     main > .history-grid { animation-delay: 360ms; }
     main > .summary-grid { animation-delay: 300ms; }
 
@@ -256,65 +265,6 @@
       font-weight: bold;
       margin-top: 8px;
     }
-
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-
-    .action-tile {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
-      min-height: 104px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--surface);
-      color: var(--text);
-      text-align: left;
-      box-shadow: 0 5px 18px var(--shadow);
-    }
-
-    .action-tile:hover {
-      transform: translateY(-3px);
-      border-color: var(--border-hover);
-      background: var(--surface);
-      box-shadow: 0 12px 28px var(--shadow-hover);
-    }
-
-    .action-icon {
-      display: grid;
-      flex: 0 0 44px;
-      width: 44px;
-      height: 44px;
-      place-items: center;
-      border-radius: 10px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 21px;
-    }
-
-    .action-copy {
-      display: grid;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .action-copy strong { font-size: 16px; }
-
-    .action-copy span { color: var(--muted); font-size: 13px; }
-
-    .action-arrow {
-      margin-left: auto;
-      color: var(--accent);
-      transition: transform 180ms ease;
-    }
-
-    .action-tile:hover .action-arrow { transform: translate(2px, -2px); }
 
     .entry-dialog {
       width: min(540px, calc(100% - 28px));
@@ -885,50 +835,44 @@
 
     .car-photo-help { margin: 0; font-size: 13px; }
 
-    .theme-menu { position: relative; z-index: 5; }
-
-    .header-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 8px;
+    .settings-dialog {
+      width: min(480px, calc(100% - 28px));
     }
 
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 46px;
-      padding: 10px 14px;
-      border: 1px solid var(--border-strong);
-      background: var(--surface);
-      color: var(--text);
-      white-space: nowrap;
-      box-shadow: 0 5px 18px var(--shadow);
+    .settings-dialog > .theme-options,
+    .settings-dialog > .push-options {
+      display: grid;
+      position: static;
+      width: 100%;
+      max-height: min(68vh, 560px);
+      margin-top: 16px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      box-shadow: none;
     }
 
-    .theme-toggle:hover {
-      border-color: var(--border-hover);
-      background: var(--surface);
+    .settings-dialog > .theme-options {
+      grid-template-columns: 1fr;
+    }
+
+    .settings-dialog > .push-options {
+      gap: 12px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .settings-dialog .push-card {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .settings-dialog .push-card-status,
+    .settings-dialog .push-server-check,
+    .settings-dialog .push-settings {
+      grid-column: 1;
     }
 
     .theme-toggle-icon { color: var(--accent); font-size: 18px; }
-
-    .push-options {
-      display: grid;
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
-      width: min(390px, calc(100vw - 28px));
-      gap: 12px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: 0 16px 36px var(--shadow-hover);
-    }
-
-    .push-options[hidden] { display: none; }
 
     .push-card {
       display: grid;
@@ -1149,11 +1093,21 @@
 
     .spend-widget .label { margin-bottom: 8px; }
 
+    .expense-overview-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 14px 18px;
+    }
+
     .spend-mode-switch {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 5px;
-      margin: 12px 0;
+      flex: 0 1 420px;
+      margin: 0;
       padding: 4px;
       border-radius: 11px;
       background: var(--surface-alt);
@@ -1184,6 +1138,409 @@
 
     .history-grid h2 { margin-bottom: 12px; }
 
+    .app-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 20px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px var(--shadow);
+    }
+
+    .app-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-width: 0;
+      min-height: 48px;
+      padding: 9px 12px;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      box-shadow: none;
+    }
+
+    .app-tab:hover {
+      transform: none;
+      background: var(--surface-alt);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .app-tab[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .app-tab-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    .tab-panel[hidden] { display: none !important; }
+
+    .home-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .home-metric {
+      display: grid;
+      align-content: start;
+      gap: 5px;
+      min-width: 0;
+      margin: 0;
+      padding: 18px;
+    }
+
+    .home-metric .label { font-size: 11px; }
+    .home-metric .amount {
+      overflow-wrap: anywhere;
+      margin: 0;
+      font-size: clamp(20px, 2.5vw, 28px);
+    }
+    .home-metric > span:last-child { font-size: 12px; }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 12px;
+    }
+
+    .section-heading .label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+    }
+
+    .section-heading h2 { font-size: 22px; }
+    .section-heading > button { flex: 0 0 auto; }
+    .section-heading > .section-add-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .section-add-button > span {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .expense-history-card { margin-top: 14px; }
+    .event-history-card { margin-top: 18px; }
+
+    .journal-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .journal-metric {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .journal-metric strong {
+      color: var(--text);
+      font-size: clamp(16px, 2.2vw, 22px);
+      overflow-wrap: anywhere;
+    }
+
+    .fuel-chart-card { margin-top: 14px; }
+
+    .fuel-chart-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .fuel-chart-heading h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .fuel-chart-unit {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .fuel-chart {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .fuel-chart-gridline {
+      stroke: var(--border);
+      stroke-width: 1;
+    }
+
+    .fuel-chart-axis-label {
+      fill: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    .fuel-chart-line {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 3;
+    }
+
+    .fuel-chart-area { fill: var(--accent-soft); opacity: .58; }
+
+    .fuel-chart-point {
+      fill: var(--surface);
+      stroke: var(--accent-secondary);
+      stroke-width: 3;
+    }
+
+    .fuel-chart-empty {
+      min-height: 120px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 5px;
+      padding: 18px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--surface-alt) 70%, transparent);
+      text-align: center;
+    }
+
+    .fuel-chart-empty strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .fuel-chart-empty span {
+      max-width: 36ch;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .journal-recent-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .journal-history-disclosure {
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .journal-history-disclosure > summary {
+      padding: 14px 2px 4px;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .journal-history-list { padding-top: 6px; }
+
+    .expense-chart-widget { text-align: center; }
+
+    .expense-chart-widget > .label { margin-bottom: 8px; }
+
+    .expense-chart-widget .expense-chart { text-align: left; }
+
+    .more-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .more-action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      min-height: 72px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .more-action:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-hover);
+      background: var(--surface);
+      box-shadow: 0 8px 20px var(--shadow-hover);
+    }
+
+    .more-action > span:first-child {
+      flex: 0 0 24px;
+      color: var(--accent);
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .more-action > span:last-child {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .more-action small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.4;
+    }
+
+    .feature-placeholder {
+      position: relative;
+      margin-top: 16px;
+      padding: 20px;
+    }
+
+    .feature-placeholder h3 { margin: 12px 0 6px; font-size: 17px; }
+    .feature-placeholder p { margin: 8px 0 0; line-height: 1.55; }
+
+    .feature-status {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 99px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .service-upcoming,
+    .service-history { margin-top: 16px; }
+
+    .service-upcoming h3 { margin: 0 0 12px; }
+
+    .service-fields-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .service-dialog .dialog-heading p { margin: 6px 0 0; }
+    .service-dialog form { gap: 14px; }
+
+    .service-form-actions { margin-top: 2px; }
+    .service-form-actions button { min-width: 120px; }
+
+    .service-field {
+      display: grid;
+      align-content: start;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .service-field-full { grid-column: 1 / -1; }
+
+    .service-interval-options {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-alt);
+    }
+
+    .service-interval-options summary {
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .service-interval-options[open] summary { margin-bottom: 12px; }
+    .service-interval-options > p { margin: 10px 0 0; font-size: 13px; }
+
+    .service-history-disclosure {
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .service-history-disclosure > summary {
+      padding: 16px 18px;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .service-history-list { padding: 0 18px 8px; }
+
+    .service-record {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .service-record:last-child { border-bottom: 0; }
+    .service-record-title { display: block; font-size: 15px; }
+    .service-record-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 12px;
+      margin-top: 7px;
+      font-size: 13px;
+    }
+    .service-record-status { margin-top: 5px; color: var(--accent); font-size: 13px; }
+    .service-record-status.overdue { color: var(--danger, #b44848); }
+    .service-record-status {
+      width: fit-content;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+    }
+
+    .service-record-status.overdue {
+      background: color-mix(in srgb, #b44848 12%, var(--surface));
+    }
+
+    .service-show-more {
+      margin-top: 8px;
+      padding: 9px 12px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      font-size: 13px;
+    }
+
+    .service-show-more:hover { background: var(--secondary-hover); }
+
+    .service-record-interval {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .service-record-delete {
+      padding: 8px 10px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      font-size: 13px;
+    }
+    .service-record-delete:hover { background: var(--secondary-hover); }
+
     .expense-chart-note {
       margin: -4px 0 12px;
       font-size: 13px;
@@ -1192,7 +1549,8 @@
     .expense-period-controls {
       display: grid;
       gap: 7px;
-      margin: 0 0 12px;
+      flex: 0 1 340px;
+      margin: 0;
     }
 
     .expense-period-controls[hidden] { display: none; }
@@ -1229,16 +1587,19 @@
     .expense-chart {
       display: grid;
       gap: 9px;
-      width: min(100%, 380px);
-      margin: 14px auto 0;
+      width: 100%;
+      margin: 0;
       padding: 0;
       list-style: none;
     }
 
     .spend-chart-layout {
       display: grid;
+      grid-template-columns: minmax(120px, 190px) minmax(0, 1fr);
+      align-items: center;
       justify-items: center;
-      gap: 0;
+      gap: 18px;
+      margin-top: 16px;
     }
 
     .expense-chart-donut {
@@ -1318,6 +1679,14 @@
         grid-template-columns: minmax(0, 1fr);
       }
 
+      .expense-overview-controls {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .spend-mode-switch,
+      .expense-period-controls { flex-basis: auto; }
+
       .expense-chart-item { grid-template-columns: 11px minmax(0, 1fr) auto; }
     }
 
@@ -1352,7 +1721,6 @@
       }
 
       .card:hover, button:hover, button:active,
-      .action-tile:hover .action-arrow,
       .fuel-slider::-webkit-slider-thumb:hover,
       .fuel-slider::-moz-range-thumb:hover,
       .car-summary:hover .car-illustration,
@@ -1364,33 +1732,9 @@
     }
 
     @media (max-width: 480px) {
-      body { padding: 28px 14px 42px; }
+      body { padding: 28px 14px calc(92px + env(safe-area-inset-bottom)); }
       .page-header { align-items: flex-start; flex-wrap: wrap; gap: 14px 10px; }
       .page-heading .tag { font-size: 10px; }
-      .theme-toggle { min-height: 42px; padding: 9px 10px; font-size: 13px; }
-      .header-actions {
-        position: relative;
-        width: 100%;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-      }
-      .header-actions .theme-menu { flex: 1 1 0; min-width: 0; }
-      .header-actions .theme-toggle {
-        justify-content: center;
-        width: 100%;
-        height: 42px;
-        min-height: 42px;
-      }
-      .theme-options { left: 0; right: auto; }
-      .push-options {
-        top: calc(100% + 10px);
-        right: auto;
-        left: calc(-100% - 8px);
-        width: min(390px, calc(100vw - 28px));
-        max-height: min(60vh, 480px);
-        overflow-y: auto;
-        overscroll-behavior: contain;
-      }
       .push-card { grid-template-columns: 1fr; gap: 12px; }
       .push-card > button { justify-self: start; }
       .push-setting { flex-wrap: wrap; }
@@ -1400,8 +1744,6 @@
       .card { padding: 17px; }
       .fuel-input-row { grid-template-columns: 1fr; gap: 4px; }
       .entry-dialog { padding: 18px; }
-      .action-grid { grid-template-columns: 1fr; gap: 10px; }
-      .action-tile { min-height: 82px; }
       .car-summary {
         grid-template-columns: minmax(0, 1fr);
         gap: 16px;
@@ -1412,12 +1754,111 @@
       .car-photo { min-height: 145px; }
       .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; gap: 12px; }
+      .home-metrics { grid-template-columns: 1fr; gap: 9px; }
+      .home-metric {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 12px;
+        padding: 14px;
+      }
+      .home-metric .label,
+      .home-metric > span:last-child { grid-column: 1; }
+      .home-metric .amount {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        text-align: right;
+      }
+      .more-actions { grid-template-columns: 1fr; gap: 8px; }
+      .service-fields-grid { grid-template-columns: 1fr; }
+      .service-field-full { grid-column: auto; }
+      .service-heading {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .service-heading .service-add-button { width: 100%; }
+      .app-tabs {
+        position: fixed;
+        z-index: 20;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 2px;
+        margin: 0;
+        padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+        border: 0;
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: 0 -6px 24px var(--shadow-hover);
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+      }
+      .app-tab {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 3px;
+        min-height: 54px;
+        padding: 4px 2px;
+        border-radius: 11px;
+        font-size: 10px;
+        line-height: 1.2;
+      }
+      .app-tab-icon { font-size: 19px; }
+      .section-heading { align-items: flex-end; }
+      .section-heading h2 { font-size: 19px; }
+      .section-heading > button { padding: 10px; font-size: 13px; }
     }
 
     @media (min-width: 481px) and (max-width: 760px) {
-      body { padding: 34px 20px 52px; }
+      body { padding: 34px 20px calc(92px + env(safe-area-inset-bottom)); }
       .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; }
+      .home-metrics { grid-template-columns: 1fr; }
+      .more-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .app-tabs {
+        position: fixed;
+        z-index: 20;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 2px;
+        margin: 0;
+        padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+        border: 0;
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: 0 -6px 24px var(--shadow-hover);
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+      }
+      .app-tab {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 3px;
+        min-height: 54px;
+        padding: 4px 2px;
+        border-radius: 11px;
+        font-size: 10px;
+        line-height: 1.2;
+      }
+      .app-tab-icon { font-size: 19px; }
+    }
+
+    @media (min-width: 481px) and (max-width: 760px) {
+      .app-tabs { padding-right: 14px; padding-left: 14px; }
+      .app-tab { font-size: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .app-tabs { scroll-behavior: auto; }
     }
 
     @media (max-width: 760px) {
@@ -1446,6 +1887,443 @@
       .car-fields-grid { grid-template-columns: minmax(0, 1fr); }
       .car-form-section { padding: 13px; }
     }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 20px;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-top: calc(clamp(30px, 5vw, 56px) + env(safe-area-inset-top));
+      padding-left: calc(28px + env(safe-area-inset-left));
+      padding-right: calc(28px + env(safe-area-inset-right));
+      background-color: var(--page-bg);
+      background-image:
+        radial-gradient(
+          ellipse at 0% 0%,
+          color-mix(in srgb, var(--accent) 19%, transparent),
+          transparent 38rem
+        ),
+        radial-gradient(
+          ellipse at 100% 0%,
+          color-mix(in srgb, var(--accent-secondary) 22%, transparent),
+          transparent 34rem
+        ),
+        radial-gradient(
+          ellipse at 100% 100%,
+          color-mix(in srgb, var(--accent-secondary) 16%, transparent),
+          transparent 38rem
+        );
+      background-repeat: no-repeat;
+      line-height: 1.5;
+    }
+
+    main { max-width: 1120px; }
+
+    .page-header { margin-bottom: 20px; }
+
+    .page-heading .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--accent);
+      font-size: 10px;
+      letter-spacing: 1.7px;
+    }
+
+    .page-heading .tag::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+    }
+
+    h1 {
+      margin-bottom: 5px;
+      font-size: clamp(30px, 4vw, 40px);
+      letter-spacing: -0.045em;
+      line-height: 1.08;
+    }
+
+    .page-heading > p { font-size: 14px; }
+
+    .card,
+    .car-summary,
+    .service-history-disclosure {
+      border-radius: 20px;
+      box-shadow: 0 8px 26px var(--shadow);
+    }
+
+    .card { padding: clamp(18px, 2.4vw, 24px); }
+
+    .card:not(.car) {
+      background: linear-gradient(
+        145deg,
+        var(--surface),
+        color-mix(in srgb, var(--surface) 88%, var(--accent-secondary-soft))
+      );
+    }
+
+    .car-summary {
+      position: relative;
+      overflow: hidden;
+      min-height: 300px;
+      border-radius: 24px;
+      background:
+        radial-gradient(
+          ellipse at 79% 45%,
+          color-mix(in srgb, var(--accent-soft) 76%, transparent),
+          transparent 36%
+        ),
+        radial-gradient(
+          ellipse at 100% 100%,
+          color-mix(in srgb, var(--accent-secondary) 20%, transparent),
+          transparent 42%
+        ),
+        linear-gradient(125deg, var(--surface), var(--surface-alt));
+    }
+
+    .car-summary-copy {
+      justify-items: start;
+      justify-self: start;
+      width: min(100%, 480px);
+      text-align: left;
+    }
+
+    .car-summary-copy > .label {
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 1.4px;
+    }
+
+    .car-summary-title { letter-spacing: -0.04em; }
+
+    .car-summary-note { max-width: 34ch; }
+
+    .car-summary-visual {
+      width: min(100%, 330px);
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse,
+        color-mix(in srgb, var(--surface) 74%, transparent),
+        transparent 68%
+      );
+    }
+
+    button:not(.app-tab):not(.dialog-close):not(.car-color-swatch):not(.date-wheel-option) {
+      min-height: 44px;
+      border-radius: 12px;
+    }
+
+    .app-tabs {
+      gap: 6px;
+      margin-bottom: 22px;
+      padding: 7px;
+      border-radius: 17px;
+      background: color-mix(in srgb, var(--surface) 92%, var(--accent-soft));
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .app-tab {
+      min-height: 48px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: background-color 180ms ease, color 180ms ease,
+        box-shadow 180ms ease;
+    }
+
+    .app-tab[aria-selected="true"] {
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .app-tab-icon {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .app-tab:nth-child(even) .app-tab-icon {
+      color: var(--accent-secondary);
+    }
+
+    .home-metrics { gap: 12px; }
+
+    .home-metric {
+      --metric-accent: var(--accent);
+      min-height: 126px;
+      padding: 18px;
+      border-top: 3px solid var(--metric-accent);
+      border-top-color: var(--metric-accent);
+      border-radius: 18px;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      background: linear-gradient(
+        145deg,
+        var(--surface),
+        color-mix(in srgb, var(--surface) 84%, var(--metric-tint))
+      );
+    }
+
+    .home-metric:nth-child(even) {
+      --metric-accent: var(--accent-secondary);
+      --metric-tint: var(--accent-secondary-soft);
+    }
+
+    .home-metric:nth-child(odd) { --metric-tint: var(--accent-soft); }
+
+    .home-metric:hover { border-top-color: var(--metric-accent); }
+
+    .home-metric .label {
+      color: var(--metric-accent);
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .home-metric .amount {
+      font-size: clamp(20px, 2vw, 25px);
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .home-metric > span:last-child {
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .section-heading {
+      align-items: center;
+      margin-top: 24px;
+      margin-bottom: 14px;
+    }
+
+    .section-heading .label {
+      margin-bottom: 6px;
+      color: var(--accent);
+      letter-spacing: 1.3px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(21px, 3vw, 25px);
+      letter-spacing: -0.03em;
+    }
+
+    .section-add-button {
+      padding: 11px 16px;
+      box-shadow: 0 5px 14px var(--focus-ring);
+    }
+
+    .journal-metrics { gap: 16px; }
+
+    .journal-metric strong {
+      font-size: clamp(17px, 2vw, 22px);
+      letter-spacing: -0.025em;
+    }
+
+    .journal-recent-card h3,
+    .event-history-card h2,
+    .service-upcoming h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .expense {
+      padding: 15px 0;
+      border-color: color-mix(in srgb, var(--border) 82%, transparent);
+    }
+
+    .expense > div:first-child strong,
+    .service-record-title {
+      line-height: 1.4;
+    }
+
+    .more-action {
+      min-height: 78px;
+      border-radius: 16px;
+      background: linear-gradient(
+        145deg,
+        var(--surface),
+        color-mix(in srgb, var(--surface) 90%, var(--accent-soft))
+      );
+    }
+
+    .more-action:nth-child(even) {
+      border-color: color-mix(in srgb, var(--accent-secondary) 32%, var(--border));
+    }
+
+    .more-action:nth-child(even) > span:first-child {
+      color: var(--accent-secondary);
+    }
+
+    .entry-dialog {
+      border-radius: 22px;
+      box-shadow: 0 28px 90px var(--shadow-hover);
+    }
+
+    input { border-radius: 12px; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover,
+      .service-history-disclosure:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 32px var(--shadow-hover);
+      }
+
+      .car-summary:hover {
+        transform: translateY(-2px);
+        background:
+          radial-gradient(
+            ellipse at 79% 45%,
+            color-mix(in srgb, var(--accent-soft) 76%, transparent),
+            transparent 36%
+          ),
+          radial-gradient(
+            ellipse at 100% 100%,
+            color-mix(in srgb, var(--accent-secondary) 20%, transparent),
+            transparent 42%
+          ),
+          linear-gradient(125deg, var(--surface), var(--surface-alt));
+        box-shadow: 0 14px 32px var(--shadow-hover);
+      }
+    }
+
+    @media (hover: none) {
+      .card:hover,
+      .car-summary:hover,
+      .service-history-disclosure:hover {
+        transform: none;
+        box-shadow: 0 8px 26px var(--shadow);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding-top: calc(28px + env(safe-area-inset-top));
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        padding-left: calc(20px + env(safe-area-inset-left));
+        padding-right: calc(20px + env(safe-area-inset-right));
+      }
+
+      .car-summary {
+        min-height: 0;
+        background:
+          radial-gradient(
+            ellipse at 50% 70%,
+            color-mix(in srgb, var(--accent-soft) 76%, transparent),
+            transparent 42%
+          ),
+          radial-gradient(
+            ellipse at 100% 100%,
+            color-mix(in srgb, var(--accent-secondary) 20%, transparent),
+            transparent 48%
+          ),
+          linear-gradient(125deg, var(--surface), var(--surface-alt));
+      }
+
+      .car-summary-copy {
+        justify-items: center;
+        justify-self: center;
+        text-align: center;
+      }
+
+      .car-summary-visual {
+        background: radial-gradient(
+          ellipse,
+          color-mix(in srgb, var(--surface) 74%, transparent),
+          transparent 68%
+        );
+      }
+
+      .app-tabs {
+        padding-top: 9px;
+        padding-bottom: calc(9px + env(safe-area-inset-bottom));
+        padding-left: calc(8px + env(safe-area-inset-left));
+        padding-right: calc(8px + env(safe-area-inset-right));
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -8px 28px var(--shadow-hover);
+      }
+
+      .app-tab {
+        min-height: 56px;
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding-left: calc(14px + env(safe-area-inset-left));
+        padding-right: calc(14px + env(safe-area-inset-right));
+      }
+
+      .page-header { margin-bottom: 17px; }
+
+      .page-heading .tag {
+        margin-bottom: 10px;
+        padding: 5px 9px;
+      }
+
+      .car-summary {
+        gap: 8px;
+        padding: 18px 15px;
+        border-radius: 20px;
+      }
+
+      .car-summary-visual { width: min(100%, 280px); }
+
+      .home-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      .home-metric {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 118px;
+        padding: 13px;
+      }
+
+      .home-metric .amount {
+        grid-column: auto;
+        grid-row: auto;
+        text-align: left;
+      }
+
+      .home-metric .label,
+      .home-metric > span:last-child { grid-column: auto; }
+
+      .section-heading:not(.service-heading) {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .section-heading > .section-add-button { width: 100%; }
+
+      .journal-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px 12px;
+      }
+
+      .journal-metric:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+      .card { padding: 16px; }
+
+      .event-history-card { padding: 18px; }
+    }
+
+    @media (max-width: 360px) {
+      .home-metrics { grid-template-columns: minmax(0, 1fr); }
+      .home-metric { min-height: 104px; }
+      .app-tab { font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
   </style>
 </head>
 <body>
@@ -1456,149 +2334,193 @@
         <h1>Мой гараж</h1>
         <p class="muted">История обслуживания твоего автомобиля</p>
       </div>
-      <div class="header-actions">
-        <div class="theme-menu">
-          <button class="theme-toggle" id="themeToggle" type="button"
-            aria-expanded="false" aria-controls="themeOptions">
-            <span class="theme-toggle-icon" aria-hidden="true">◐</span>
-            <span id="themeLabel">Тема</span>
-            <span aria-hidden="true">⌄</span>
-          </button>
-          <div class="theme-options" id="themeOptions" role="group"
-            aria-label="Выбор темы сайта" hidden>
-            <button class="theme-option" type="button" data-theme-option="warm"
-              aria-pressed="true">
-              <span class="theme-swatches" aria-hidden="true">
-                <span style="background:#f5f2eb"></span>
-                <span style="background:#fffefa"></span>
-                <span style="background:#a45b42"></span>
-              </span>
-              <strong>Светлая</strong>
-            </button>
-            <button class="theme-option" type="button" data-theme-option="dark"
-              aria-pressed="false">
-              <span class="theme-swatches" aria-hidden="true">
-                <span style="background:#17191c"></span>
-                <span style="background:#30343a"></span>
-                <span style="background:#f1f3f5"></span>
-              </span>
-              <strong>Тёмная</strong>
-            </button>
-            <button class="theme-option" type="button" data-theme-option="blue"
-              aria-pressed="false">
-              <span class="theme-swatches" aria-hidden="true">
-                <span style="background:#eaf1f8"></span>
-                <span style="background:#fff"></span>
-                <span style="background:#28679d"></span>
-              </span>
-              <strong>Синяя</strong>
-            </button>
-            <button class="theme-option" type="button" data-theme-option="green"
-              aria-pressed="false">
-              <span class="theme-swatches" aria-hidden="true">
-                <span style="background:#dce8d8"></span>
-                <span style="background:#eaf2e6"></span>
-                <span style="background:#47764e"></span>
-              </span>
-              <strong>Зелёная</strong>
-            </button>
-            <button class="theme-option" type="button" data-theme-option="lavender"
-              aria-pressed="false">
-              <span class="theme-swatches" aria-hidden="true">
-                <span style="background:#e0d7ed"></span>
-                <span style="background:#eee8f5"></span>
-                <span style="background:#7655a5"></span>
-              </span>
-              <strong>Лавандовая</strong>
-            </button>
-          </div>
-        </div>
-        <div class="theme-menu">
-          <button class="theme-toggle" id="pushToggle" type="button"
-            aria-expanded="false" aria-controls="pushOptions">
-            <svg class="theme-toggle-icon" viewBox="0 0 24 24"
-              width="18" height="18" fill="none" aria-hidden="true">
-              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"
-                stroke="currentColor" stroke-linecap="round"
-                stroke-linejoin="round" stroke-width="1.8"></path>
-            </svg>
-            <span>Уведомления</span>
-            <span aria-hidden="true">⌄</span>
-          </button>
-          <section class="push-options" id="pushOptions"
-            aria-label="Настройки уведомлений" hidden>
-            <div class="push-card">
-              <div>
-                <h2 id="pushTitle">Push-уведомления</h2>
-                <p class="muted">Напоминания каждые 3 часа и сообщения о новых версиях.</p>
-              </div>
-              <button id="pushEnableButton" type="button">Включить</button>
-              <div class="push-card-status muted" id="pushStatus" role="status"
-                aria-live="polite">
-                Проверяем поддержку уведомлений…
-              </div>
-              <a class="push-server-check" id="pushServerCheck"
-                href="https://my-garage-push.onrender.com/api/push/public-key"
-                target="_blank" rel="noopener" hidden>
-                Проверить доступ к серверу с этого устройства
-              </a>
-              <div class="push-settings" id="pushSettings" hidden>
-                <div class="push-setting">
-                  <input id="reminderNotifications" type="checkbox" checked>
-                  <label for="reminderNotifications">Напоминать каждые 3 часа</label>
-                </div>
-                <div class="push-setting">
-                  <input id="updateNotices" type="checkbox" checked>
-                  <label for="updateNotices">Сообщать о новых версиях и обновлениях</label>
-                </div>
-                <button class="push-disable" id="pushDisableButton" type="button">
-                  Отключить уведомления
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
     </header>
 
-    <section class="card install-prompt" id="installPrompt"
-      aria-labelledby="installPromptTitle" hidden>
-      <div class="install-prompt-copy">
-        <h2 id="installPromptTitle">Добавь «Мой гараж» на главный экран</h2>
-        <p class="muted" id="installPromptDescription">
-          Открывай приложение одним касанием.
-        </p>
+    <nav class="app-tabs" role="tablist" aria-label="Разделы приложения">
+      <button class="app-tab" id="tab-home" type="button" role="tab"
+        aria-selected="true" aria-controls="panel-home" tabindex="0"
+        data-tab="home">
+        <span class="app-tab-icon" aria-hidden="true">⌂</span>
+        <span>Главная</span>
+      </button>
+      <button class="app-tab" id="tab-service" type="button" role="tab"
+        aria-selected="false" aria-controls="panel-service" tabindex="-1"
+        data-tab="service">
+        <span class="app-tab-icon" aria-hidden="true">⚒</span>
+        <span>ТО</span>
+      </button>
+      <button class="app-tab" id="tab-fuel" type="button" role="tab"
+        aria-selected="false" aria-controls="panel-fuel" tabindex="-1"
+        data-tab="fuel">
+        <span class="app-tab-icon" aria-hidden="true">⛽</span>
+        <span>Заправки</span>
+      </button>
+      <button class="app-tab" id="tab-expenses" type="button" role="tab"
+        aria-selected="false" aria-controls="panel-expenses" tabindex="-1"
+        data-tab="expenses">
+        <span class="app-tab-icon" aria-hidden="true">₽</span>
+        <span>Расходы</span>
+      </button>
+      <button class="app-tab" id="tab-more" type="button" role="tab"
+        aria-selected="false" aria-controls="panel-more" tabindex="-1"
+        data-tab="more">
+        <span class="app-tab-icon" aria-hidden="true">⋯</span>
+        <span>Ещё</span>
+      </button>
+    </nav>
+
+    <section class="tab-panel" id="panel-home" role="tabpanel"
+      aria-labelledby="tab-home" tabindex="0" data-panel="home">
+      <section class="card install-prompt" id="installPrompt"
+        aria-labelledby="installPromptTitle" hidden>
+        <div class="install-prompt-copy">
+          <h2 id="installPromptTitle">Добавь «Мой гараж» на главный экран</h2>
+          <p class="muted" id="installPromptDescription">
+            Открывай приложение одним касанием.
+          </p>
+        </div>
+        <div class="install-prompt-actions">
+          <button id="openInstallGuide" type="button">Как добавить</button>
+          <button class="install-prompt-dismiss" id="dismissInstallPrompt"
+            type="button" aria-label="Скрыть предложение">×</button>
+        </div>
+      </section>
+
+      <section class="car-summary" aria-labelledby="carTitle">
+        <div class="car-summary-copy">
+          <span class="label">МОЙ АВТОМОБИЛЬ</span>
+          <h2 class="car-summary-title" id="carTitle">Volkswagen</h2>
+          <p class="car-summary-note">
+            Персональная карточка и история твоего автомобиля
+          </p>
+          <button class="car-summary-edit" id="openCarDialog" type="button"
+            aria-haspopup="dialog" aria-controls="carDialog">
+            Изменить автомобиль <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <div class="car-summary-visual">
+          <img class="car-photo" id="carPhoto" alt="" hidden>
+          <canvas class="car-illustration" id="carIllustration" width="626"
+            height="626" role="img"
+            aria-label="Спортивный автомобиль, вид сзади"></canvas>
+        </div>
+      </section>
+
+      <div class="home-metrics">
+        <section class="card home-metric">
+          <span class="label">ТЕКУЩИЙ ПРОБЕГ</span>
+          <strong class="amount" id="homeOdometer">—</strong>
+          <span class="muted" id="homeOdometerHint">Добавь заправку с пробегом</span>
+        </section>
+        <section class="card home-metric">
+          <span class="label">ПОТРАТЫ ЗА ВСЁ ВРЕМЯ</span>
+          <strong class="amount" id="homeTotal">0 ₽</strong>
+          <span class="muted">Расходы и заправки</span>
+        </section>
+        <section class="card home-metric">
+          <span class="label">РАСХОД ТОПЛИВА</span>
+          <strong class="amount" id="fuelConsumption">—</strong>
+          <span class="muted" id="fuelHint">
+            Добавь две заправки с известным пробегом.
+          </span>
+        </section>
+        <section class="card home-metric">
+          <span class="label">БЛИЖАЙШЕЕ ТО</span>
+          <strong class="amount" id="homeServiceDue">—</strong>
+          <span class="muted" id="homeServiceHint">
+            Добавь выполненную работу с интервалом.
+          </span>
+        </section>
       </div>
-      <div class="install-prompt-actions">
-        <button id="openInstallGuide" type="button">Как добавить</button>
-        <button class="install-prompt-dismiss" id="dismissInstallPrompt"
-          type="button" aria-label="Скрыть предложение">×</button>
-      </div>
+
+      <section class="card event-history-card">
+        <h2>Последние записи</h2>
+        <div id="homeRecentEvents"></div>
+      </section>
     </section>
 
-    <section class="car-summary" aria-labelledby="carTitle">
-      <div class="car-summary-copy">
-        <span class="label">МОЙ АВТОМОБИЛЬ</span>
-        <h2 class="car-summary-title" id="carTitle">Volkswagen</h2>
-        <p class="car-summary-note">
-          Персональная карточка и история твоего автомобиля
-        </p>
-        <button class="car-summary-edit" id="openCarDialog" type="button"
-          aria-haspopup="dialog" aria-controls="carDialog">
-          Изменить автомобиль <span aria-hidden="true">↗</span>
+    <section class="tab-panel" id="panel-service" role="tabpanel"
+      aria-labelledby="tab-service" tabindex="0" data-panel="service" hidden>
+      <div class="section-heading service-heading">
+        <div>
+          <span class="label">ЗАБОТА ОБ АВТОМОБИЛЕ</span>
+          <h2>Техническое обслуживание</h2>
+        </div>
+        <button class="section-add-button service-add-button"
+          id="openServiceDialog" type="button" aria-haspopup="dialog"
+          aria-controls="serviceDialog">
+          <span aria-hidden="true">＋</span> Записать ТО
         </button>
       </div>
-      <div class="car-summary-visual">
-        <img class="car-photo" id="carPhoto" alt="" hidden>
-        <canvas class="car-illustration" id="carIllustration" width="626"
-          height="626" role="img"
-          aria-label="Спортивный автомобиль, вид сзади"></canvas>
-      </div>
+      <section class="card service-upcoming">
+        <h3>Что скоро сделать</h3>
+        <div id="serviceUpcoming"></div>
+      </section>
+      <details class="service-history-disclosure" id="serviceHistoryDisclosure">
+        <summary id="serviceHistorySummary">История обслуживания</summary>
+        <div class="service-history-list" id="serviceHistory"></div>
+      </details>
     </section>
 
-    <div class="summary-grid">
-      <section class="card spend-widget">
-        <div class="label" id="spendWidgetTitle">ВСЕГО ПОТРАЧЕНО</div>
+    <section class="tab-panel" id="panel-fuel" role="tabpanel"
+      aria-labelledby="tab-fuel" tabindex="0" data-panel="fuel" hidden>
+      <div class="section-heading">
+        <div>
+          <span class="label">ТОПЛИВО</span>
+          <h2>История заправок</h2>
+        </div>
+        <button class="section-add-button" id="openFuelDialogFromTab"
+          type="button" aria-haspopup="dialog" aria-controls="fuelDialog">
+          <span aria-hidden="true">＋</span> Добавить заправку
+        </button>
+      </div>
+      <section class="card">
+        <div class="journal-metrics">
+          <div class="journal-metric">
+            <span class="muted">Заправок</span>
+            <strong id="fuelEntryCount">0</strong>
+          </div>
+          <div class="journal-metric">
+            <span class="muted">Потрачено на топливо</span>
+            <strong id="fuelSpendTotal">0 ₽</strong>
+          </div>
+          <div class="journal-metric">
+            <span class="muted">Средний расход</span>
+            <strong id="fuelTabConsumption">—</strong>
+          </div>
+        </div>
+      </section>
+      <section class="card fuel-chart-card" aria-labelledby="fuelChartTitle">
+        <div class="fuel-chart-heading">
+          <h3 id="fuelChartTitle">Динамика расхода</h3>
+          <span class="fuel-chart-unit">л / 100 км</span>
+        </div>
+        <div id="fuelChart" aria-live="polite"></div>
+      </section>
+      <section class="card journal-recent-card">
+        <h3>Последние заправки</h3>
+        <div id="fuelRecent"></div>
+        <details class="journal-history-disclosure" id="fuelHistoryDisclosure">
+          <summary id="fuelHistorySummary">Вся история заправок</summary>
+          <div class="journal-history-list" id="fuelHistory"></div>
+        </details>
+      </section>
+    </section>
+
+    <section class="tab-panel" id="panel-expenses" role="tabpanel"
+      aria-labelledby="tab-expenses" tabindex="0" data-panel="expenses" hidden>
+      <div class="section-heading">
+        <div>
+          <span class="label">УЧЁТ АВТОМОБИЛЯ</span>
+          <h2>Расходы</h2>
+        </div>
+        <button class="section-add-button" id="openExpenseDialogFromTab"
+          type="button" aria-haspopup="dialog" aria-controls="expenseDialog">
+          <span aria-hidden="true">＋</span> Добавить расход
+        </button>
+      </div>
+      <section class="card expense-overview-controls"
+        aria-label="Общий период расходов и статистики">
         <div class="spend-mode-switch" role="group"
           aria-label="Период отображения трат">
           <button id="showAllSpend" type="button" aria-pressed="true">
@@ -1618,69 +2540,267 @@
               aria-label="Следующий месяц">›</button>
           </div>
         </div>
-        <div class="amount" id="total">0 ₽</div>
-        <div class="spend-chart-layout">
-          <div class="expense-chart-donut" id="expenseChartDonut"
-            role="img" aria-label="Круговая диаграмма трат">
-            <div class="expense-chart-center">
-              <strong id="expenseChartCenterTotal">0 ₽</strong>
-              <span id="expenseChartCenterLabel">всего</span>
-            </div>
+      </section>
+      <div class="summary-grid">
+        <section class="card spend-widget">
+          <div class="label" id="spendWidgetTitle">ВСЕГО ПОТРАЧЕНО</div>
+          <div class="amount" id="total">0 ₽</div>
+          <p class="muted expense-spend-total" id="expenseSpendTotal"
+            aria-live="polite"></p>
+          <p class="muted" id="count">Расходов пока нет</p>
+        </section>
+        <section class="card expense-chart-widget"
+          aria-labelledby="expenseChartTitle">
+          <div class="label" id="expenseChartTitle">
+            СТАТИСТИКА ПО КАТЕГОРИЯМ
           </div>
-          <ul class="expense-chart" id="expenseChart"
-            aria-label="Траты по категориям"></ul>
-        </div>
-        <p class="muted expense-spend-total" id="expenseSpendTotal"
-          aria-live="polite"></p>
-        <p class="muted" id="count">Расходов пока нет</p>
-      </section>
-      <section class="card fuel-summary">
-        <div class="label">РАСХОД ТОПЛИВА</div>
-        <div class="amount" id="fuelConsumption">—</div>
-        <p class="muted" id="fuelHint">
-          Добавь две заправки с известным пробегом.
-        </p>
-      </section>
-    </div>
-
-    <div class="action-grid" aria-label="Добавить запись">
-      <button class="action-tile" id="openExpenseDialog" type="button">
-        <span class="action-icon" aria-hidden="true">₽</span>
-        <span class="action-copy">
-          <strong>Добавить расход</strong>
-          <span>Обслуживание, ремонт, детали</span>
-        </span>
-        <span class="action-arrow" aria-hidden="true">↗</span>
-      </button>
-      <button class="action-tile" id="openFuelDialog" type="button">
-        <span class="action-icon" aria-hidden="true">⛽</span>
-        <span class="action-copy">
-          <strong>Записать заправку</strong>
-          <span>Дата, пробег, литры и цена</span>
-        </span>
-        <span class="action-arrow" aria-hidden="true">↗</span>
-      </button>
-    </div>
-
-    <div class="history-grid">
-      <section class="card">
-        <h2>История заправок</h2>
-        <div id="fuelHistory"></div>
-      </section>
-      <section class="card">
-        <h2>История расходов</h2>
+          <div class="spend-chart-layout">
+            <div class="expense-chart-donut" id="expenseChartDonut"
+              role="img" aria-label="Круговая диаграмма трат">
+              <div class="expense-chart-center">
+                <strong id="expenseChartCenterTotal">0 ₽</strong>
+                <span id="expenseChartCenterLabel">всего</span>
+              </div>
+            </div>
+            <ul class="expense-chart" id="expenseChart"
+              aria-label="Траты по категориям"></ul>
+          </div>
+        </section>
+      </div>
+      <section class="card expense-history-card">
+        <h2>Последние расходы</h2>
         <p class="expense-chart-note muted">
-          Старые расходы без даты остаются в истории.
+          Записи об обслуживании также учитываются здесь.
         </p>
         <div id="history"></div>
+        <details class="journal-history-disclosure" id="expenseHistoryDisclosure">
+          <summary id="expenseHistorySummary">Вся история расходов</summary>
+          <div class="journal-history-list" id="historyArchive"></div>
+        </details>
       </section>
-    </div>
+    </section>
+
+    <section class="tab-panel" id="panel-more" role="tabpanel"
+      aria-labelledby="tab-more" tabindex="0" data-panel="more" hidden>
+      <div class="section-heading">
+        <div>
+          <span class="label">ДОПОЛНИТЕЛЬНО</span>
+          <h2>Ещё</h2>
+        </div>
+      </div>
+      <div class="more-actions">
+        <button class="more-action" id="openMoreCar" type="button">
+          <span aria-hidden="true">🚘</span>
+          <span><strong>Информация об автомобиле</strong>
+            <small>Марка, модель, цвет и фотография</small></span>
+        </button>
+        <button class="more-action" id="themeToggle" type="button"
+          aria-haspopup="dialog" aria-controls="themeDialog"
+          aria-expanded="false">
+          <span aria-hidden="true">◐</span>
+          <span><strong>Оформление</strong>
+            <small>Тема: <span id="themeLabel">Светлая</span></small></span>
+        </button>
+        <button class="more-action" id="pushToggle" type="button"
+          aria-haspopup="dialog" aria-controls="pushDialog"
+          aria-expanded="false">
+          <span aria-hidden="true">♧</span>
+          <span><strong>Уведомления</strong>
+            <small>Настройки push-уведомлений</small></span>
+        </button>
+        <button class="more-action" id="openMoreInstall" type="button">
+          <span aria-hidden="true">⌂</span>
+          <span><strong>Установить приложение</strong>
+            <small>Инструкции для iPhone и Android</small></span>
+        </button>
+        <button class="more-action" id="openMoreUpdates" type="button">
+          <span aria-hidden="true">↻</span>
+          <span><strong>История обновлений</strong>
+            <small>Что менялось в приложении</small></span>
+        </button>
+        <button class="more-action" id="exportGarageData" type="button">
+          <span aria-hidden="true">⇩</span>
+          <span><strong>Экспорт данных</strong>
+            <small>Скачать профиль и записи в формате JSON</small></span>
+        </button>
+      </div>
+      <section class="card event-history-card">
+        <h2>История событий</h2>
+        <p class="muted">Заправки и расходы из сохранённых записей.</p>
+        <div id="eventHistory"></div>
+      </section>
+      <section class="card feature-placeholder">
+        <span class="feature-status">В разработке</span>
+        <p class="muted">
+          Каталог запчастей и артикулов пока недоступен.
+          Экспорт не включает фотографии автомобиля.
+        </p>
+      </section>
+    </section>
   </main>
 
   <footer class="app-version muted">
     <button class="version-link" id="openUpdateDialog" type="button"
-      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.006</button>
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.007</button>
   </footer>
+
+  <dialog class="entry-dialog settings-dialog" id="themeDialog"
+    aria-labelledby="themeDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="themeDialogTitle">Оформление</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть настройки оформления">×</button>
+    </div>
+    <div class="theme-options" id="themeOptions" role="group"
+      aria-label="Выбор темы сайта">
+      <button class="theme-option" type="button" data-theme-option="warm"
+        aria-pressed="true">
+        <span class="theme-swatches" aria-hidden="true">
+          <span style="background:#f5f2eb"></span>
+          <span style="background:#fffefa"></span>
+          <span style="background:#a45b42"></span>
+        </span>
+        <strong>Светлая</strong>
+      </button>
+      <button class="theme-option" type="button" data-theme-option="dark"
+        aria-pressed="false">
+        <span class="theme-swatches" aria-hidden="true">
+          <span style="background:#17191c"></span>
+          <span style="background:#30343a"></span>
+          <span style="background:#f1f3f5"></span>
+        </span>
+        <strong>Тёмная</strong>
+      </button>
+      <button class="theme-option" type="button" data-theme-option="blue"
+        aria-pressed="false">
+        <span class="theme-swatches" aria-hidden="true">
+          <span style="background:#eaf1f8"></span>
+          <span style="background:#fff"></span>
+          <span style="background:#28679d"></span>
+        </span>
+        <strong>Синяя</strong>
+      </button>
+      <button class="theme-option" type="button" data-theme-option="green"
+        aria-pressed="false">
+        <span class="theme-swatches" aria-hidden="true">
+          <span style="background:#dce8d8"></span>
+          <span style="background:#eaf2e6"></span>
+          <span style="background:#47764e"></span>
+        </span>
+        <strong>Зелёная</strong>
+      </button>
+      <button class="theme-option" type="button" data-theme-option="lavender"
+        aria-pressed="false">
+        <span class="theme-swatches" aria-hidden="true">
+          <span style="background:#e0d7ed"></span>
+          <span style="background:#eee8f5"></span>
+          <span style="background:#7655a5"></span>
+        </span>
+        <strong>Лавандовая</strong>
+      </button>
+    </div>
+  </dialog>
+
+  <dialog class="entry-dialog settings-dialog" id="pushDialog"
+    aria-labelledby="pushDialogTitle">
+    <div class="dialog-heading">
+      <h2 id="pushDialogTitle">Уведомления</h2>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть настройки уведомлений">×</button>
+    </div>
+    <section class="push-options" id="pushOptions"
+      aria-label="Настройки уведомлений">
+      <div class="push-card">
+        <div>
+          <h2 id="pushTitle">Push-уведомления</h2>
+          <p class="muted">Напоминания каждые 3 часа и сообщения о новых версиях.</p>
+        </div>
+        <button id="pushEnableButton" type="button">Включить</button>
+        <div class="push-card-status muted" id="pushStatus" role="status"
+          aria-live="polite">
+          Проверяем поддержку уведомлений…
+        </div>
+        <a class="push-server-check" id="pushServerCheck"
+          href="https://my-garage-push.onrender.com/api/push/public-key"
+          target="_blank" rel="noopener" hidden>
+          Проверить доступ к серверу с этого устройства
+        </a>
+        <div class="push-settings" id="pushSettings" hidden>
+          <div class="push-setting">
+            <input id="reminderNotifications" type="checkbox" checked>
+            <label for="reminderNotifications">Напоминать каждые 3 часа</label>
+          </div>
+          <div class="push-setting">
+            <input id="updateNotices" type="checkbox" checked>
+            <label for="updateNotices">Сообщать о новых версиях и обновлениях</label>
+          </div>
+          <button class="push-disable" id="pushDisableButton" type="button">
+            Отключить уведомления
+          </button>
+        </div>
+      </div>
+    </section>
+  </dialog>
+
+  <dialog class="entry-dialog service-dialog" id="serviceDialog"
+    aria-labelledby="serviceDialogTitle">
+    <div class="dialog-heading">
+      <div>
+        <h2 id="serviceDialogTitle">Записать ТО</h2>
+        <p class="muted">Стоимость добавится в общие расходы.</p>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть форму ТО">×</button>
+    </div>
+    <form id="serviceForm">
+      <label class="service-field" for="serviceName">
+        Что сделали
+        <input id="serviceName" maxlength="100"
+          placeholder="Например, замена масла" required>
+      </label>
+      <div class="service-fields-grid">
+        <label class="service-field" for="serviceDate">
+          Дата
+          <input id="serviceDate" type="date" required>
+        </label>
+        <label class="service-field" for="servicePrice">
+          Стоимость, ₽
+          <input id="servicePrice" type="number" min="0"
+            max="100000000" step="0.01" placeholder="0" required>
+        </label>
+        <label class="service-field service-field-full"
+          for="serviceOdometer">
+          Пробег, км <span class="muted">(необязательно)</span>
+          <input id="serviceOdometer" type="number" min="0"
+            max="2000000" step="1" placeholder="Например, 85 000">
+        </label>
+      </div>
+      <details class="service-interval-options">
+        <summary>Добавить интервал следующего ТО</summary>
+        <div class="service-fields-grid">
+          <label class="service-field" for="serviceIntervalKm">
+            Через километры
+            <input id="serviceIntervalKm" type="number" min="1"
+              max="1000000" step="1" placeholder="Например, 10 000">
+          </label>
+          <label class="service-field" for="serviceIntervalMonths">
+            Через месяцы
+            <input id="serviceIntervalMonths" type="number" min="1"
+              max="600" step="1" placeholder="Например, 12">
+          </label>
+        </div>
+        <p class="muted">
+          Можно указать один или оба интервала. Push-напоминания о ТО не отправляются.
+        </p>
+      </details>
+      <div class="confirm-actions service-form-actions">
+        <button class="confirm-cancel" type="button" data-close-dialog>
+          Отмена
+        </button>
+        <button type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog class="entry-dialog" id="carDialog"
     aria-labelledby="carDialogTitle">
@@ -1979,6 +3099,20 @@
         aria-label="Закрыть окно">×</button>
     </div>
     <div class="update-history">
+      <section class="update-version" aria-labelledby="updateVersion007">
+        <h3 id="updateVersion007">test 0.0.007</h3>
+        <ul class="install-guide-list">
+          <li>Добавлена навигация по пяти разделам и главная сводка автомобиля: пробег, общие траты, расход топлива, ТО и последние записи.</li>
+          <li>Добавление заправок, расходов и ТО находится в соответствующих разделах; формы открываются отдельно и не загромождают экран.</li>
+          <li>ТО стало проще вести: ближайшие работы видны отдельно, история скрыта до раскрытия, интервалы задаются при записи обслуживания.</li>
+          <li>В журналах топлива и расходов сразу видны последние записи, остальная история открывается отдельно.</li>
+          <li>В заправках появился график расхода топлива между заправками с понятным пустым состоянием.</li>
+          <li>Статистика расходов по категориям вынесена в отдельную видимую карточку; общий переключатель периода обновляет её вместе с суммой.</li>
+          <li>Настройки оформления и push-уведомлений собраны в разделе «Ещё» и открываются в отдельных окнах; доступен экспорт локальных данных.</li>
+          <li>Обновлён автомобильный интерфейс: аккуратные карточки, мягкие угловые градиенты и адаптация для телефона, планшета и компьютера.</li>
+          <li>Для каждой темы подобраны основной и дополнительный цвета; оттенки используются в фоне, карточке автомобиля, сводке и навигации.</li>
+        </ul>
+      </section>
       <section class="update-version" aria-labelledby="updateVersion006">
         <h3 id="updateVersion006">test 0.0.006</h3>
         <ul class="install-guide-list">
@@ -2036,13 +3170,47 @@
   const carPhotoSourceStorageKey = "my-garage-car-photo-source-v1";
   const carPhotoCropStorageKey = "my-garage-car-photo-crop-v1";
   const themeStorageKey = "my-garage-theme-v1";
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  let showAllServiceUpcoming = false;
   const themeOptions = [...document.querySelectorAll("[data-theme-option]")];
   const availableThemes = ["warm", "dark", "blue", "green", "lavender"];
   const themeToggle = document.getElementById("themeToggle");
-  const themeOptionsMenu = document.getElementById("themeOptions");
   const themeLabel = document.getElementById("themeLabel");
+  const themeDialog = document.getElementById("themeDialog");
+  const pushDialog = document.getElementById("pushDialog");
+  const appTabs = [...document.querySelectorAll(".app-tab")];
+  const appPanels = [...document.querySelectorAll(".tab-panel")];
+  const appTabIds = new Set(appTabs.map(tab => tab.dataset.tab));
+
+  function setActiveTab(tabId, focusTab = false) {
+    if (!appTabIds.has(tabId)) return;
+    appTabs.forEach(tab => {
+      const isActive = tab.dataset.tab === tabId;
+      tab.setAttribute("aria-selected", String(isActive));
+      tab.tabIndex = isActive ? 0 : -1;
+      if (isActive && focusTab) tab.focus();
+    });
+    appPanels.forEach(panel => {
+      panel.hidden = panel.dataset.panel !== tabId;
+    });
+  }
+
+  appTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => setActiveTab(tab.dataset.tab));
+    tab.addEventListener("keydown", event => {
+      let nextIndex;
+      if (event.key === "ArrowRight") nextIndex = (index + 1) % appTabs.length;
+      else if (event.key === "ArrowLeft") {
+        nextIndex = (index - 1 + appTabs.length) % appTabs.length;
+      } else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = appTabs.length - 1;
+      else return;
+      event.preventDefault();
+      setActiveTab(appTabs[nextIndex].dataset.tab, true);
+    });
+  });
+
   const pushToggle = document.getElementById("pushToggle");
-  const pushOptionsMenu = document.getElementById("pushOptions");
   const themeNames = {
     warm: "Светлая",
     dark: "Тёмная",
@@ -2093,6 +3261,7 @@
   const carDialog = document.getElementById("carDialog");
   const expenseDialog = document.getElementById("expenseDialog");
   const fuelDialog = document.getElementById("fuelDialog");
+  const serviceDialog = document.getElementById("serviceDialog");
   const deleteConfirmDialog = document.getElementById("deleteConfirmDialog");
   const updateDialog = document.getElementById("updateDialog");
   const deleteConfirmMessage = document.getElementById("deleteConfirmMessage");
@@ -2114,6 +3283,8 @@
   const carIllustrationImage = new Image();
   let carIllustrationBaseData = null;
   let carBodyMaskData = null;
+  let carRoofMaskData = null;
+  let carTireMaskData = null;
   const carCropEditor = document.getElementById("carCropEditor");
   const carCropCanvas = document.getElementById("carCropCanvas");
   const carCropContext = carCropCanvas.getContext("2d");
@@ -2534,6 +3705,44 @@
   document.getElementById("openUpdateDialog").addEventListener(
     "click", () => updateDialog.showModal()
   );
+  document.getElementById("openMoreCar").addEventListener(
+    "click", () => carDialog.showModal()
+  );
+  document.getElementById("openServiceDialog").addEventListener(
+    "click", () => {
+      serviceForm.reset();
+      serviceIntervalDetails.open = false;
+      setServiceDateToToday();
+      serviceDialog.showModal();
+    }
+  );
+  document.getElementById("openMoreInstall").addEventListener(
+    "click", () => installDialog.showModal()
+  );
+  document.getElementById("openMoreUpdates").addEventListener(
+    "click", () => updateDialog.showModal()
+  );
+  document.getElementById("exportGarageData").addEventListener(
+    "click", () => {
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        vehicle: { make: carMake, model: carModel, color: carColor },
+        expenses,
+        fuelEntries
+      };
+      const objectUrl = URL.createObjectURL(new Blob(
+        [JSON.stringify(exportData, null, 2)],
+        { type: "application/json" }
+      ));
+      const download = document.createElement("a");
+      download.href = objectUrl;
+      download.download = `my-garage-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.append(download);
+      download.click();
+      download.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    }
+  );
   document.getElementById("dismissInstallPrompt").addEventListener(
     "click", () => {
       installPrompt.hidden = true;
@@ -2564,6 +3773,9 @@
   function applyTheme(theme) {
     if (!availableThemes.includes(theme)) return;
     document.body.dataset.theme = theme;
+    themeColorMeta.content = getComputedStyle(document.body)
+      .getPropertyValue("--page-bg")
+      .trim();
     themeLabel.textContent = themeNames[theme];
     themeOptions.forEach(button => {
       button.setAttribute(
@@ -2583,19 +3795,13 @@
   applyTheme(selectedTheme);
 
   themeToggle.addEventListener("click", () => {
-    const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
-    pushOptionsMenu.hidden = true;
-    pushToggle.setAttribute("aria-expanded", "false");
-    themeToggle.setAttribute("aria-expanded", String(!isOpen));
-    themeOptionsMenu.hidden = isOpen;
+    themeDialog.showModal();
+    themeToggle.setAttribute("aria-expanded", "true");
   });
 
   pushToggle.addEventListener("click", () => {
-    const isOpen = pushToggle.getAttribute("aria-expanded") === "true";
-    themeOptionsMenu.hidden = true;
-    themeToggle.setAttribute("aria-expanded", "false");
-    pushToggle.setAttribute("aria-expanded", String(!isOpen));
-    pushOptionsMenu.hidden = isOpen;
+    pushDialog.showModal();
+    pushToggle.setAttribute("aria-expanded", "true");
   });
 
   themeOptions.forEach(button => {
@@ -2610,48 +3816,33 @@
         applyTheme(previousTheme);
         alert("Не удалось сохранить тему оформления.");
       }
-      themeOptionsMenu.hidden = true;
-      themeToggle.setAttribute("aria-expanded", "false");
+      themeDialog.close();
     });
   });
 
-  document.addEventListener("click", event => {
-    if (!event.target.closest(".header-actions") &&
-        !event.target.closest(".install-prompt-actions")) {
-      themeOptionsMenu.hidden = true;
-      themeToggle.setAttribute("aria-expanded", "false");
-      pushOptionsMenu.hidden = true;
-      pushToggle.setAttribute("aria-expanded", "false");
-    }
+  themeDialog.addEventListener("close", () => {
+    themeToggle.setAttribute("aria-expanded", "false");
   });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" &&
-        (!themeOptionsMenu.hidden || !pushOptionsMenu.hidden)) {
-      const focusedMenuButton = pushOptionsMenu.hidden
-        ? themeToggle
-        : pushToggle;
-      themeOptionsMenu.hidden = true;
-      themeToggle.setAttribute("aria-expanded", "false");
-      pushOptionsMenu.hidden = true;
-      pushToggle.setAttribute("aria-expanded", "false");
-      focusedMenuButton.focus();
-    }
+  pushDialog.addEventListener("close", () => {
+    pushToggle.setAttribute("aria-expanded", "false");
   });
 
-  document.getElementById("openExpenseDialog").addEventListener(
-    "click", () => {
-      setDeviceDate(expenseDate, expenseDateWheels);
-      expenseDialog.showModal();
-    }
+  function openExpenseEntryDialog() {
+    setDeviceDate(expenseDate, expenseDateWheels);
+    expenseDialog.showModal();
+  }
+  document.getElementById("openExpenseDialogFromTab").addEventListener(
+    "click", openExpenseEntryDialog
   );
   document.getElementById("openCarDialog").addEventListener(
     "click", () => carDialog.showModal()
   );
-  document.getElementById("openFuelDialog").addEventListener(
-    "click", () => {
-      setDeviceDate(fuelDate, fuelDateWheels);
-      fuelDialog.showModal();
-    }
+  function openFuelEntryDialog() {
+    setDeviceDate(fuelDate, fuelDateWheels);
+    fuelDialog.showModal();
+  }
+  document.getElementById("openFuelDialogFromTab").addEventListener(
+    "click", openFuelEntryDialog
   );
   document.getElementById("cancelDelete").addEventListener(
     "click", () => deleteConfirmDialog.close()
@@ -2671,7 +3862,10 @@
     fuelDialog,
     deleteConfirmDialog,
     installDialog,
-    updateDialog
+    updateDialog,
+    themeDialog,
+    pushDialog,
+    serviceDialog
   ].forEach(dialog => {
     dialog.addEventListener("click", event => {
       if (event.target === dialog) dialog.close();
@@ -2961,7 +4155,9 @@
   function renderCarIllustration() {
     const width = carIllustration.width;
     const height = carIllustration.height;
-    if (!carIllustrationBaseData || !carBodyMaskData) return;
+    if (!carIllustrationBaseData || !carBodyMaskData || !carRoofMaskData) {
+      return;
+    }
     const imageData = new ImageData(
       new Uint8ClampedArray(carIllustrationBaseData.data),
       width,
@@ -2971,19 +4167,32 @@
       1, 3, 5
     ].map(offset => parseInt(carColorInput.value.slice(offset, offset + 2), 16));
     const mask = carBodyMaskData;
+    const roofMask = carRoofMaskData;
+    const tireMask = carTireMaskData;
     const pixels = imageData.data;
 
     for (let pixel = 0; pixel < pixels.length; pixel += 4) {
-      if (!mask[pixel + 3] || pixels[pixel + 3] === 0) continue;
+      if (tireMask[pixel + 3] && pixels[pixel + 3]) {
+        pixels[pixel] = 8;
+        pixels[pixel + 1] = 8;
+        pixels[pixel + 2] = 8;
+        continue;
+      }
+      const isRoof = roofMask[pixel + 3] > 0;
+      if ((!mask[pixel + 3] && !isRoof) || pixels[pixel + 3] === 0) {
+        continue;
+      }
       const red = pixels[pixel];
       const green = pixels[pixel + 1];
       const blue = pixels[pixel + 2];
       const darkest = Math.min(red, green, blue);
       const brightest = Math.max(red, green, blue);
-      if (brightest - darkest > 48 || brightest < 76) continue;
+      if (brightest - darkest > 48 || brightest < 24) {
+        continue;
+      }
 
       const luminance = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
-      const shade = 0.3 + luminance * 0.7;
+      const shade = (isRoof ? 0.2 : 0.3) + luminance * 0.7;
       pixels[pixel] = Math.round(targetRed * shade);
       pixels[pixel + 1] = Math.round(targetGreen * shade);
       pixels[pixel + 2] = Math.round(targetBlue * shade);
@@ -3001,6 +4210,49 @@
     carIllustrationBaseData = carIllustrationContext.getImageData(
       0, 0, width, height
     );
+    const tireCanvas = document.createElement("canvas");
+    tireCanvas.width = width;
+    tireCanvas.height = height;
+    const tireContext = tireCanvas.getContext(
+      "2d", { willReadFrequently: true }
+    );
+    const fillTire = points => {
+      tireContext.beginPath();
+      points.forEach(([x, y], index) => {
+        if (index === 0) tireContext.moveTo(x, y);
+        else tireContext.lineTo(x, y);
+      });
+      tireContext.closePath();
+      tireContext.fill();
+    };
+    const leftTire = [
+      [46, 446], [62, 449], [78, 454], [96, 460], [111, 465],
+      [117, 473], [105, 478], [80, 477], [62, 470], [49, 460]
+    ];
+    fillTire(leftTire);
+    fillTire(leftTire.map(([x, y]) => [width - x, y]));
+    carTireMaskData = tireContext.getImageData(
+      0, 0, width, height
+    ).data;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pixel = (y * width + x) * 4;
+        const red = carIllustrationBaseData.data[pixel];
+        const green = carIllustrationBaseData.data[pixel + 1];
+        const blue = carIllustrationBaseData.data[pixel + 2];
+        const brightest = Math.max(red, green, blue);
+        const darkest = Math.min(red, green, blue);
+        const isSpoilerGap = y >= 182 && y <= 211 &&
+          ((x >= 84 && x <= 158) || (x >= width - 158 && x <= width - 84));
+        const isTire = carTireMaskData[pixel + 3] > 0;
+        const isShadow = y >= 450 && brightest < 200 &&
+          brightest - darkest <= 35;
+        if (y >= 478 || (isShadow && !isTire) ||
+            (isSpoilerGap && brightest >= 190 && brightest - darkest <= 20)) {
+          carIllustrationBaseData.data[pixel + 3] = 0;
+        }
+      }
+    }
 
     const maskCanvas = document.createElement("canvas");
     maskCanvas.width = width;
@@ -3008,19 +4260,100 @@
     const maskContext = maskCanvas.getContext(
       "2d", { willReadFrequently: true }
     );
-    maskContext.beginPath();
+    const fillMaskPolygon = points => {
+      maskContext.beginPath();
+      points.forEach(([x, y], index) => {
+        if (index === 0) maskContext.moveTo(x, y);
+        else maskContext.lineTo(x, y);
+      });
+      maskContext.closePath();
+      maskContext.fill();
+    };
+    const bodyOutline = [
+      [75, 215], [160, 200], [230, 193], [396, 193], [466, 200],
+      [520, 220], [557, 230], [577, 260], [582, 320], [577, 365],
+      [565, 393], [550, 407], [490, 407], [136, 407], [105, 397],
+      [72, 380], [55, 350], [48, 300], [55, 255]
+    ];
+    const upperSide = [
+      [121, 218], [130, 194], [146, 171], [160, 151], [174, 136],
+      [191, 128], [188, 141], [179, 153], [169, 171], [157, 192],
+      [143, 216]
+    ];
+    const lowerSide = [
+      [42, 374], [96, 393], [137, 405], [178, 408], [175, 432],
+      [158, 453], [125, 463], [84, 457], [49, 443]
+    ];
+    fillMaskPolygon(bodyOutline);
+    fillMaskPolygon(upperSide);
+    fillMaskPolygon(upperSide.map(([x, y]) => [width - x, y]));
+    fillMaskPolygon(lowerSide);
+    fillMaskPolygon(lowerSide.map(([x, y]) => [width - x, y]));
+    fillMaskPolygon([
+      [154, 405], [472, 405], [503, 449], [490, 476],
+      [136, 476], [123, 449]
+    ]);
+    const leftBumper = [
+      [42, 365], [60, 367], [82, 377], [111, 384], [140, 395],
+      [178, 405], [174, 418], [138, 410], [108, 401], [78, 393],
+      [55, 384], [43, 380]
+    ];
+    fillMaskPolygon(leftBumper);
+    fillMaskPolygon(leftBumper.map(([x, y]) => [width - x, y]));
+    const bumperEdge = [
+      [38, 374], [58, 375], [76, 389], [82, 419], [96, 446],
+      [86, 459], [62, 455], [45, 445], [38, 430]
+    ];
+    fillMaskPolygon(bumperEdge);
+    fillMaskPolygon(bumperEdge.map(([x, y]) => [width - x, y]));
+    const lowerCorner = [
+      [44, 414], [78, 419], [91, 449], [100, 468], [82, 467],
+      [62, 455], [47, 445]
+    ];
+    fillMaskPolygon(lowerCorner);
+    fillMaskPolygon(lowerCorner.map(([x, y]) => [width - x, y]));
+    fillMaskPolygon([
+      [86, 163], [96, 165], [536, 165], [540, 162],
+      [540, 179], [530, 181], [96, 181], [86, 180]
+    ]);
+    const spoilerEnd = [
+      [86, 164], [98, 167], [101, 190], [95, 196], [88, 189]
+    ];
+    fillMaskPolygon(spoilerEnd);
+    fillMaskPolygon(spoilerEnd.map(([x, y]) => [width - x, y]));
+
+    maskContext.globalCompositeOperation = "destination-out";
     [
-      [110, 215], [160, 200], [230, 193], [396, 193], [466, 200],
-      [520, 220], [544, 260], [556, 320], [550, 365], [526, 393],
-      [490, 407], [136, 407], [102, 385], [78, 350], [73, 300],
-      [85, 255]
-    ].forEach(([x, y], index) => {
-      if (index === 0) maskContext.moveTo(x, y);
-      else maskContext.lineTo(x, y);
+      [110, 260, 29], [169, 269, 26], [456, 269, 26], [515, 260, 29],
+      [104, 416, 19], [142, 416, 19], [484, 416, 19], [522, 416, 19]
+    ].forEach(([x, y, radius]) => {
+      maskContext.beginPath();
+      maskContext.arc(x, y, radius, 0, Math.PI * 2);
+      maskContext.fill();
     });
-    maskContext.closePath();
-    maskContext.fill();
+    maskContext.globalCompositeOperation = "source-over";
     carBodyMaskData = maskContext.getImageData(
+      0, 0, width, height
+    ).data;
+
+    const roofCanvas = document.createElement("canvas");
+    roofCanvas.width = width;
+    roofCanvas.height = height;
+    const roofContext = roofCanvas.getContext(
+      "2d", { willReadFrequently: true }
+    );
+    roofContext.beginPath();
+    [
+      [178, 136], [186, 128], [198, 123], [300, 117], [428, 123],
+      [440, 128], [448, 136], [468, 169], [484, 205], [450, 212],
+      [176, 212], [142, 205], [158, 169]
+    ].forEach(([x, y], index) => {
+      if (index === 0) roofContext.moveTo(x, y);
+      else roofContext.lineTo(x, y);
+    });
+    roofContext.closePath();
+    roofContext.fill();
+    carRoofMaskData = roofContext.getImageData(
       0, 0, width, height
     ).data;
     renderCarIllustration();
@@ -3224,9 +4557,21 @@
   // 5. Показываем историю расходов и общую сумму
   function render() {
     const history = document.getElementById("history");
+    const historyArchive = document.getElementById("historyArchive");
+    const historyDisclosure = document.getElementById(
+      "expenseHistoryDisclosure"
+    );
+    const historySummary = document.getElementById("expenseHistorySummary");
+    const sortedExpenses = [...expenses].reverse();
+    const recentExpenses = sortedExpenses.slice(0, 3);
+    const archivedExpenses = sortedExpenses.slice(3);
     history.replaceChildren();
+    historyArchive.replaceChildren();
+    historySummary.textContent =
+      `Вся история расходов · ${expenses.length}`;
+    historyDisclosure.hidden = archivedExpenses.length === 0;
 
-    if (expenses.length === 0) {
+    if (recentExpenses.length === 0) {
       const empty = document.createElement("p");
       empty.className = "empty";
       empty.textContent = "Пока пусто. Добавь первый расход!";
@@ -3235,51 +4580,62 @@
 
     renderExpenseChart();
 
-    [...expenses].reverse().forEach(item => {
-      const row = document.createElement("div");
-      row.className = "expense";
-
-      const info = document.createElement("div");
-      const title = document.createElement("strong");
-      title.textContent = item.name;
-
-      const price = document.createElement("div");
-      price.className = "muted";
-      const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(item.date || "")
-        ? item.date.split("-").reverse().join(".") + " · "
-        : "";
-      price.textContent = dateLabel + money(item.price);
-
-      info.append(title, price);
-
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.textContent = "Удалить";
-
-      remove.addEventListener("click", () => {
-        const dateMessage = dateLabel
-          ? ` от ${item.date.split("-").reverse().join(".")}`
-          : "";
-        confirmDelete(
-          `Расход «${item.name}»${dateMessage} будет удалён из истории.`,
-          () => {
-            const previous = expenses;
-            expenses = expenses.filter(exp => exp.id !== item.id);
-
-            if (save()) {
-              render();
-            } else {
-              expenses = previous;
-            }
-          }
-        );
-      });
-
-      row.append(info, remove);
-      history.append(row);
+    recentExpenses.forEach(item => {
+      history.append(createExpenseRow(item));
+    });
+    archivedExpenses.forEach(item => {
+      historyArchive.append(createExpenseRow(item));
     });
 
     renderFuel();
+    renderServicePlan();
+    renderEventHistory();
+  }
+
+  function createExpenseRow(item) {
+    const row = document.createElement("div");
+    row.className = "expense";
+
+    const info = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = item.kind === "service"
+      ? `ТО · ${item.name}`
+      : item.name;
+
+    const price = document.createElement("div");
+    price.className = "muted";
+    const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(item.date || "")
+      ? item.date.split("-").reverse().join(".") + " · "
+      : "";
+    price.textContent = dateLabel + money(item.price);
+
+    info.append(title, price);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Удалить";
+
+    remove.addEventListener("click", () => {
+      const dateMessage = dateLabel
+        ? ` от ${item.date.split("-").reverse().join(".")}`
+        : "";
+      confirmDelete(
+        `Расход «${item.name}»${dateMessage} будет удалён из истории.`,
+        () => {
+          const previous = expenses;
+          expenses = expenses.filter(exp => exp.id !== item.id);
+
+          if (save()) {
+            render();
+          } else {
+            expenses = previous;
+          }
+        }
+      );
+    });
+
+    row.append(info, remove);
+    return row;
   }
 
   function renderExpenseChart() {
@@ -3316,6 +4672,14 @@
       const amount = Number(item.liters) * Number(item.pricePerLiter);
       return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
     }, 0);
+    const allTimeTotal = expenses.reduce((sum, item) => {
+      const amount = Number(item.price);
+      return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+    }, 0) + fuelEntries.reduce((sum, item) => {
+      const amount = Number(item.liters) * Number(item.pricePerLiter);
+      return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+    }, 0);
+    document.getElementById("homeTotal").textContent = money(allTimeTotal);
     if (fuelTotal > 0) {
       const key = "заправки";
       const existing = totalsByName.get(key);
@@ -3463,19 +4827,43 @@
   );
 
   // 6. Показываем историю заправок и расход топлива
+  function getCurrentOdometer() {
+    return [...fuelEntries, ...expenses.filter(item => item.kind === "service")]
+      .reduce((latest, item) => {
+        const odometer = Number(item.odometer);
+        return Number.isFinite(odometer) && odometer >= 0
+          ? Math.max(latest, odometer)
+          : latest;
+      }, -1);
+  }
+
   function renderFuel() {
     const history = document.getElementById("fuelHistory");
+    const recentHistory = document.getElementById("fuelRecent");
+    const historyDisclosure = document.getElementById("fuelHistoryDisclosure");
+    const historySummary = document.getElementById("fuelHistorySummary");
     const consumption = document.getElementById("fuelConsumption");
     const hint = document.getElementById("fuelHint");
 
     history.replaceChildren();
+    recentHistory.replaceChildren();
 
     const sorted = [...fuelEntries].sort(
       (a, b) => a.odometer - b.odometer
     );
+    renderFuelChart(sorted);
 
     const latest = sorted[sorted.length - 1];
     const previous = sorted[sorted.length - 2];
+    const currentOdometer = getCurrentOdometer();
+    document.getElementById("homeOdometer").textContent =
+      currentOdometer >= 0
+      ? currentOdometer.toLocaleString("ru-RU") + " км"
+      : "—";
+    document.getElementById("homeOdometerHint").textContent =
+      currentOdometer >= 0
+      ? "По последним записям"
+      : "Добавь заправку с пробегом";
 
     if (latest && previous) {
       const distance = latest.odometer - previous.odometer;
@@ -3494,56 +4882,524 @@
         "Для расчёта нужны две заправки с разным пробегом.";
     }
 
-    if (fuelEntries.length === 0) {
+    const currentFuelConsumption = consumption.textContent;
+    document.getElementById("fuelEntryCount").textContent =
+      String(fuelEntries.length);
+    document.getElementById("fuelTabConsumption").textContent =
+      currentFuelConsumption;
+    const fuelTotal = fuelEntries.reduce((sum, item) => {
+      const amount = Number(item.liters) * Number(item.pricePerLiter);
+      return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+    }, 0);
+    document.getElementById("fuelSpendTotal").textContent = money(fuelTotal);
+
+    const sortedByDate = [...fuelEntries].sort((a, b) =>
+      String(b.date || "").localeCompare(String(a.date || "")) ||
+      Number(b.odometer) - Number(a.odometer)
+    );
+    const recentEntries = sortedByDate.slice(0, 3);
+    const archivedEntries = sortedByDate.slice(3);
+    historySummary.textContent =
+      `Вся история заправок · ${fuelEntries.length}`;
+    historyDisclosure.hidden = archivedEntries.length === 0;
+
+    if (recentEntries.length === 0) {
       const empty = document.createElement("p");
       empty.className = "empty";
       empty.textContent = "Заправок пока нет.";
-      history.append(empty);
+      recentHistory.append(empty);
     }
 
-    [...fuelEntries].sort(
-      (a, b) => b.odometer - a.odometer
-    ).forEach(item => {
-      const row = document.createElement("div");
-      row.className = "expense";
+    recentEntries.forEach(item => {
+      recentHistory.append(createFuelRow(item));
+    });
+    archivedEntries.forEach(item => {
+      history.append(createFuelRow(item));
+    });
+  }
 
+  function renderFuelChart(sortedEntries) {
+    const container = document.getElementById("fuelChart");
+    container.replaceChildren();
+
+    const intervals = [];
+    for (let index = 1; index < sortedEntries.length; index += 1) {
+      const previous = sortedEntries[index - 1];
+      const current = sortedEntries[index];
+      const distance = Number(current.odometer) - Number(previous.odometer);
+      const liters = Number(current.liters);
+      if (!Number.isFinite(distance) || distance <= 0 ||
+          !Number.isFinite(liters) || liters <= 0) continue;
+
+      intervals.push({
+        odometer: Number(current.odometer),
+        date: current.date,
+        consumption: liters / distance * 100
+      });
+    }
+
+    const chartEntries = intervals.slice(-8);
+    if (chartEntries.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "fuel-chart-empty";
+      const title = document.createElement("strong");
+      title.textContent = sortedEntries.length === 0
+        ? "Добавь первую заправку"
+        : sortedEntries.length === 1
+          ? "Добавь ещё одну заправку"
+          : "Пока нечего показать";
+      const description = document.createElement("span");
+      description.textContent = sortedEntries.length < 2
+        ? "Расход появится, когда будут две записи с разным пробегом."
+        : "Проверь пробег и количество литров в записях.";
+      empty.append(title, description);
+      container.append(empty);
+      return;
+    }
+
+    const svgNamespace = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNamespace, "svg");
+    svg.classList.add("fuel-chart");
+    svg.setAttribute("viewBox", "0 0 640 250");
+    svg.setAttribute("role", "img");
+    svg.setAttribute(
+      "aria-label",
+      `Динамика расхода топлива: ${chartEntries.map(item =>
+        `${item.consumption.toFixed(2)} литра на 100 километров при пробеге ` +
+        `${item.odometer.toLocaleString("ru-RU")} километров`
+      ).join("; ")}`
+    );
+
+    const title = document.createElementNS(svgNamespace, "title");
+    title.textContent = "Расход топлива между заправками";
+    svg.append(title);
+
+    const left = 58;
+    const right = 618;
+    const top = 20;
+    const bottom = 194;
+    const values = chartEntries.map(item => item.consumption);
+    const minValue = Math.min(0, ...values);
+    const maxValue = Math.max(...values);
+    const range = maxValue - minValue || Math.max(maxValue * 0.2, 1);
+    const chartMin = Math.max(0, minValue - range * 0.18);
+    const chartMax = maxValue + range * 0.18;
+    const chartRange = chartMax - chartMin || 1;
+    const xFor = index => chartEntries.length === 1
+      ? (left + right) / 2
+      : left + index / (chartEntries.length - 1) * (right - left);
+    const yFor = value =>
+      bottom - (value - chartMin) / chartRange * (bottom - top);
+
+    for (let index = 0; index < 3; index += 1) {
+      const value = chartMax - chartRange * index / 2;
+      const y = top + (bottom - top) * index / 2;
+      const line = document.createElementNS(svgNamespace, "line");
+      line.classList.add("fuel-chart-gridline");
+      line.setAttribute("x1", String(left));
+      line.setAttribute("x2", String(right));
+      line.setAttribute("y1", String(y));
+      line.setAttribute("y2", String(y));
+
+      const label = document.createElementNS(svgNamespace, "text");
+      label.classList.add("fuel-chart-axis-label");
+      label.setAttribute("x", String(left - 10));
+      label.setAttribute("y", String(y + 4));
+      label.setAttribute("text-anchor", "end");
+      label.textContent = value.toFixed(1);
+      svg.append(line, label);
+    }
+
+    const points = chartEntries.map((item, index) => ({
+      ...item,
+      x: xFor(index),
+      y: yFor(item.consumption)
+    }));
+    const linePath = document.createElementNS(svgNamespace, "path");
+    linePath.classList.add("fuel-chart-line");
+    linePath.setAttribute(
+      "d",
+      points.map((point, index) =>
+        `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+      ).join(" ")
+    );
+
+    const areaPath = document.createElementNS(svgNamespace, "path");
+    areaPath.classList.add("fuel-chart-area");
+    areaPath.setAttribute(
+      "d",
+      `M ${points[0].x} ${bottom} ` +
+      points.map(point => `L ${point.x} ${point.y}`).join(" ") +
+      ` L ${points[points.length - 1].x} ${bottom} Z`
+    );
+    svg.append(areaPath, linePath);
+
+    points.forEach(point => {
+      const circle = document.createElementNS(svgNamespace, "circle");
+      circle.classList.add("fuel-chart-point");
+      circle.setAttribute("cx", String(point.x));
+      circle.setAttribute("cy", String(point.y));
+      circle.setAttribute("r", "5");
+
+      const pointTitle = document.createElementNS(svgNamespace, "title");
+      pointTitle.textContent =
+        `${point.consumption.toFixed(2)} л/100 км · ` +
+        `${point.odometer.toLocaleString("ru-RU")} км`;
+      circle.append(pointTitle);
+      svg.append(circle);
+    });
+
+    const first = chartEntries[0];
+    const last = chartEntries[chartEntries.length - 1];
+    const labels = [
+      { item: first, x: left, anchor: "start" },
+      ...(chartEntries.length > 1
+        ? [{ item: last, x: right, anchor: "end" }]
+        : [])
+    ];
+    labels.forEach(({ item, x, anchor }) => {
+      const label = document.createElementNS(svgNamespace, "text");
+      label.classList.add("fuel-chart-axis-label");
+      label.setAttribute("x", String(x));
+      label.setAttribute("y", "226");
+      label.setAttribute("text-anchor", anchor);
+      label.textContent = item.odometer.toLocaleString("ru-RU") + " км";
+      svg.append(label);
+    });
+
+    container.append(svg);
+  }
+
+  function createFuelRow(item) {
+    const row = document.createElement("div");
+    row.className = "expense";
+
+    const info = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = item.date + " · " + item.odometer + " км";
+
+    const details = document.createElement("div");
+    details.className = "muted";
+    details.textContent =
+      item.liters + " л × " + money(item.pricePerLiter) +
+      " = " + money(item.liters * item.pricePerLiter);
+
+    info.append(title, details);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Удалить";
+
+    remove.addEventListener("click", () => {
+      confirmDelete(
+        `Заправка от ${item.date} (${item.odometer} км) будет удалена из истории.`,
+        () => {
+          const previousEntries = fuelEntries;
+          fuelEntries = fuelEntries.filter(
+            entry => entry.id !== item.id
+          );
+
+          if (saveFuel()) {
+            render();
+          } else {
+            fuelEntries = previousEntries;
+          }
+        }
+      );
+    });
+    row.append(info, remove);
+    return row;
+  }
+
+  function renderServicePlan() {
+    const upcomingElement = document.getElementById("serviceUpcoming");
+    const historyElement = document.getElementById("serviceHistory");
+    const historySummary = document.getElementById("serviceHistorySummary");
+    upcomingElement.replaceChildren();
+    historyElement.replaceChildren();
+
+    const serviceEntries = expenses
+      .map((item, index) => ({ item, index }))
+      .filter(entry => entry.item.kind === "service")
+      .sort((a, b) =>
+        String(b.item.date || "").localeCompare(String(a.item.date || "")) ||
+        b.index - a.index
+      )
+      .map(entry => entry.item);
+    const currentOdometer = getCurrentOdometer();
+    const latestByTask = new Map();
+    const seenTasks = new Set();
+
+    serviceEntries.forEach(item => {
+      const taskKey = String(item.name || "").trim().toLocaleLowerCase("ru-RU");
+      if (!taskKey || seenTasks.has(taskKey)) return;
+      seenTasks.add(taskKey);
+      const intervalKm = Number(item.intervalKm);
+      const intervalMonths = Number(item.intervalMonths);
+      if (
+        !(Number.isFinite(intervalKm) && intervalKm > 0) &&
+        !(Number.isFinite(intervalMonths) && intervalMonths > 0)
+      ) return;
+
+      const completedDate = /^\d{4}-\d{2}-\d{2}$/.test(item.date || "")
+        ? new Date(
+          Number(item.date.slice(0, 4)),
+          Number(item.date.slice(5, 7)) - 1,
+          Number(item.date.slice(8, 10))
+        )
+        : null;
+      let dueDate = null;
+      if (completedDate && Number.isFinite(intervalMonths) &&
+          intervalMonths > 0) {
+        const monthIndex = completedDate.getMonth() + intervalMonths;
+        const targetYear = completedDate.getFullYear() +
+          Math.floor(monthIndex / 12);
+        const targetMonth = monthIndex % 12;
+        const targetDay = Math.min(
+          completedDate.getDate(),
+          new Date(targetYear, targetMonth + 1, 0).getDate()
+        );
+        dueDate = new Date(targetYear, targetMonth, targetDay);
+      }
+
+      const completedOdometer = Number(item.odometer);
+      const dueOdometer = Number.isFinite(intervalKm) && intervalKm > 0 &&
+        Number.isFinite(completedOdometer) && completedOdometer >= 0
+        ? completedOdometer + intervalKm
+        : null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const remainingDays = dueDate
+        ? Math.ceil((dueDate - today) / 86400000)
+        : null;
+      const remainingKm = dueOdometer !== null && currentOdometer >= 0
+        ? dueOdometer - currentOdometer
+        : null;
+      const overdue = (remainingDays !== null && remainingDays <= 0) ||
+        (remainingKm !== null && remainingKm <= 0);
+      const status = [];
+      if (dueOdometer !== null) {
+        status.push(remainingKm === null
+          ? `следующий пробег ${dueOdometer.toLocaleString("ru-RU")} км`
+          : remainingKm <= 0
+            ? `просрочено на ${Math.abs(remainingKm).toLocaleString("ru-RU")} км`
+            : `через ${remainingKm.toLocaleString("ru-RU")} км`);
+      } else if (Number.isFinite(intervalKm) && intervalKm > 0) {
+        status.push("укажи пробег выполнения для расчёта по километрам");
+      }
+      if (dueDate) {
+        status.push(remainingDays <= 0
+          ? `срок ${remainingDays === 0
+            ? "сегодня"
+            : `просрочен на ${Math.abs(remainingDays)} дн.`}`
+          : `до ${dueDate.toLocaleDateString("ru-RU")} (${remainingDays} дн.)`);
+      }
+      latestByTask.set(taskKey, {
+        item,
+        dueDate,
+        remainingKm,
+        overdue,
+        status: status.join(" · ")
+      });
+    });
+
+    const upcoming = [...latestByTask.values()].sort((a, b) => {
+      if (a.overdue !== b.overdue) return a.overdue ? -1 : 1;
+      if (a.dueDate && b.dueDate) return a.dueDate - b.dueDate;
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return (a.remainingKm ?? Infinity) - (b.remainingKm ?? Infinity);
+    });
+
+    function appendEmpty(target, message) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = message;
+      target.append(empty);
+    }
+
+    historySummary.textContent =
+      `История обслуживания · ${serviceEntries.length}`;
+
+    if (upcoming.length === 0) {
+      appendEmpty(
+        upcomingElement,
+        serviceEntries.length
+          ? "Пока нечего планировать. При следующем ТО добавь интервал."
+          : "Пока нет плановых работ. Запиши обслуживание и интервал."
+      );
+    } else {
+      const visibleUpcoming = showAllServiceUpcoming
+        ? upcoming
+        : upcoming.slice(0, 3);
+      visibleUpcoming.forEach(entry => {
+        const row = document.createElement("div");
+        row.className = "service-record";
+        const info = document.createElement("div");
+        const title = document.createElement("strong");
+        title.className = "service-record-title";
+        title.textContent = entry.item.name;
+        const status = document.createElement("div");
+        status.className = "service-record-status" +
+          (entry.overdue ? " overdue" : "");
+        status.textContent = entry.status;
+        info.append(title, status);
+        row.append(info);
+        upcomingElement.append(row);
+      });
+      if (upcoming.length > 3) {
+        const showMore = document.createElement("button");
+        showMore.type = "button";
+        showMore.className = "service-show-more";
+        showMore.textContent = showAllServiceUpcoming
+          ? "Свернуть"
+          : `Показать все · ещё ${upcoming.length - 3}`;
+        showMore.setAttribute("aria-expanded", String(showAllServiceUpcoming));
+        showMore.addEventListener("click", () => {
+          showAllServiceUpcoming = !showAllServiceUpcoming;
+          renderServicePlan();
+        });
+        upcomingElement.append(showMore);
+      }
+    }
+
+    const homeDue = document.getElementById("homeServiceDue");
+    const homeHint = document.getElementById("homeServiceHint");
+    const nearest = upcoming[0];
+    homeDue.textContent = nearest
+      ? nearest.overdue ? "Срок подошёл" : "Запланировано"
+      : "—";
+    homeHint.textContent = nearest
+      ? `${nearest.item.name} · ${nearest.status}`
+      : "Добавь выполненную работу с интервалом.";
+
+    if (serviceEntries.length === 0) {
+      appendEmpty(historyElement, "Записей пока нет.");
+      return;
+    }
+
+    serviceEntries.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "service-record";
       const info = document.createElement("div");
       const title = document.createElement("strong");
-      title.textContent = item.date + " · " + item.odometer + " км";
-
+      title.className = "service-record-title";
+      title.textContent = item.name;
       const details = document.createElement("div");
-      details.className = "muted";
-      details.textContent =
-        item.liters + " л × " + money(item.pricePerLiter) +
-        " = " + money(item.liters * item.pricePerLiter);
-
+      details.className = "muted service-record-details";
+      const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(item.date || "")
+        ? new Date(
+          Number(item.date.slice(0, 4)),
+          Number(item.date.slice(5, 7)) - 1,
+          Number(item.date.slice(8, 10))
+        ).toLocaleDateString("ru-RU")
+        : "Дата не указана";
+      const detailParts = [dateLabel];
+      if (Number.isFinite(Number(item.odometer)) &&
+          item.odometer !== null && item.odometer !== "") {
+        detailParts.push(
+          Number(item.odometer).toLocaleString("ru-RU") + " км"
+        );
+      }
+      detailParts.push(money(Number(item.price) || 0));
+      const intervalParts = [];
+      if (Number(item.intervalKm) > 0) {
+        intervalParts.push(
+          Number(item.intervalKm).toLocaleString("ru-RU") + " км"
+        );
+      }
+      if (Number(item.intervalMonths) > 0) {
+        intervalParts.push(item.intervalMonths + " мес.");
+      }
+      if (intervalParts.length) {
+        detailParts.push("Интервал: " + intervalParts.join(" / "));
+      }
+      detailParts.forEach((part, index) => {
+        const detail = document.createElement("span");
+        detail.textContent = part;
+        if (index === detailParts.length - 1 && part.startsWith("Интервал:")) {
+          detail.className = "service-record-interval";
+        }
+        details.append(detail);
+      });
       info.append(title, details);
 
       const remove = document.createElement("button");
       remove.type = "button";
+      remove.className = "service-record-delete";
       remove.textContent = "Удалить";
-
+      remove.setAttribute("aria-label", `Удалить запись «${item.name}»`);
       remove.addEventListener("click", () => {
         confirmDelete(
-          `Заправка от ${item.date} (${item.odometer} км) будет удалена из истории.`,
+          `Запись ТО «${item.name}» будет удалена из истории и общих расходов.`,
           () => {
-            const previousEntries = fuelEntries;
-            fuelEntries = fuelEntries.filter(
-              entry => entry.id !== item.id
-            );
-
-            if (saveFuel()) {
-              render();
-            } else {
-              fuelEntries = previousEntries;
-            }
+            const previous = expenses;
+            expenses = expenses.filter(expense => expense.id !== item.id);
+            if (save()) render();
+            else expenses = previous;
           }
         );
       });
-
       row.append(info, remove);
-      history.append(row);
+      historyElement.append(row);
     });
+  }
+
+  function renderEventHistory() {
+    const records = [
+      ...expenses.map(item => ({
+        date: /^\d{4}-\d{2}-\d{2}$/.test(item.date || "") ? item.date : "",
+        title: item.kind === "service"
+          ? `ТО · ${String(item.name || "Работа")}`
+          : String(item.name || "Расход"),
+        details: money(item.price)
+      })),
+      ...fuelEntries.map(item => ({
+        date: /^\d{4}-\d{2}-\d{2}$/.test(item.date || "") ? item.date : "",
+        title: "Заправка",
+        details: [
+          Number(item.odometer).toLocaleString("ru-RU") + " км",
+          item.liters + " л",
+          money(Number(item.liters) * Number(item.pricePerLiter))
+        ].join(" · ")
+      }))
+    ].sort((a, b) => {
+      if (!a.date) return b.date ? 1 : 0;
+      if (!b.date) return -1;
+      return b.date.localeCompare(a.date);
+    });
+
+    function renderRecords(targetId, visibleRecords) {
+      const target = document.getElementById(targetId);
+      target.replaceChildren();
+      if (visibleRecords.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "Пока нет записей. Добавь первую заправку или расход.";
+        target.append(empty);
+        return;
+      }
+
+      visibleRecords.forEach(record => {
+        const row = document.createElement("div");
+        row.className = "expense";
+        const info = document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = record.title;
+        const details = document.createElement("div");
+        details.className = "muted";
+        const dateLabel = record.date
+          ? record.date.split("-").reverse().join(".") + " · "
+          : "";
+        details.textContent = dateLabel + record.details;
+        info.append(title, details);
+        row.append(info);
+        target.append(row);
+      });
+    }
+
+    renderRecords("homeRecentEvents", records.slice(0, 4));
+    renderRecords("eventHistory", records);
   }
 
   // 7. Добавляем обычный расход
@@ -3573,6 +5429,81 @@
       setDeviceDate(expenseDate, expenseDateWheels);
       render();
       expenseDialog.close();
+    } else {
+      expenses = previous;
+    }
+  });
+
+  const serviceForm = document.getElementById("serviceForm");
+  const serviceDateInput = document.getElementById("serviceDate");
+  const serviceIntervalDetails =
+    document.querySelector(".service-interval-options");
+  function setServiceDateToToday() {
+    const now = new Date();
+    serviceDateInput.value = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0")
+    ].join("-");
+  }
+  setServiceDateToToday();
+
+  serviceForm.addEventListener("submit", event => {
+    event.preventDefault();
+    const name = document.getElementById("serviceName").value.trim();
+    const date = serviceDateInput.value;
+    const odometerValue = document.getElementById("serviceOdometer").value;
+    const price = Number(document.getElementById("servicePrice").value);
+    const intervalKmValue =
+      document.getElementById("serviceIntervalKm").value;
+    const intervalMonthsValue =
+      document.getElementById("serviceIntervalMonths").value;
+    const odometer = odometerValue === "" ? null : Number(odometerValue);
+    const intervalKm = intervalKmValue === ""
+      ? null
+      : Number(intervalKmValue);
+    const intervalMonths = intervalMonthsValue === ""
+      ? null
+      : Number(intervalMonthsValue);
+    const dateParts = date.split("-").map(Number);
+    const parsedDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+    const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+      parsedDate.getFullYear() === dateParts[0] &&
+      parsedDate.getMonth() === dateParts[1] - 1 &&
+      parsedDate.getDate() === dateParts[2];
+
+    if (!name || !validDate || !Number.isFinite(price) ||
+        price < 0 || price > 100000000 ||
+        (odometer !== null &&
+          (!Number.isFinite(odometer) || odometer < 0 || odometer > 2000000)) ||
+        (intervalKm !== null &&
+          (!Number.isFinite(intervalKm) || intervalKm < 1 ||
+            intervalKm > 1000000)) ||
+        (intervalMonths !== null &&
+          (!Number.isFinite(intervalMonths) || intervalMonths < 1 ||
+            intervalMonths > 600))) {
+      alert("Проверь название, дату, стоимость, пробег и интервалы ТО.");
+      return;
+    }
+
+    const previous = expenses;
+    expenses = [...expenses, {
+      id: crypto.randomUUID(),
+      date,
+      name,
+      price,
+      kind: "service",
+      odometer,
+      intervalKm,
+      intervalMonths
+    }];
+
+    if (save()) {
+      serviceForm.reset();
+      serviceIntervalDetails.open = false;
+      setServiceDateToToday();
+      render();
+      serviceDialog.close();
     } else {
       expenses = previous;
     }
