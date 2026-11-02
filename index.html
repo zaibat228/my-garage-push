@@ -86,6 +86,54 @@
       --backdrop: rgb(19 37 56 / 48%);
     }
 
+    body[data-theme="green"] {
+      color-scheme: light;
+      --page-bg: #dce8d8;
+      --surface: #eaf2e6;
+      --surface-alt: #dce9d7;
+      --text: #26342b;
+      --muted: #5f705f;
+      --label: #4c6251;
+      --border: #c8d8c2;
+      --border-strong: #b5c9ad;
+      --border-hover: #9eb995;
+      --accent: #47764e;
+      --accent-hover: #365f3d;
+      --accent-soft: #d2e3cf;
+      --accent-contrast: #fff;
+      --secondary-bg: #d5e3d1;
+      --secondary-text: #405744;
+      --secondary-hover: #c5d8c0;
+      --shadow: rgb(42 68 45 / 6%);
+      --shadow-hover: rgb(42 68 45 / 12%);
+      --focus-ring: rgb(71 118 78 / 20%);
+      --backdrop: rgb(31 47 34 / 48%);
+    }
+
+    body[data-theme="lavender"] {
+      color-scheme: light;
+      --page-bg: #e0d7ed;
+      --surface: #eee8f5;
+      --surface-alt: #e2d8ef;
+      --text: #30283d;
+      --muted: #655b75;
+      --label: #594c70;
+      --border: #d0c3e1;
+      --border-strong: #beadd5;
+      --border-hover: #a991c7;
+      --accent: #7655a5;
+      --accent-hover: #5f4389;
+      --accent-soft: #ddd0ed;
+      --accent-contrast: #fff;
+      --secondary-bg: #ddd3eb;
+      --secondary-text: #504365;
+      --secondary-hover: #cfc1e1;
+      --shadow: rgb(57 42 79 / 6%);
+      --shadow-hover: rgb(57 42 79 / 12%);
+      --focus-ring: rgb(118 85 165 / 20%);
+      --backdrop: rgb(39 31 51 / 48%);
+    }
+
     body {
       margin: 0;
       padding: 48px 28px 72px;
@@ -883,9 +931,29 @@
       .page-header { align-items: flex-start; flex-wrap: wrap; gap: 14px 10px; }
       .page-heading .tag { font-size: 10px; }
       .theme-toggle { min-height: 42px; padding: 9px 10px; font-size: 13px; }
-      .header-actions { width: 100%; justify-content: flex-start; }
+      .header-actions {
+        position: relative;
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+      }
+      .header-actions .theme-menu { flex: 1 1 0; min-width: 0; }
+      .header-actions .theme-toggle {
+        justify-content: center;
+        width: 100%;
+        height: 42px;
+        min-height: 42px;
+      }
       .theme-options { left: 0; right: auto; }
-      .push-options { left: 0; right: auto; }
+      .push-options {
+        top: calc(100% + 10px);
+        right: auto;
+        left: calc(-100% - 8px);
+        width: min(390px, calc(100vw - 28px));
+        max-height: min(60vh, 480px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
       .push-card { grid-template-columns: 1fr; gap: 12px; }
       .push-card > button { justify-self: start; }
       .push-setting { flex-wrap: wrap; }
@@ -956,6 +1024,24 @@
                 <span style="background:#28679d"></span>
               </span>
               <strong>Синяя</strong>
+            </button>
+            <button class="theme-option" type="button" data-theme-option="green"
+              aria-pressed="false">
+              <span class="theme-swatches" aria-hidden="true">
+                <span style="background:#dce8d8"></span>
+                <span style="background:#eaf2e6"></span>
+                <span style="background:#47764e"></span>
+              </span>
+              <strong>Зелёная</strong>
+            </button>
+            <button class="theme-option" type="button" data-theme-option="lavender"
+              aria-pressed="false">
+              <span class="theme-swatches" aria-hidden="true">
+                <span style="background:#e0d7ed"></span>
+                <span style="background:#eee8f5"></span>
+                <span style="background:#7655a5"></span>
+              </span>
+              <strong>Лавандовая</strong>
             </button>
           </div>
         </div>
@@ -1315,6 +1401,7 @@
       <li>Добавлены отдельные инструкции по установке для Android и iPhone.</li>
       <li>Для поддерживаемых браузеров Android доступна установка приложения прямо из инструкции.</li>
       <li>Информацию об обновлениях можно открыть нажатием на номер версии внизу страницы.</li>
+      <li>Добавлены зелёная и лавандовая темы с более насыщенными цветами.</li>
     </ul>
   </dialog>
 
@@ -1330,7 +1417,7 @@
   const carPhotoCropStorageKey = "my-garage-car-photo-crop-v1";
   const themeStorageKey = "my-garage-theme-v1";
   const themeOptions = [...document.querySelectorAll("[data-theme-option]")];
-  const availableThemes = ["warm", "dark", "blue"];
+  const availableThemes = ["warm", "dark", "blue", "green", "lavender"];
   const themeToggle = document.getElementById("themeToggle");
   const themeOptionsMenu = document.getElementById("themeOptions");
   const themeLabel = document.getElementById("themeLabel");
@@ -1339,7 +1426,9 @@
   const themeNames = {
     warm: "Светлая",
     dark: "Тёмная",
-    blue: "Синяя"
+    blue: "Синяя",
+    green: "Зелёная",
+    lavender: "Лавандовая"
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
   const installPromptStorageKey = "my-garage-install-prompt-dismissed-v1";
