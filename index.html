@@ -699,6 +699,15 @@
 
     .push-card-status[data-state="error"] { color: #b54747; }
 
+    .push-server-check {
+      grid-column: 1 / -1;
+      color: var(--accent);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .push-server-check[hidden] { display: none; }
+
     .push-settings {
       display: grid;
       grid-column: 1 / -1;
@@ -751,9 +760,12 @@
 
     .install-prompt-actions {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
+
+    .install-prompt-actions button { min-width: 0; }
 
     .install-prompt-dismiss {
       padding: 10px 12px;
@@ -1069,6 +1081,11 @@
                 aria-live="polite">
                 Проверяем поддержку уведомлений…
               </div>
+              <a class="push-server-check" id="pushServerCheck"
+                href="https://my-garage-push.onrender.com/api/push/public-key"
+                target="_blank" rel="noopener" hidden>
+                Проверить доступ к серверу с этого устройства
+              </a>
               <div class="push-settings" id="pushSettings" hidden>
                 <div class="push-setting">
                   <input id="reminderNotifications" type="checkbox" checked>
@@ -1092,10 +1109,13 @@
       aria-labelledby="installPromptTitle" hidden>
       <div class="install-prompt-copy">
         <h2 id="installPromptTitle">Добавь «Мой гараж» на главный экран</h2>
-        <p class="muted">Открывай приложение одним касанием и не теряй его среди вкладок.</p>
+        <p class="muted" id="installPromptDescription">
+          Открывай приложение одним касанием и включи уведомления о расходах и заправках.
+        </p>
       </div>
       <div class="install-prompt-actions">
         <button id="openInstallGuide" type="button">Как добавить</button>
+        <button id="openPushSettings" type="button">Настроить уведомления</button>
         <button class="install-prompt-dismiss" id="dismissInstallPrompt"
           type="button" aria-label="Скрыть предложение">×</button>
       </div>
@@ -1177,7 +1197,7 @@
 
   <footer class="app-version muted">
     <button class="version-link" id="openUpdateDialog" type="button"
-      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.003</button>
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.004</button>
   </footer>
 
   <dialog class="entry-dialog" id="carDialog"
@@ -1390,7 +1410,7 @@
   <dialog class="entry-dialog" id="updateDialog"
     aria-labelledby="updateDialogTitle">
     <div class="dialog-heading">
-      <h2 id="updateDialogTitle">Обновление test 0.0.003</h2>
+      <h2 id="updateDialogTitle">Обновление test 0.0.004</h2>
       <button class="dialog-close" type="button" data-close-dialog
         aria-label="Закрыть окно">×</button>
     </div>
@@ -1402,6 +1422,8 @@
       <li>Для поддерживаемых браузеров Android доступна установка приложения прямо из инструкции.</li>
       <li>Информацию об обновлениях можно открыть нажатием на номер версии внизу страницы.</li>
       <li>Добавлены зелёная и лавандовая темы с более насыщенными цветами.</li>
+      <li>На телефоне можно сразу открыть инструкции по установке и настройки уведомлений.</li>
+      <li>Подключение уведомлений на Android повторяет запросы при временных сбоях сети.</li>
     </ul>
   </dialog>
 
@@ -1431,15 +1453,20 @@
     lavender: "Лавандовая"
   };
   const pushSettingsStorageKey = "my-garage-push-settings-v1";
-  const installPromptStorageKey = "my-garage-install-prompt-dismissed-v1";
+  const installPromptStorageKey = "my-garage-install-prompt-dismissed-v2";
   const pushApiBaseUrl = "https://my-garage-push.onrender.com/api/push";
   const pushApplicationServerKey =
     "BDuhGKaBCYgVF8HvlzAjRp4F12pEYD97j2HPVm_iw0ZSOTscxO9PclxOlsjU_XGEpHzpgKrxXs5pDavqgKoKubk";
   const pushEnableButton = document.getElementById("pushEnableButton");
   const pushDisableButton = document.getElementById("pushDisableButton");
   const pushStatus = document.getElementById("pushStatus");
+  const pushServerCheck = document.getElementById("pushServerCheck");
   const pushSettingsPanel = document.getElementById("pushSettings");
   const installPrompt = document.getElementById("installPrompt");
+  const installPromptTitle = document.getElementById("installPromptTitle");
+  const installPromptDescription =
+    document.getElementById("installPromptDescription");
+  const openInstallGuideButton = document.getElementById("openInstallGuide");
   const installDialog = document.getElementById("installDialog");
   const nativeInstallButton = document.getElementById("nativeInstallButton");
   const reminderNotificationsInput =
@@ -1523,18 +1550,37 @@
   }
 
   function isMobileDevice() {
-    return isIosDevice() || /android|mobile/i.test(navigator.userAgent);
+    return isIosDevice() ||
+      /android|mobile/i.test(navigator.userAgent) ||
+      navigator.userAgentData?.mobile === true ||
+      window.matchMedia("(max-width: 760px)").matches;
   }
 
   function initializeHomeScreenPrompt() {
     let isDismissed = false;
     try {
       isDismissed =
-        localStorage.getItem(installPromptStorageKey) === "true";
+        sessionStorage.getItem(installPromptStorageKey) === "true";
     } catch (error) {
       console.warn("Не удалось загрузить настройку предложения установки", error);
     }
-    installPrompt.hidden = !isMobileDevice() || isInstalledApp() || isDismissed;
+    const installed = isInstalledApp();
+    const notificationsNeedSetup =
+      !("Notification" in window) ||
+      Notification.permission !== "granted" ||
+      !pushSubscription;
+    const showInstallGuide = !installed;
+    const showNotificationSettings = notificationsNeedSetup;
+    installPrompt.hidden = !isMobileDevice() ||
+      isDismissed ||
+      (!showInstallGuide && !showNotificationSettings);
+    openInstallGuideButton.hidden = !showInstallGuide;
+    installPromptTitle.textContent = showInstallGuide
+      ? "Добавь «Мой гараж» на главный экран"
+      : "Включи уведомления «Моего гаража»";
+    installPromptDescription.textContent = showInstallGuide
+      ? "Открывай приложение одним касанием и включи уведомления о расходах и заправках."
+      : "Получай напоминания о расходах, заправках и обслуживании автомобиля.";
   }
 
   window.addEventListener("beforeinstallprompt", event => {
@@ -1547,6 +1593,7 @@
     installPrompt.hidden = true;
     nativeInstallButton.hidden = true;
     if (installDialog.open) installDialog.close();
+    initializeHomeScreenPrompt();
   });
 
   function base64UrlToBytes(value) {
@@ -1580,7 +1627,7 @@
     timeoutDuration = 90000,
     progressMessage = ""
   ) {
-    const maxAttempts = 5;
+    const maxAttempts = 7;
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const controller = new AbortController();
       let timer;
@@ -1601,14 +1648,22 @@
       });
       try {
         const response = await Promise.race([request, timeout]);
+        if (response.ok) pushServerCheck.hidden = true;
         if (response.status < 500 || attempt === maxAttempts - 1) {
           return response;
         }
       } catch (error) {
-        if (error.message === timeoutMessage) throw error;
-        if (error.name === "AbortError") throw new Error(timeoutMessage);
+        if (error.message === timeoutMessage) {
+          pushServerCheck.hidden = false;
+          throw error;
+        }
+        if (error.name === "AbortError") {
+          pushServerCheck.hidden = false;
+          throw new Error(timeoutMessage);
+        }
         if (!(error instanceof TypeError) || attempt === maxAttempts - 1) {
           if (error instanceof TypeError) {
+            pushServerCheck.hidden = false;
             throw new Error(
               "Не удалось подключиться к серверу уведомлений. Ошибка браузера: " +
               (error.message || "сбой сетевого запроса") +
@@ -1703,6 +1758,7 @@
       setPushStatus(error.message, "error");
     } finally {
       pushEnableButton.disabled = false;
+      initializeHomeScreenPrompt();
     }
   }
 
@@ -1717,7 +1773,7 @@
       }
       if (Notification.permission === "denied") {
         throw new Error(
-          "iPhone уже запретил уведомления и не покажет запрос повторно. Открой Настройки iPhone → Уведомления → Мой гараж и разреши уведомления."
+          "Браузер заблокировал уведомления. Открой настройки сайта в браузере, разреши уведомления и попробуй снова."
         );
       }
 
@@ -1729,6 +1785,7 @@
         "Проверяем связь с сервером уведомлений"
       );
       if (!serverResponse.ok) {
+        pushServerCheck.hidden = false;
         throw new Error(
           `Сервер уведомлений ответил с ошибкой ${serverResponse.status}. Попробуй ещё раз позже.`
         );
@@ -1760,12 +1817,12 @@
             userVisibleOnly: true,
             applicationServerKey: base64UrlToBytes(pushApplicationServerKey)
           }),
-          "iPhone не завершил создание подписки за 45 секунд. Проверь разрешение уведомлений в настройках iPhone и попробуй ещё раз."
+          "Не удалось создать подписку за 45 секунд. Проверь разрешение уведомлений в настройках устройства и попробуй ещё раз."
         );
       }
       if (Notification.permission !== "granted") {
         throw new Error(
-          "Подписка создана, но разрешение на уведомления отключено. Разреши уведомления в настройках iPhone."
+          "Подписка создана, но уведомления заблокированы. Разреши их в настройках устройства."
         );
       }
       await savePushSubscription(pushSubscription, getCurrentPushSettings());
@@ -1787,7 +1844,7 @@
       } catch (error) {
         console.warn("Не удалось показать подтверждение уведомлений", error);
         setPushStatus(
-          "Уведомления включены, но iPhone не показал тестовое уведомление. Проверь настройки уведомлений приложения.",
+          "Уведомления включены, но устройство не показало тестовое уведомление. Проверь настройки уведомлений приложения.",
           "error"
         );
       }
@@ -1796,6 +1853,7 @@
       setPushStatus(error.message, "error");
     } finally {
       pushEnableButton.disabled = false;
+      initializeHomeScreenPrompt();
     }
   });
 
@@ -1869,6 +1927,12 @@
   document.getElementById("openInstallGuide").addEventListener(
     "click", () => installDialog.showModal()
   );
+  document.getElementById("openPushSettings").addEventListener(
+    "click", () => {
+      if (pushOptionsMenu.hidden) pushToggle.click();
+      pushEnableButton.focus();
+    }
+  );
   document.getElementById("openUpdateDialog").addEventListener(
     "click", () => updateDialog.showModal()
   );
@@ -1876,7 +1940,7 @@
     "click", () => {
       installPrompt.hidden = true;
       try {
-        localStorage.setItem(installPromptStorageKey, "true");
+        sessionStorage.setItem(installPromptStorageKey, "true");
       } catch (error) {
         console.warn("Не удалось сохранить настройку предложения установки", error);
       }
@@ -1896,6 +1960,7 @@
       if (choice.outcome === "accepted") {
         installPrompt.hidden = true;
         installDialog.close();
+        initializeHomeScreenPrompt();
       }
     } catch (error) {
       console.warn("Не удалось запустить установку приложения", error);
@@ -1958,7 +2023,8 @@
   });
 
   document.addEventListener("click", event => {
-    if (!event.target.closest(".header-actions")) {
+    if (!event.target.closest(".header-actions") &&
+        !event.target.closest(".install-prompt-actions")) {
       themeOptionsMenu.hidden = true;
       themeToggle.setAttribute("aria-expanded", "false");
       pushOptionsMenu.hidden = true;
