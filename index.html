@@ -331,6 +331,11 @@
 
     .entry-dialog[open] { animation: dialog-in 220ms ease-out both; }
 
+    @keyframes car-sheet-in {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @keyframes dialog-in {
       from { opacity: 0; transform: translateY(10px) scale(.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -431,18 +436,127 @@
 
     .car-field[hidden] { display: none; }
 
-    .car-color-field {
-      grid-template-columns: minmax(0, 1fr) 54px;
-      align-items: center;
+    #carForm {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
     }
 
-    .car-color-field input[type="color"] {
+    .car-form-section {
+      display: grid;
+      min-width: 0;
+      gap: 14px;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface-alt);
+    }
+
+    .car-form-section legend {
+      padding: 0 7px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .car-fields-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .car-color-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .car-color-picker {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 54px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .car-color-picker input[type="color"] {
       grid-column: 2;
       grid-row: 1;
-      height: 42px;
+      width: 54px;
+      height: 46px;
       padding: 4px;
+      border-radius: 11px;
       cursor: pointer;
     }
+
+    .car-color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .car-color-swatch {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 3px solid var(--surface-alt);
+      border-radius: 50%;
+      background: var(--swatch-color);
+      box-shadow: 0 0 0 1px var(--border-strong);
+    }
+
+    .car-color-swatch:hover {
+      transform: scale(1.08);
+      background: var(--swatch-color);
+    }
+
+    .car-color-swatch[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .car-form-section input:not([type="color"]):not([type="range"]) {
+      background: var(--surface);
+    }
+
+    .car-photo-input {
+      padding: 9px;
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .car-photo-input::file-selector-button {
+      margin-right: 10px;
+      padding: 8px 11px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .car-photo-status {
+      min-height: 1.4em;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .car-photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .car-photo-actions button {
+      padding: 9px 12px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+    }
+
+    .car-photo-actions button:hover { background: var(--secondary-hover); }
+
+    #carForm > button[type="submit"] { width: 100%; }
 
     .car-crop-editor {
       grid-column: 1 / -1;
@@ -475,21 +589,17 @@
 
     .car-crop-zoom input { accent-color: var(--accent); }
 
-    #carForm {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: end;
-    }
-
-    #carForm button { grid-column: 2; }
-
     #fuelForm {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       align-items: end;
     }
 
-    .fuel-date-field, .fuel-price-field { grid-column: 1 / -1; }
+    .expense-date-field,
+    .fuel-date-field,
+    .fuel-price-field { grid-column: 1 / -1; }
 
+    .expense-date-field,
     .fuel-date-picker {
       display: grid;
       gap: 8px;
@@ -646,11 +756,12 @@
 
     .car-summary {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 250px;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
       width: 100%;
-      gap: 7px;
+      align-items: center;
+      gap: clamp(12px, 3vw, 32px);
       margin-top: 18px;
-      padding: 22px;
+      padding: clamp(16px, 3vw, 32px);
       border: 1px solid var(--border-strong);
       border-radius: 18px;
       background: linear-gradient(125deg, var(--surface), var(--surface-alt));
@@ -668,56 +779,111 @@
       box-shadow: 0 12px 28px var(--shadow-hover);
     }
 
-    .car-summary-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 25px;
+    .car-summary-copy {
+      display: grid;
+      justify-items: center;
+      justify-self: center;
+      width: min(100%, 520px);
+      gap: 8px;
+      min-width: 0;
+      text-align: center;
     }
 
-    .car-summary-title .action-arrow { font-size: 17px; }
+    .car-summary-title {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 36px);
+      line-height: 1.1;
+    }
 
-    .car-summary-note { color: var(--muted); font-size: 13px; }
+    .car-summary-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
     .car-summary-name { overflow-wrap: anywhere; }
 
-    .car-illustration {
-      grid-column: 2;
-      grid-row: 1 / span 3;
-      align-self: center;
+    .car-summary-edit {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 4px;
+      padding: 11px 15px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+    }
+
+    .car-summary-edit:hover { background: var(--accent-hover); }
+
+    .car-summary-visual {
+      display: grid;
+      width: min(100%, 340px);
+      justify-self: center;
+      aspect-ratio: 1;
+      min-height: 160px;
+      place-items: center;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .car-illustration,
+    .car-photo {
+      grid-area: 1 / 1;
       width: 100%;
-      max-width: 250px;
-      overflow: visible;
+      height: 100%;
       transition: transform 240ms ease;
+    }
+
+    .car-illustration { display: block; }
+
+    .car-photo {
+      object-fit: cover;
     }
 
     .car-illustration[hidden],
     .car-photo[hidden] { display: none; }
 
-    .car-summary:hover .car-illustration { transform: translateX(-3px) scale(1.03); }
+    .car-summary:hover .car-illustration,
+    .car-summary:hover .car-photo { transform: scale(1.04); }
 
-    .car-photo {
-      grid-column: 2;
-      grid-row: 1 / span 3;
-      align-self: center;
-      width: 100%;
-      max-width: 250px;
-      max-height: 170px;
-      aspect-ratio: 3 / 2;
-      border-radius: 9px;
-      object-fit: cover;
-      transition: transform 240ms ease;
+    @media (max-width: 760px) {
+      .car-summary {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: 8px;
+        padding: 18px clamp(14px, 5vw, 24px);
+        text-align: center;
+      }
+
+      .car-summary-copy {
+        grid-row: 1;
+      }
+
+      .car-summary-visual {
+        grid-row: 2;
+        width: min(100%, 330px);
+        min-height: 0;
+        margin-top: -5px;
+      }
+
+      .car-summary-title { overflow-wrap: anywhere; }
     }
 
-    .car-summary:hover .car-photo { transform: translateX(-3px) scale(1.03); }
+    @media (max-width: 480px) {
+      .car-summary {
+        gap: 4px;
+        padding: 16px 14px;
+      }
 
-    .car-body { fill: var(--car-color, #6d8790); }
-
-    .car-photo-help {
-      grid-column: 1 / -1;
-      margin: 0;
-      font-size: 13px;
+      .car-summary-copy { gap: 7px; }
+      .car-summary-note { max-width: 32ch; }
+      .car-summary-visual { width: min(100%, 290px); }
+      .car-summary-edit { margin-top: 2px; }
     }
+
+    .car-photo-help { margin: 0; font-size: 13px; }
 
     .theme-menu { position: relative; z-index: 5; }
 
@@ -896,6 +1062,16 @@
       line-height: 1.5;
     }
 
+    .update-history {
+      display: grid;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .update-version h3 { margin: 0; font-size: 16px; }
+
+    .update-version .install-guide-list { margin-top: 8px; }
+
     .theme-options {
       display: grid;
       position: absolute;
@@ -967,18 +1143,183 @@
 
     .summary-grid .card { margin-top: 0; }
 
+    .spend-widget { text-align: center; }
+
+    .fuel-summary { text-align: center; }
+
+    .spend-widget .label { margin-bottom: 8px; }
+
+    .spend-mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+      margin: 12px 0;
+      padding: 4px;
+      border-radius: 11px;
+      background: var(--surface-alt);
+    }
+
+    .spend-mode-switch button {
+      padding: 9px 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: none;
+    }
+
+    .spend-mode-switch button:hover {
+      transform: none;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .spend-mode-switch button[aria-pressed="true"] {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 2px 6px var(--shadow);
+    }
+
     .history-grid .card { min-width: 0; margin-top: 0; }
 
     .history-grid h2 { margin-bottom: 12px; }
 
-    .car-photo-remove {
-      grid-column: 1 / -1;
-      padding: 10px;
-      background: var(--secondary-bg);
-      color: var(--secondary-text);
+    .expense-chart-note {
+      margin: -4px 0 12px;
+      font-size: 13px;
     }
 
-    .car-photo-remove:hover { background: var(--secondary-hover); }
+    .expense-period-controls {
+      display: grid;
+      gap: 7px;
+      margin: 0 0 12px;
+    }
+
+    .expense-period-controls[hidden] { display: none; }
+
+    .expense-month-navigation {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .expense-month-label {
+      font: inherit;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .expense-month-navigation button {
+      padding: 8px;
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      font-size: 20px;
+    }
+
+    .expense-month-navigation button:hover {
+      background: var(--secondary-hover);
+    }
+
+    .expense-spend-total {
+      margin: 0 0 12px;
+      font-size: 13px;
+    }
+
+    .expense-chart {
+      display: grid;
+      gap: 9px;
+      width: min(100%, 380px);
+      margin: 14px auto 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .spend-chart-layout {
+      display: grid;
+      justify-items: center;
+      gap: 0;
+    }
+
+    .expense-chart-donut {
+      display: grid;
+      position: relative;
+      width: min(100%, 190px);
+      aspect-ratio: 1;
+      place-items: center;
+      justify-self: center;
+      border-radius: 50%;
+      background: var(--surface-alt);
+    }
+
+    .expense-chart-donut[hidden] { display: none; }
+
+    .expense-chart-donut::before {
+      position: absolute;
+      width: 62%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--surface);
+      content: "";
+    }
+
+    .expense-chart-center {
+      z-index: 1;
+      display: grid;
+      max-width: 62%;
+      gap: 3px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .expense-chart-center strong {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      font-size: 15px;
+    }
+
+    .expense-chart-center span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .expense-chart-item {
+      display: grid;
+      grid-template-columns: 11px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .expense-chart-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: var(--chart-color);
+    }
+
+    .expense-chart-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .expense-chart-amount {
+      white-space: nowrap;
+      font-weight: bold;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 480px) {
+      .spend-chart-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .expense-chart-item { grid-template-columns: 11px minmax(0, 1fr) auto; }
+    }
 
     .expense {
       display: flex;
@@ -1057,14 +1398,18 @@
       .install-prompt-actions { width: 100%; }
       .amount { font-size: 27px; }
       .card { padding: 17px; }
-      #carForm { grid-template-columns: 1fr; }
-      #carForm button { grid-column: 1; }
       .fuel-input-row { grid-template-columns: 1fr; gap: 4px; }
       .entry-dialog { padding: 18px; }
       .action-grid { grid-template-columns: 1fr; gap: 10px; }
       .action-tile { min-height: 82px; }
-      .car-summary { grid-template-columns: minmax(0, 1fr) 120px; padding: 17px; }
-      .car-photo { max-height: 100px; }
+      .car-summary {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        padding: 17px;
+      }
+      .car-summary-visual { grid-row: 1; min-height: 145px; }
+      .car-summary-copy { grid-row: 2; }
+      .car-photo { min-height: 145px; }
       .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; gap: 12px; }
     }
@@ -1073,6 +1418,33 @@
       body { padding: 34px 20px 52px; }
       .summary-grid { grid-template-columns: 1fr; gap: 14px; }
       .history-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      #carDialog {
+        position: fixed;
+        inset: auto 0 0;
+        width: 100%;
+        max-width: none;
+        max-height: min(90vh, 840px);
+        max-height: min(90dvh, 840px);
+        margin: 0 auto;
+        padding: 22px 18px calc(18px + env(safe-area-inset-bottom));
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 22px 22px 0 0;
+      }
+
+      #carDialog[open] { animation: car-sheet-in 220ms ease-out both; }
+      #carForm {
+        max-height: calc(90vh - 110px);
+        max-height: calc(90dvh - 110px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+      .car-fields-grid { grid-template-columns: minmax(0, 1fr); }
+      .car-form-section { padding: 13px; }
     }
   </style>
 </head>
@@ -1204,38 +1576,62 @@
       </div>
     </section>
 
-    <button class="car-summary" id="openCarDialog" type="button"
-      aria-haspopup="dialog" aria-controls="carDialog">
-      <span class="label">МОЙ АВТОМОБИЛЬ</span>
-      <span class="car-summary-title">
-        <span id="carTitle">Volkswagen</span>
-        <span class="action-arrow" aria-hidden="true">↗</span>
-      </span>
-      <span class="car-summary-note">Нажми, чтобы изменить автомобиль</span>
-      <img class="car-photo" id="carPhoto" alt="" hidden>
-      <svg class="car-illustration" id="carIllustration"
-        viewBox="0 0 240 160" aria-hidden="true">
-        <ellipse cx="120" cy="150" rx="78" ry="5" fill="#cfc3b4"></ellipse>
-        <circle cx="48" cy="122" r="18" fill="#252825"></circle>
-        <circle cx="192" cy="122" r="18" fill="#252825"></circle>
-        <path d="m49 56-20-5q-7-1-9 6l-1 8 27 5zm142 0 20-5q7-1 9 6l1 8-27 5z" fill="#343a3b"></path>
-        <path class="car-body" d="M120 13c-28 0-49 8-64 24L41 58c-6 9-10 21-13 36l-5 22q-2 10 7 17l14 9h1a17 17 0 0 1 34 0h82a17 17 0 0 1 34 0h1l14-9q9-7 7-17l-5-22c-3-15-7-27-13-36l-15-21c-15-16-36-24-64-24z"></path>
-        <path d="m64 55 15-21q13-12 41-12t41 12l15 21q-27 8-56 8t-56-8z" fill="#202b31"></path>
-        <path d="M120 23v39" fill="none" stroke="#dce4e1" stroke-width="2"></path>
-        <path d="M46 69q31-10 58-8m32 0q27-2 58 8" fill="none" stroke="#f4eee3" stroke-width="2"></path>
-        <path d="m38 78 38-7 8 16-43 6zm164 0-38-7-8 16 43 6z" fill="#f2d18e"></path>
-        <path d="M88 82h64v31H88z" fill="#252b2a"></path>
-        <path d="M96 90h48m-48 8h48m-48 8h48" fill="none" stroke="#87908a" stroke-width="2"></path>
-        <path d="M31 116h178v13H31z" fill="#343a3b"></path>
-        <path d="M38 132h164v8H38z" fill="#252825"></path>
-        <rect x="103" y="117" width="34" height="7" fill="#e6e1d8"></rect>
-      </svg>
-    </button>
+    <section class="car-summary" aria-labelledby="carTitle">
+      <div class="car-summary-copy">
+        <span class="label">МОЙ АВТОМОБИЛЬ</span>
+        <h2 class="car-summary-title" id="carTitle">Volkswagen</h2>
+        <p class="car-summary-note">
+          Персональная карточка и история твоего автомобиля
+        </p>
+        <button class="car-summary-edit" id="openCarDialog" type="button"
+          aria-haspopup="dialog" aria-controls="carDialog">
+          Изменить автомобиль <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+      <div class="car-summary-visual">
+        <img class="car-photo" id="carPhoto" alt="" hidden>
+        <canvas class="car-illustration" id="carIllustration" width="626"
+          height="626" role="img"
+          aria-label="Спортивный автомобиль, вид сзади"></canvas>
+      </div>
+    </section>
 
     <div class="summary-grid">
-      <section class="card">
-        <div class="label">ВСЕГО ПОТРАЧЕНО</div>
+      <section class="card spend-widget">
+        <div class="label" id="spendWidgetTitle">ВСЕГО ПОТРАЧЕНО</div>
+        <div class="spend-mode-switch" role="group"
+          aria-label="Период отображения трат">
+          <button id="showAllSpend" type="button" aria-pressed="true">
+            Всего потрачено
+          </button>
+          <button id="showMonthlySpend" type="button" aria-pressed="false">
+            За месяц
+          </button>
+        </div>
+        <div class="expense-period-controls" id="expensePeriodControls" hidden>
+          <div class="expense-month-navigation">
+            <button id="previousExpenseMonth" type="button"
+              aria-label="Предыдущий месяц">‹</button>
+            <span class="expense-month-label" id="expenseMonth"
+              aria-live="polite"></span>
+            <button id="nextExpenseMonth" type="button"
+              aria-label="Следующий месяц">›</button>
+          </div>
+        </div>
         <div class="amount" id="total">0 ₽</div>
+        <div class="spend-chart-layout">
+          <div class="expense-chart-donut" id="expenseChartDonut"
+            role="img" aria-label="Круговая диаграмма трат">
+            <div class="expense-chart-center">
+              <strong id="expenseChartCenterTotal">0 ₽</strong>
+              <span id="expenseChartCenterLabel">всего</span>
+            </div>
+          </div>
+          <ul class="expense-chart" id="expenseChart"
+            aria-label="Траты по категориям"></ul>
+        </div>
+        <p class="muted expense-spend-total" id="expenseSpendTotal"
+          aria-live="polite"></p>
         <p class="muted" id="count">Расходов пока нет</p>
       </section>
       <section class="card fuel-summary">
@@ -1273,6 +1669,9 @@
       </section>
       <section class="card">
         <h2>История расходов</h2>
+        <p class="expense-chart-note muted">
+          Старые расходы без даты остаются в истории.
+        </p>
         <div id="history"></div>
       </section>
     </div>
@@ -1280,93 +1679,139 @@
 
   <footer class="app-version muted">
     <button class="version-link" id="openUpdateDialog" type="button"
-      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.005</button>
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.006</button>
   </footer>
 
   <dialog class="entry-dialog" id="carDialog"
     aria-labelledby="carDialogTitle">
     <div class="dialog-heading">
-      <h2 id="carDialogTitle">Мой автомобиль</h2>
+      <div>
+        <p class="label">ПРОФИЛЬ МАШИНЫ</p>
+        <h2 id="carDialogTitle">Мой автомобиль</h2>
+      </div>
       <button class="dialog-close" type="button" data-close-dialog
         aria-label="Закрыть окно">×</button>
     </div>
     <form id="carForm">
-      <div class="car-field">
-        <label for="carMakeInput">Марка автомобиля</label>
-        <input id="carMakeInput" list="carMakes" maxlength="60"
-          placeholder="Введите или выберите марку" required>
-        <datalist id="carMakes">
-          <option value="Toyota"></option>
-          <option value="Volkswagen"></option>
-          <option value="Hyundai"></option>
-          <option value="Kia"></option>
-          <option value="Lada"></option>
-          <option value="Renault"></option>
-          <option value="Nissan"></option>
-          <option value="Honda"></option>
-          <option value="BMW"></option>
-          <option value="Mercedes-Benz"></option>
-          <option value="Audi"></option>
-          <option value="Skoda"></option>
-          <option value="Mazda"></option>
-          <option value="Ford"></option>
-          <option value="Chevrolet"></option>
-          <option value="Mitsubishi"></option>
-          <option value="Subaru"></option>
-          <option value="Volvo"></option>
-          <option value="Lexus"></option>
-          <option value="Chery"></option>
-          <option value="Geely"></option>
-          <option value="Haval"></option>
-          <option value="BYD"></option>
-          <option value="Omoda"></option>
-          <option value="Jaecoo"></option>
-          <option value="Москвич"></option>
-          <option value="УАЗ"></option>
-          <option value="ГАЗ"></option>
-          <option value="Porsche"></option>
-          <option value="Peugeot"></option>
-          <option value="Citroen"></option>
-          <option value="Opel"></option>
-          <option value="Suzuki"></option>
-          <option value="Infiniti"></option>
-          <option value="Genesis"></option>
-          <option value="Tesla"></option>
-        </datalist>
-      </div>
-      <div class="car-field">
-        <label for="carModelInput">Модель автомобиля</label>
-        <input id="carModelInput" maxlength="80"
-          placeholder="Например, Passat B6">
-      </div>
-      <div class="car-field car-color-field" id="carColorField">
-        <label for="carColorInput">Цвет автомобиля</label>
-        <input id="carColorInput" type="color" value="#6d8790">
-      </div>
-      <div class="car-field">
-        <label for="carPhotoInput">Фотография автомобиля</label>
-        <input id="carPhotoInput" type="file" accept="image/*">
-      </div>
-      <button class="car-photo-remove" id="editCarPhoto" type="button" hidden>
-        Изменить кадрирование
-      </button>
-      <p class="muted car-photo-help">
-        Фото сохранится в этом браузере. Можно загрузить JPG, PNG или другое изображение.
-      </p>
-      <div class="car-crop-editor" id="carCropEditor" hidden>
-        <label for="carCropZoom">Обрезка фото · перетащи изображение, чтобы выбрать центр</label>
-        <canvas class="car-crop-canvas" id="carCropCanvas"
-          width="600" height="400" aria-label="Область обрезки фотографии"></canvas>
-        <div class="car-crop-zoom">
-          <label for="carCropZoom">Масштаб</label>
-          <input id="carCropZoom" type="range" min="1" max="3"
-            step="0.05" value="1">
+      <fieldset class="car-form-section">
+        <legend>Автомобиль</legend>
+        <div class="car-fields-grid">
+          <div class="car-field">
+            <label for="carMakeInput">Марка</label>
+            <input id="carMakeInput" list="carMakes" maxlength="60"
+              placeholder="Введите или выберите марку" required>
+            <datalist id="carMakes">
+              <option value="Toyota"></option>
+              <option value="Volkswagen"></option>
+              <option value="Hyundai"></option>
+              <option value="Kia"></option>
+              <option value="Lada"></option>
+              <option value="Renault"></option>
+              <option value="Nissan"></option>
+              <option value="Honda"></option>
+              <option value="BMW"></option>
+              <option value="Mercedes-Benz"></option>
+              <option value="Audi"></option>
+              <option value="Skoda"></option>
+              <option value="Mazda"></option>
+              <option value="Ford"></option>
+              <option value="Chevrolet"></option>
+              <option value="Mitsubishi"></option>
+              <option value="Subaru"></option>
+              <option value="Volvo"></option>
+              <option value="Lexus"></option>
+              <option value="Chery"></option>
+              <option value="Geely"></option>
+              <option value="Haval"></option>
+              <option value="BYD"></option>
+              <option value="Omoda"></option>
+              <option value="Jaecoo"></option>
+              <option value="Москвич"></option>
+              <option value="УАЗ"></option>
+              <option value="ГАЗ"></option>
+              <option value="Porsche"></option>
+              <option value="Peugeot"></option>
+              <option value="Citroen"></option>
+              <option value="Opel"></option>
+              <option value="Suzuki"></option>
+              <option value="Infiniti"></option>
+              <option value="Genesis"></option>
+              <option value="Tesla"></option>
+            </datalist>
+          </div>
+          <div class="car-field">
+            <label for="carModelInput">Модель</label>
+            <input id="carModelInput" maxlength="80"
+              placeholder="Например, Passat B6">
+          </div>
         </div>
-      </div>
-      <button class="car-photo-remove" id="removeCarPhoto" type="button">
-        Убрать фотографию
+      </fieldset>
+      <fieldset class="car-form-section">
+        <legend>Внешний вид</legend>
+        <div class="car-field car-color-field" id="carColorField">
+          <label for="carColorInput">Цвет кузова</label>
+          <div class="car-color-picker">
+            <div class="car-color-swatches" role="group"
+              aria-label="Быстрый выбор цвета">
+              <button class="car-color-swatch" type="button"
+                data-car-color="#25282b" style="--swatch-color:#25282b"
+                aria-label="Чёрный" aria-pressed="false"></button>
+              <button class="car-color-swatch" type="button"
+                data-car-color="#a83c36" style="--swatch-color:#a83c36"
+                aria-label="Красный" aria-pressed="false"></button>
+              <button class="car-color-swatch" type="button"
+                data-car-color="#426b50" style="--swatch-color:#426b50"
+                aria-label="Зелёный" aria-pressed="false"></button>
+              <button class="car-color-swatch" type="button"
+                data-car-color="#32618c" style="--swatch-color:#32618c"
+                aria-label="Синий" aria-pressed="false"></button>
+              <button class="car-color-swatch" type="button"
+                data-car-color="#f2f0e9" style="--swatch-color:#f2f0e9"
+                aria-label="Светлый" aria-pressed="false"></button>
+            </div>
+            <input id="carColorInput" type="color" value="#32618c"
+              aria-label="Выбрать свой цвет">
+          </div>
+          <p class="muted car-photo-help">
+            Цвет меняет кузов иллюстрации. Загруженные фотографии не перекрашиваются.
+          </p>
+        </div>
+        <div class="car-field">
+          <label for="carPhotoInput">Фотография автомобиля</label>
+          <input class="car-photo-input" id="carPhotoInput" type="file"
+            accept="image/*">
+          <p class="muted car-photo-help">
+            Фото хранится в этом браузере. Поддерживаются файлы изображений до 20 МБ.
+          </p>
+          <p class="car-photo-status" id="carPhotoStatus" role="status"
+            aria-live="polite"></p>
+          <div class="car-crop-editor" id="carCropEditor" hidden>
+            <label for="carCropZoom">
+              Предпросмотр · перетащи фото, чтобы выбрать кадрирование
+            </label>
+            <canvas class="car-crop-canvas" id="carCropCanvas"
+              width="600" height="400"
+              aria-label="Предпросмотр и кадрирование фотографии автомобиля"></canvas>
+            <div class="car-crop-zoom">
+              <label for="carCropZoom">Масштаб</label>
+              <input id="carCropZoom" type="range" min="1" max="3"
+                step="0.05" value="1">
+            </div>
+          </div>
+          <div class="car-photo-actions">
+            <button id="editCarPhoto" type="button" hidden>
+              Настроить кадрирование
+            </button>
+            <button id="removeCarPhoto" type="button">
+              Убрать фотографию
+            </button>
+          </div>
+        </div>
+      </fieldset>
+      <button type="submit">Сохранить автомобиль</button>
+      <button class="confirm-cancel" type="button" data-close-dialog>
+        Отмена
       </button>
-      <button type="submit">Сохранить авто</button>
     </form>
   </dialog>
 
@@ -1378,6 +1823,26 @@
         aria-label="Закрыть окно">×</button>
     </div>
     <form id="expenseForm">
+      <div class="expense-date-field">
+        <label id="expenseDateLabel">Дата расхода</label>
+        <input class="date-wheel-value" id="expenseDate" type="date"
+          aria-hidden="true" tabindex="-1" required>
+        <div class="fuel-date-picker">
+          <div class="date-wheel-labels" aria-hidden="true">
+            <span>День</span><span>Месяц</span><span>Год</span>
+          </div>
+          <div class="date-wheel-picker" id="expenseDatePicker"
+            aria-labelledby="expenseDateLabel">
+            <div class="date-wheel" data-date-wheel="day" role="listbox"
+              aria-label="День"></div>
+            <div class="date-wheel" data-date-wheel="month" role="listbox"
+              aria-label="Месяц"></div>
+            <div class="date-wheel" data-date-wheel="year" role="listbox"
+              aria-label="Год"></div>
+          </div>
+          <p class="date-wheel-help">Прокрути колонки или нажми на нужное значение</p>
+        </div>
+      </div>
       <label for="name">На что потрачено</label>
       <input id="name" placeholder="Например, замена масла"
         maxlength="100" required>
@@ -1509,22 +1974,55 @@
   <dialog class="entry-dialog" id="updateDialog"
     aria-labelledby="updateDialogTitle">
     <div class="dialog-heading">
-      <h2 id="updateDialogTitle">Обновление test 0.0.005</h2>
+      <h2 id="updateDialogTitle">История изменений</h2>
       <button class="dialog-close" type="button" data-close-dialog
         aria-label="Закрыть окно">×</button>
     </div>
-    <p class="muted">В этой версии стало удобнее пользоваться гаражом с телефона:</p>
-    <ul class="install-guide-list">
-      <li>Настройки push-уведомлений теперь открываются отдельной кнопкой рядом с выбором темы.</li>
-      <li>Добавлено предложение установить сайт на главный экран.</li>
-      <li>Добавлены отдельные инструкции по установке для Android и iPhone.</li>
-      <li>Для поддерживаемых браузеров Android доступна установка приложения прямо из инструкции.</li>
-      <li>Информацию об обновлениях можно открыть нажатием на номер версии внизу страницы.</li>
-      <li>Добавлены зелёная и лавандовая темы с более насыщенными цветами.</li>
-      <li>На телефоне можно сразу открыть инструкции по установке и настройки уведомлений.</li>
-      <li>Подключение уведомлений на Android повторяет запросы при временных сбоях сети.</li>
-      <li>Дата заправки выбирается прокручиваемыми колёсами дня, месяца и года.</li>
-    </ul>
+    <div class="update-history">
+      <section class="update-version" aria-labelledby="updateVersion006">
+        <h3 id="updateVersion006">test 0.0.006</h3>
+        <ul class="install-guide-list">
+          <li>В виджете трат появилась круговая диаграмма с переключением между всеми тратами и расходами за выбранный месяц.</li>
+          <li>Для расходов добавлен выбор даты; дата расходов и заправок при открытии форм синхронизируется с устройством.</li>
+          <li>Месяцы можно выбирать вручную или листать вперёд и назад.</li>
+          <li>Подписи и суммы в диаграмме выровнены для удобного чтения; виджет расхода топлива выровнен по центру.</li>
+          <li>Обновлена карточка автомобиля и форма редактирования: кадрирование фото и удобная мобильная панель.</li>
+          <li>Добавлено предоставленное изображение спортивного автомобиля с видом сзади.</li>
+          <li>Для иллюстрации автомобиля добавлены выбор и сохранение цвета; фон изображения сделан прозрачным.</li>
+        </ul>
+      </section>
+      <section class="update-version" aria-labelledby="updateVersion005">
+        <h3 id="updateVersion005">test 0.0.005</h3>
+        <ul class="install-guide-list">
+          <li>Дата заправки выбирается прокручиваемыми колёсами дня, месяца и года.</li>
+        </ul>
+      </section>
+      <section class="update-version" aria-labelledby="updateVersion004">
+        <h3 id="updateVersion004">test 0.0.004</h3>
+        <ul class="install-guide-list">
+          <li>На телефоне можно сразу открыть инструкции по установке и настройки уведомлений.</li>
+          <li>Подключение уведомлений на Android повторяет запросы при временных сбоях сети.</li>
+        </ul>
+      </section>
+      <section class="update-version" aria-labelledby="updateVersion003">
+        <h3 id="updateVersion003">test 0.0.003</h3>
+        <ul class="install-guide-list">
+          <li>Настройки push-уведомлений теперь открываются отдельной кнопкой рядом с выбором темы.</li>
+          <li>Добавлено предложение установить сайт на главный экран.</li>
+          <li>Добавлены отдельные инструкции по установке для Android и iPhone.</li>
+          <li>Для поддерживаемых браузеров Android доступна установка приложения прямо из инструкции.</li>
+          <li>Информацию об обновлениях можно открыть нажатием на номер версии внизу страницы.</li>
+          <li>Добавлены зелёная и лавандовая темы с более насыщенными цветами.</li>
+        </ul>
+      </section>
+      <section class="update-version" aria-labelledby="updateVersion002">
+        <h3 id="updateVersion002">test 0.0.002</h3>
+        <ul class="install-guide-list">
+          <li>Повышена надёжность подключения к серверу уведомлений: добавлены повторные попытки.</li>
+          <li>Добавлены понятные подсказки, если на iPhone уведомления запрещены или не включены.</li>
+        </ul>
+      </section>
+    </div>
   </dialog>
 
 <script>
@@ -1580,6 +2078,18 @@
   const form = document.getElementById("expenseForm");
   const nameInput = document.getElementById("name");
   const priceInput = document.getElementById("price");
+  const showAllSpendButton = document.getElementById("showAllSpend");
+  const showMonthlySpendButton =
+    document.getElementById("showMonthlySpend");
+  const expensePeriodControls =
+    document.getElementById("expensePeriodControls");
+  const expenseMonth = document.getElementById("expenseMonth");
+  let spendPeriod = "all";
+  const initialExpenseMonth = new Date();
+  let selectedExpenseMonth = [
+    initialExpenseMonth.getFullYear(),
+    String(initialExpenseMonth.getMonth() + 1).padStart(2, "0")
+  ].join("-");
   const carDialog = document.getElementById("carDialog");
   const expenseDialog = document.getElementById("expenseDialog");
   const fuelDialog = document.getElementById("fuelDialog");
@@ -1591,10 +2101,19 @@
   const carMakeInput = document.getElementById("carMakeInput");
   const carModelInput = document.getElementById("carModelInput");
   const carColorInput = document.getElementById("carColorInput");
+  const carColorSwatches = [
+    ...document.querySelectorAll(".car-color-swatch")
+  ];
   const carPhotoInput = document.getElementById("carPhotoInput");
+  const carPhotoStatus = document.getElementById("carPhotoStatus");
   const carPhotoElement = document.getElementById("carPhoto");
   const carIllustration = document.getElementById("carIllustration");
-  const carColorField = document.getElementById("carColorField");
+  const carIllustrationContext = carIllustration.getContext(
+    "2d", { willReadFrequently: true }
+  );
+  const carIllustrationImage = new Image();
+  let carIllustrationBaseData = null;
+  let carBodyMaskData = null;
   const carCropEditor = document.getElementById("carCropEditor");
   const carCropCanvas = document.getElementById("carCropCanvas");
   const carCropContext = carCropCanvas.getContext("2d");
@@ -1604,9 +2123,17 @@
   const saveCarButton = carForm.querySelector('button[type="submit"]');
 
   const fuelForm = document.getElementById("fuelForm");
+  const expenseDate = document.getElementById("expenseDate");
+  const expenseDateWheels = [
+    ...document.querySelectorAll("#expenseDatePicker [data-date-wheel]")
+  ];
   const fuelDate = document.getElementById("fuelDate");
   const fuelDateWheels = [
-    ...document.querySelectorAll("[data-date-wheel]")
+    ...document.querySelectorAll("#fuelDatePicker [data-date-wheel]")
+  ];
+  const datePickers = [
+    { input: expenseDate, wheels: expenseDateWheels },
+    { input: fuelDate, wheels: fuelDateWheels }
   ];
 
   function setPushStatus(message, state = "") {
@@ -2112,13 +2639,19 @@
   });
 
   document.getElementById("openExpenseDialog").addEventListener(
-    "click", () => expenseDialog.showModal()
+    "click", () => {
+      setDeviceDate(expenseDate, expenseDateWheels);
+      expenseDialog.showModal();
+    }
   );
   document.getElementById("openCarDialog").addEventListener(
     "click", () => carDialog.showModal()
   );
   document.getElementById("openFuelDialog").addEventListener(
-    "click", () => fuelDialog.showModal()
+    "click", () => {
+      setDeviceDate(fuelDate, fuelDateWheels);
+      fuelDialog.showModal();
+    }
   );
   document.getElementById("cancelDelete").addEventListener(
     "click", () => deleteConfirmDialog.close()
@@ -2155,9 +2688,15 @@
   }
 
   carDialog.addEventListener("close", renderCar);
-  carColorInput.addEventListener("input", () => {
-    carIllustration.style.setProperty("--car-color", carColorInput.value);
+  carColorInput.addEventListener("input", updateCarColorPreview);
+  carColorSwatches.forEach(swatch => {
+    swatch.addEventListener("click", () => {
+      carColorInput.value = swatch.dataset.carColor;
+      updateCarColorPreview();
+    });
   });
+  carIllustrationImage.addEventListener("load", initializeCarIllustration);
+  carIllustrationImage.src = "assets/car-front-transparent.png";
   carCropZoomInput.addEventListener("input", () => {
     cropZoom = Number(carCropZoomInput.value);
     renderCarCrop();
@@ -2193,6 +2732,7 @@
     const selectionId = ++photoSelectionId;
     editCarPhotoButton.disabled = true;
     saveCarButton.disabled = true;
+    carPhotoStatus.textContent = "Открываем фотографию для кадрирования…";
     try {
       const source = carPhotoSource || carPhoto;
       const image = await loadCarImageSource(source);
@@ -2208,9 +2748,13 @@
       carCropZoomInput.value = String(cropZoom);
       carCropEditor.hidden = false;
       renderCarCrop();
+      carPhotoStatus.textContent =
+        "Настрой кадрирование и сохрани автомобиль, чтобы применить фото.";
     } catch (error) {
       if (selectionId !== photoSelectionId) return;
       console.warn("Не удалось открыть кадрирование фотографии", error);
+      carPhotoStatus.textContent =
+        "Не удалось открыть фотографию для кадрирования.";
       alert("Не удалось открыть фотографию для кадрирования.");
     } finally {
       if (selectionId === photoSelectionId) {
@@ -2226,6 +2770,7 @@
     const selectionId = ++photoSelectionId;
     carPhotoInput.disabled = true;
     saveCarButton.disabled = true;
+    carPhotoStatus.textContent = "Обрабатываем фотографию…";
     try {
       const image = await loadCarImage(file);
       if (selectionId !== photoSelectionId) return;
@@ -2239,9 +2784,13 @@
       carCropZoomInput.value = String(cropZoom);
       carCropEditor.hidden = false;
       renderCarCrop();
+      carPhotoStatus.textContent =
+        "Настрой кадрирование и сохрани автомобиль, чтобы применить фото.";
     } catch (error) {
       if (selectionId !== photoSelectionId) return;
       console.warn("Не удалось обработать фотографию автомобиля", error);
+      carPhotoStatus.textContent = error.message ||
+        "Не удалось загрузить фотографию автомобиля.";
       alert(error.message || "Не удалось загрузить фотографию автомобиля.");
       carPhotoInput.value = "";
     } finally {
@@ -2266,7 +2815,7 @@
   let fuelEntries = [];
   let carMake = "Volkswagen";
   let carModel = "";
-  let carColor = "#6d8790";
+  let carColor = "#32618c";
   let carPhoto = "";
   let carPhotoSource = "";
   let carPhotoCrop = null;
@@ -2375,6 +2924,10 @@
     photoSelectionId++;
     document.getElementById("carTitle").textContent =
       [carMake, carModel].filter(Boolean).join(" ");
+    carPhotoElement.alt = [
+      "Фотография автомобиля",
+      [carMake, carModel].filter(Boolean).join(" ")
+    ].filter(Boolean).join(": ");
     carMakeInput.value = carMake;
     carModelInput.value = carModel;
     carColorInput.value = carColor;
@@ -2391,15 +2944,104 @@
     carCropZoomInput.value = "1";
     showCarPhoto(carPhoto);
     editCarPhotoButton.hidden = !carPhoto;
-    carIllustration.style.setProperty("--car-color", carColor);
+    updateCarColorPreview();
+  }
+
+  function updateCarColorPreview() {
+    const color = carColorInput.value.toLowerCase();
+    carColorSwatches.forEach(swatch => {
+      swatch.setAttribute(
+        "aria-pressed",
+        String(swatch.dataset.carColor.toLowerCase() === color)
+      );
+    });
+    renderCarIllustration();
+  }
+
+  function renderCarIllustration() {
+    const width = carIllustration.width;
+    const height = carIllustration.height;
+    if (!carIllustrationBaseData || !carBodyMaskData) return;
+    const imageData = new ImageData(
+      new Uint8ClampedArray(carIllustrationBaseData.data),
+      width,
+      height
+    );
+    const [targetRed, targetGreen, targetBlue] = [
+      1, 3, 5
+    ].map(offset => parseInt(carColorInput.value.slice(offset, offset + 2), 16));
+    const mask = carBodyMaskData;
+    const pixels = imageData.data;
+
+    for (let pixel = 0; pixel < pixels.length; pixel += 4) {
+      if (!mask[pixel + 3] || pixels[pixel + 3] === 0) continue;
+      const red = pixels[pixel];
+      const green = pixels[pixel + 1];
+      const blue = pixels[pixel + 2];
+      const darkest = Math.min(red, green, blue);
+      const brightest = Math.max(red, green, blue);
+      if (brightest - darkest > 48 || brightest < 76) continue;
+
+      const luminance = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
+      const shade = 0.3 + luminance * 0.7;
+      pixels[pixel] = Math.round(targetRed * shade);
+      pixels[pixel + 1] = Math.round(targetGreen * shade);
+      pixels[pixel + 2] = Math.round(targetBlue * shade);
+    }
+
+    carIllustrationContext.putImageData(imageData, 0, 0);
+  }
+
+  function initializeCarIllustration() {
+    const width = carIllustration.width;
+    const height = carIllustration.height;
+    carIllustrationContext.drawImage(
+      carIllustrationImage, 0, 0, width, height
+    );
+    carIllustrationBaseData = carIllustrationContext.getImageData(
+      0, 0, width, height
+    );
+
+    const maskCanvas = document.createElement("canvas");
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+    const maskContext = maskCanvas.getContext(
+      "2d", { willReadFrequently: true }
+    );
+    maskContext.beginPath();
+    [
+      [110, 215], [160, 200], [230, 193], [396, 193], [466, 200],
+      [520, 220], [544, 260], [556, 320], [550, 365], [526, 393],
+      [490, 407], [136, 407], [102, 385], [78, 350], [73, 300],
+      [85, 255]
+    ].forEach(([x, y], index) => {
+      if (index === 0) maskContext.moveTo(x, y);
+      else maskContext.lineTo(x, y);
+    });
+    maskContext.closePath();
+    maskContext.fill();
+    carBodyMaskData = maskContext.getImageData(
+      0, 0, width, height
+    ).data;
+    renderCarIllustration();
   }
 
   function showCarPhoto(photo) {
     carPhotoElement.hidden = !photo;
     carIllustration.toggleAttribute("hidden", Boolean(photo));
-    carColorField.hidden = Boolean(photo);
     if (photo) carPhotoElement.src = photo;
     else carPhotoElement.removeAttribute("src");
+    if (pendingCarImage) {
+      carPhotoStatus.textContent =
+        "Предпросмотр кадрирования обновлён — сохрани автомобиль, чтобы применить фото.";
+    } else if (pendingCarPhoto === null) {
+      carPhotoStatus.textContent =
+        "Фотография будет удалена после сохранения автомобиля.";
+    } else {
+      carPhotoStatus.textContent = photo
+        ? "Фотография сохранена."
+        : "Фото не выбрано.";
+    }
   }
 
   async function loadCarImage(file) {
@@ -2581,21 +3223,6 @@
 
   // 5. Показываем историю расходов и общую сумму
   function render() {
-    const expenseTotal = expenses.reduce(
-      (sum, item) => sum + item.price, 0
-    );
-
-    const fuelTotal = fuelEntries.reduce(
-      (sum, item) => sum + item.liters * item.pricePerLiter, 0
-    );
-
-    document.getElementById("total").textContent =
-      money(expenseTotal + fuelTotal);
-
-    document.getElementById("count").textContent =
-      "Расходов на обслуживание: " + expenses.length +
-      " · Заправок: " + fuelEntries.length;
-
     const history = document.getElementById("history");
     history.replaceChildren();
 
@@ -2605,6 +3232,8 @@
       empty.textContent = "Пока пусто. Добавь первый расход!";
       history.append(empty);
     }
+
+    renderExpenseChart();
 
     [...expenses].reverse().forEach(item => {
       const row = document.createElement("div");
@@ -2616,7 +3245,10 @@
 
       const price = document.createElement("div");
       price.className = "muted";
-      price.textContent = money(item.price);
+      const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(item.date || "")
+        ? item.date.split("-").reverse().join(".") + " · "
+        : "";
+      price.textContent = dateLabel + money(item.price);
 
       info.append(title, price);
 
@@ -2625,16 +3257,22 @@
       remove.textContent = "Удалить";
 
       remove.addEventListener("click", () => {
-        confirmDelete(`Расход «${item.name}» будет удалён из истории.`, () => {
-          const previous = expenses;
-          expenses = expenses.filter(exp => exp.id !== item.id);
+        const dateMessage = dateLabel
+          ? ` от ${item.date.split("-").reverse().join(".")}`
+          : "";
+        confirmDelete(
+          `Расход «${item.name}»${dateMessage} будет удалён из истории.`,
+          () => {
+            const previous = expenses;
+            expenses = expenses.filter(exp => exp.id !== item.id);
 
-          if (save()) {
-            render();
-          } else {
-            expenses = previous;
+            if (save()) {
+              render();
+            } else {
+              expenses = previous;
+            }
           }
-        });
+        );
       });
 
       row.append(info, remove);
@@ -2643,6 +3281,186 @@
 
     renderFuel();
   }
+
+  function renderExpenseChart() {
+    const chart = document.getElementById("expenseChart");
+    const donut = document.getElementById("expenseChartDonut");
+    chart.replaceChildren();
+
+    const showAllTime = spendPeriod === "all";
+    const selectedMonth = selectedExpenseMonth;
+    const periodExpenses = expenses.filter(item => showAllTime || (
+      /^\d{4}-\d{2}-\d{2}$/.test(item.date || "") &&
+      item.date.slice(0, 7) === selectedMonth
+    ));
+    const periodFuelEntries = fuelEntries.filter(item => showAllTime || (
+      /^\d{4}-\d{2}-\d{2}$/.test(item.date || "") &&
+      item.date.slice(0, 7) === selectedMonth
+    ));
+    const totalsByName = new Map();
+    periodExpenses.forEach(item => {
+      const name = String(item.name || "Без названия").trim() || "Без названия";
+      const amount = Number(item.price);
+      if (!Number.isFinite(amount) || amount <= 0) return;
+
+      const key = name.toLocaleLowerCase("ru-RU");
+      const existing = totalsByName.get(key);
+      if (existing) {
+        existing.amount += amount;
+      } else {
+        totalsByName.set(key, { name, amount });
+      }
+    });
+
+    const fuelTotal = periodFuelEntries.reduce((sum, item) => {
+      const amount = Number(item.liters) * Number(item.pricePerLiter);
+      return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+    }, 0);
+    if (fuelTotal > 0) {
+      const key = "заправки";
+      const existing = totalsByName.get(key);
+      if (existing) {
+        existing.amount += fuelTotal;
+      } else {
+        totalsByName.set(key, { name: "Заправки", amount: fuelTotal });
+      }
+    }
+
+    const expensesTotal = periodExpenses.reduce((sum, item) => {
+      const amount = Number(item.price);
+      return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+    }, 0);
+    const periodTitle = showAllTime
+      ? "Траты за всё время"
+      : `Траты за ${new Intl.DateTimeFormat("ru-RU", {
+        month: "long",
+        year: "numeric"
+      }).format(new Date(
+        Number(selectedMonth.slice(0, 4)),
+        Number(selectedMonth.slice(5, 7)) - 1,
+        1
+      ))}`;
+    if (!showAllTime) {
+      const monthLabel = new Intl.DateTimeFormat("ru-RU", {
+        month: "long",
+        year: "numeric"
+      }).format(new Date(
+        Number(selectedMonth.slice(0, 4)),
+        Number(selectedMonth.slice(5, 7)) - 1,
+        1
+      ));
+      expenseMonth.textContent =
+        monthLabel.charAt(0).toLocaleUpperCase("ru-RU") + monthLabel.slice(1);
+    }
+    const total = expensesTotal + fuelTotal;
+    document.getElementById("spendWidgetTitle").textContent =
+      showAllTime ? "ВСЕГО ПОТРАЧЕНО" : periodTitle.toLocaleUpperCase("ru-RU");
+    document.getElementById("total").textContent = money(total);
+    document.getElementById("expenseSpendTotal").textContent =
+      showAllTime
+        ? "Расходы и заправки за всё время"
+        : "Расходы и заправки за выбранный месяц";
+    document.getElementById("expenseChartCenterTotal").textContent =
+      money(total);
+    document.getElementById("expenseChartCenterLabel").textContent =
+      showAllTime ? "всего" : "за месяц";
+    document.getElementById("count").textContent =
+      `Расходов: ${periodExpenses.length} · ` +
+      `заправок: ${periodFuelEntries.length}`;
+
+    const totals = [...totalsByName.values()].sort(
+      (a, b) => b.amount - a.amount
+    );
+    if (totals.length === 0) {
+      donut.hidden = true;
+      donut.style.background = "";
+      donut.setAttribute("aria-label", `${periodTitle}: нет трат`);
+      const empty = document.createElement("li");
+      empty.className = "empty";
+      empty.textContent = "За выбранный период трат нет.";
+      chart.append(empty);
+      return;
+    }
+
+    const visibleTotals = totals.slice(0, 5);
+    if (totals.length > 5) {
+      visibleTotals.push({
+        name: "Другие расходы",
+        amount: totals.slice(5).reduce((sum, item) => sum + item.amount, 0)
+      });
+    }
+
+    const colors = [
+      "#4f8d82", "#d18b45", "#8175b5",
+      "#c86f79", "#5687b5", "#879447"
+    ];
+    let percentage = 0;
+    const gradient = visibleTotals.map((item, index) => {
+      const start = percentage;
+      percentage += item.amount / total * 100;
+      return `${colors[index % colors.length]} ${start}% ${percentage}%`;
+    });
+    donut.hidden = false;
+    donut.style.background = `conic-gradient(${gradient.join(", ")})`;
+    donut.setAttribute(
+      "aria-label",
+      `${periodTitle}: ${money(total)}, круговая диаграмма трат`
+    );
+
+    visibleTotals.forEach((item, index) => {
+      const row = document.createElement("li");
+      row.className = "expense-chart-item";
+
+      const swatch = document.createElement("span");
+      swatch.className = "expense-chart-swatch";
+      swatch.style.setProperty("--chart-color", colors[index % colors.length]);
+      swatch.setAttribute("aria-hidden", "true");
+
+      const name = document.createElement("span");
+      name.className = "expense-chart-name";
+      name.textContent = item.name;
+      name.title = item.name;
+
+      const amount = document.createElement("span");
+      amount.className = "expense-chart-amount";
+      amount.textContent = money(item.amount);
+      row.append(swatch, name, amount);
+      chart.append(row);
+    });
+  }
+
+  function shiftExpenseMonth(offset) {
+    const [year, month] = selectedExpenseMonth.split("-").map(Number);
+    const shifted = new Date(year, month - 1 + offset, 1);
+    selectedExpenseMonth = [
+      shifted.getFullYear(),
+      String(shifted.getMonth() + 1).padStart(2, "0")
+    ].join("-");
+    renderExpenseChart();
+  }
+
+  function setSpendPeriod(period) {
+    spendPeriod = period;
+    showAllSpendButton.setAttribute(
+      "aria-pressed",
+      String(period === "all")
+    );
+    showMonthlySpendButton.setAttribute(
+      "aria-pressed",
+      String(period === "month")
+    );
+    expensePeriodControls.hidden = period !== "month";
+    renderExpenseChart();
+  }
+
+  showAllSpendButton.addEventListener("click", () => setSpendPeriod("all"));
+  showMonthlySpendButton.addEventListener("click", () => setSpendPeriod("month"));
+  document.getElementById("previousExpenseMonth").addEventListener(
+    "click", () => shiftExpenseMonth(-1)
+  );
+  document.getElementById("nextExpenseMonth").addEventListener(
+    "click", () => shiftExpenseMonth(1)
+  );
 
   // 6. Показываем историю заправок и расход топлива
   function renderFuel() {
@@ -2734,22 +3552,25 @@
 
     const name = nameInput.value.trim();
     const price = Number(priceInput.value);
+    const date = expenseDate.value;
 
-    if (!name || !Number.isFinite(price) ||
+    if (!date || !name || !Number.isFinite(price) ||
         price <= 0 || price > 100000000) {
-      alert("Введи название и корректную сумму больше нуля.");
+      alert("Проверь дату, название и корректную сумму больше нуля.");
       return;
     }
 
     const previous = expenses;
     expenses = [...expenses, {
       id: crypto.randomUUID(),
+      date,
       name,
       price
     }];
 
     if (save()) {
       form.reset();
+      setDeviceDate(expenseDate, expenseDateWheels);
       render();
       expenseDialog.close();
     } else {
@@ -2757,23 +3578,23 @@
     }
   });
 
-  // 8. Подставляем сегодняшнюю дату
-  function setToday() {
+  // 8. Выбираем дату расхода и заправки
+  function setDeviceDate(dateInput, wheels) {
     const now = new Date();
-    fuelDate.value = [
+    dateInput.value = [
       now.getFullYear(),
       String(now.getMonth() + 1).padStart(2, "0"),
       String(now.getDate()).padStart(2, "0")
     ].join("-");
-    renderFuelDatePicker();
+    renderDatePicker(dateInput, wheels);
   }
 
-  function getFuelDateParts() {
-    const [year, month, day] = fuelDate.value.split("-").map(Number);
+  function getDateParts(dateInput) {
+    const [year, month, day] = dateInput.value.split("-").map(Number);
     return { year, month, day };
   }
 
-  function getFuelDateWheelOptions(unit, parts) {
+  function getDateWheelOptions(unit, parts) {
     if (unit === "day") {
       const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
       return Array.from({ length: daysInMonth }, (_, index) => ({
@@ -2798,26 +3619,26 @@
     }));
   }
 
-  function setFuelDatePart(unit, value) {
-    const parts = getFuelDateParts();
+  function setDatePart(dateInput, wheels, unit, value) {
+    const parts = getDateParts(dateInput);
     parts[unit] = value;
     const lastDay = new Date(parts.year, parts.month, 0).getDate();
     parts.day = Math.min(parts.day, lastDay);
-    fuelDate.value = [
+    dateInput.value = [
       parts.year,
       String(parts.month).padStart(2, "0"),
       String(parts.day).padStart(2, "0")
     ].join("-");
-    renderFuelDatePicker();
+    renderDatePicker(dateInput, wheels);
   }
 
-  function renderFuelDatePicker() {
-    if (!fuelDate.value) return;
-    const parts = getFuelDateParts();
+  function renderDatePicker(dateInput, wheels) {
+    if (!dateInput.value) return;
+    const parts = getDateParts(dateInput);
 
-    fuelDateWheels.forEach(wheel => {
+    wheels.forEach(wheel => {
       const unit = wheel.dataset.dateWheel;
-      const options = getFuelDateWheelOptions(unit, parts);
+      const options = getDateWheelOptions(unit, parts);
       const selectedIndex = options.findIndex(
         option => option.value === parts[unit]
       );
@@ -2825,7 +3646,7 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "date-wheel-option";
-        button.id = `fuelDate-${unit}-${option.value}`;
+        button.id = `${dateInput.id}-${unit}-${option.value}`;
         button.dataset.dateValue = String(option.value);
         button.setAttribute("role", "option");
         button.setAttribute(
@@ -2838,56 +3659,60 @@
       }));
       wheel.setAttribute(
         "aria-activedescendant",
-        `fuelDate-${unit}-${parts[unit]}`
+        `${dateInput.id}-${unit}-${parts[unit]}`
       );
       wheel.scrollTop = selectedIndex * 44;
     });
   }
 
-  function changeFuelDateWheel(wheel, value) {
+  function changeDateWheel(dateInput, wheels, wheel, value) {
     const unit = wheel.dataset.dateWheel;
-    const parts = getFuelDateParts();
-    const options = getFuelDateWheelOptions(unit, parts);
+    const parts = getDateParts(dateInput);
+    const options = getDateWheelOptions(unit, parts);
     const index = options.findIndex(option => option.value === value);
     if (index < 0) return;
-    setFuelDatePart(unit, value);
-    fuelDateWheels.find(item => item.dataset.dateWheel === unit)
+    setDatePart(dateInput, wheels, unit, value);
+    wheels.find(item => item.dataset.dateWheel === unit)
       .focus({ preventScroll: true });
   }
 
-  fuelDateWheels.forEach(wheel => {
-    let scrollTimer;
-    wheel.addEventListener("click", event => {
-      const option = event.target.closest("[data-date-value]");
-      if (option) changeFuelDateWheel(wheel, Number(option.dataset.dateValue));
-    });
-    wheel.addEventListener("scroll", () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        const options = getFuelDateWheelOptions(
-          wheel.dataset.dateWheel,
-          getFuelDateParts()
+  datePickers.forEach(({ input, wheels }) => {
+    wheels.forEach(wheel => {
+      let scrollTimer;
+      wheel.addEventListener("click", event => {
+        const option = event.target.closest("[data-date-value]");
+        if (option) {
+          changeDateWheel(input, wheels, wheel, Number(option.dataset.dateValue));
+        }
+      });
+      wheel.addEventListener("scroll", () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          const options = getDateWheelOptions(
+            wheel.dataset.dateWheel,
+            getDateParts(input)
+          );
+          const index = Math.max(
+            0,
+            Math.min(options.length - 1, Math.round(wheel.scrollTop / 44))
+          );
+          changeDateWheel(input, wheels, wheel, options[index].value);
+        }, 120);
+      }, { passive: true });
+      wheel.addEventListener("keydown", event => {
+        if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+        event.preventDefault();
+        const parts = getDateParts(input);
+        const options = getDateWheelOptions(wheel.dataset.dateWheel, parts);
+        const currentIndex = options.findIndex(
+          option => option.value === parts[wheel.dataset.dateWheel]
         );
-        const index = Math.max(
-          0,
-          Math.min(options.length - 1, Math.round(wheel.scrollTop / 44))
-        );
-        changeFuelDateWheel(wheel, options[index].value);
-      }, 120);
-    }, { passive: true });
-    wheel.addEventListener("keydown", event => {
-      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-      event.preventDefault();
-      const parts = getFuelDateParts();
-      const options = getFuelDateWheelOptions(wheel.dataset.dateWheel, parts);
-      const currentIndex = options.findIndex(
-        option => option.value === parts[wheel.dataset.dateWheel]
-      );
-      const offset = event.key === "ArrowUp" ? -1 : 1;
-      const nextOption = options[currentIndex + offset];
-      if (nextOption) {
-        setFuelDatePart(wheel.dataset.dateWheel, nextOption.value);
-      }
+        const offset = event.key === "ArrowUp" ? -1 : 1;
+        const nextOption = options[currentIndex + offset];
+        if (nextOption) {
+          setDatePart(input, wheels, wheel.dataset.dateWheel, nextOption.value);
+        }
+      });
     });
   });
 
@@ -2913,7 +3738,7 @@
   connectFuelSlider("litersRange", "liters");
   connectFuelSlider("fuelPriceRange", "fuelPrice");
 
-  setToday();
+  datePickers.forEach(({ input, wheels }) => setDeviceDate(input, wheels));
 
   // 9. Добавляем заправку
   fuelForm.addEventListener("submit", event => {
@@ -2963,7 +3788,7 @@
 
     if (saveFuel()) {
       fuelForm.reset();
-      setToday();
+      setDeviceDate(fuelDate, fuelDateWheels);
       render();
       fuelDialog.close();
     } else {
