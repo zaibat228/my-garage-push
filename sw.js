@@ -1,8 +1,9 @@
+// © 2026 Андрей Морозов. Все права защищены. См. LICENSE.md.
 // Служба приложения «Мой гараж»: офлайн-режим и push-уведомления.
 // При изменении файлов интерфейса увеличь версию кеша
 // и параметр ?v= у app.css в index.html.
 const CACHE_PREFIX = "my-garage-";
-const CACHE_NAME = `${CACHE_PREFIX}0.0.008`;
+const CACHE_NAME = `${CACHE_PREFIX}0.0.010`;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,7 +14,8 @@ const APP_SHELL = [
   "./icon-192.png",
   "./icon-512.png",
   "./icon-badge-96.png",
-  "./assets/car-front-transparent.png"
+  "./assets/car-default.png",
+  "./assets/car-default-paint.png"
 ];
 const NAVIGATION_TIMEOUT = 4000;
 

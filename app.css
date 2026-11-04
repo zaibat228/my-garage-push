@@ -1,4 +1,5 @@
 /* =========================================================
+   © 2026 Андрей Морозов. Все права защищены. См. LICENSE.md.
    МОЙ ГАРАЖ — сервисная панель
    Единый визуальный язык: графит, волосяные линии,
    монотипные цифры, сигнальный акцент.
@@ -596,7 +597,7 @@ main > *:not(.app-tabs) {
 
 .car-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 292px);
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 340px);
   align-items: center;
   gap: clamp(14px, 3vw, 34px);
   position: relative;
@@ -674,8 +675,10 @@ main > *:not(.app-tabs) {
   place-items: center;
   position: relative;
   justify-self: end;
-  width: min(100%, 292px);
-  aspect-ratio: 1;
+  /* Кадр 3:2 — как у кадрирования фото и у иллюстрации */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  width: min(100%, 340px);
+  aspect-ratio: 3 / 2;
   min-height: 150px;
 }
 
@@ -688,9 +691,11 @@ main > *:not(.app-tabs) {
     var(--hatch) 0 1px,
     transparent 1px 8px
   );
-  -webkit-mask-image: radial-gradient(circle, #000 32%, transparent 70%);
-  mask-image: radial-gradient(circle, #000 32%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse, #000 30%, transparent 72%);
+  mask-image: radial-gradient(ellipse, #000 30%, transparent 72%);
 }
+
+.car-summary-visual.has-photo::before { display: none; }
 
 .car-illustration,
 .car-photo {
@@ -700,7 +705,11 @@ main > *:not(.app-tabs) {
   height: 100%;
 }
 
-.car-illustration { object-fit: contain; }
+.car-illustration {
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
 
 .car-photo {
   object-fit: cover;
@@ -1139,6 +1148,11 @@ main > *:not(.app-tabs) {
 .service-upcoming h3,
 .journal-recent-card h3,
 .event-history-card h2 { margin-bottom: 12px; }
+
+.event-history-card > h2 + p.muted {
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 .service-record {
   display: grid;
@@ -1632,6 +1646,26 @@ form {
 
 .car-color-field { gap: 10px; }
 
+.car-color-preview {
+  display: grid;
+  place-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background-color: var(--panel);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--hatch) 0 1px,
+    transparent 1px 8px
+  );
+}
+
+.car-color-preview canvas {
+  display: block;
+  width: min(100%, 260px);
+  height: auto;
+}
+
 .car-color-picker {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 52px;
@@ -1664,7 +1698,11 @@ form {
   box-shadow: 0 0 0 1px var(--line-strong);
 }
 
-.car-color-swatch:hover { box-shadow: 0 0 0 1px var(--signal); }
+/* без своей заливки при наведении кнопка становилась цвета акцента */
+.car-color-swatch:hover {
+  background: var(--swatch-color);
+  box-shadow: 0 0 0 1px var(--signal);
+}
 
 .car-color-swatch[aria-pressed="true"] {
   box-shadow: 0 0 0 2px var(--signal);
@@ -2167,11 +2205,22 @@ form {
 
   .car-summary-visual {
     grid-row: 1;
-    width: min(100%, 254px);
+    justify-self: center;
+    width: min(100%, 300px);
     min-height: 128px;
   }
 
   .car-summary-note { max-width: 30ch; }
+
+  .car-summary-specs,
+  .car-summary-ids { justify-content: center; }
+
+  .journal-metrics-4 { row-gap: 14px; }
+
+  .journal-metrics-4 .journal-metric:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
 
   .page-header {
     align-items: flex-start;
@@ -2634,3 +2683,601 @@ a.icon-button { text-decoration: none; }
 
   .parts-count { width: 100%; }
 }
+
+/* ---------- 34. ПРОФИЛЬ: VIN, ГОСНОМЕР, ХАРАКТЕРИСТИКИ ---------- */
+
+.car-summary.is-empty .car-summary-edit {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--signal-ink);
+}
+
+.car-summary.is-empty .car-summary-edit:hover {
+  background: color-mix(in srgb, var(--signal) 86%, #000);
+  color: var(--signal-ink);
+}
+
+.car-summary-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.car-summary-specs li {
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.car-summary-ids {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  min-width: 0;
+}
+
+.plate-badge {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1.5px solid #1b1d20;
+  border-radius: 5px;
+  background: #f7f7f2;
+  color: #15171a;
+  font-family: var(--f-mono);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+
+.plate-main {
+  display: flex;
+  align-items: center;
+  padding: 5px 9px;
+  font-size: 15px;
+  letter-spacing: .05em;
+}
+
+.plate-region {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  padding: 3px 7px;
+  border-left: 1.5px solid #1b1d20;
+  font-size: 12px;
+}
+
+.plate-region small {
+  font-size: 7px;
+  letter-spacing: .1em;
+}
+
+.car-vin {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-family: var(--f-mono);
+  font-size: 12px;
+}
+
+.car-vin-label {
+  color: var(--faint);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+}
+
+.car-vin-value {
+  color: var(--ink);
+  letter-spacing: .05em;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.icon-button.car-vin-copy {
+  width: 30px;
+  height: 30px;
+}
+
+.icon-button.car-vin-copy:hover {
+  border-color: var(--line-strong);
+  background: var(--panel-2);
+  color: var(--signal);
+}
+
+.car-copy-status {
+  color: var(--signal);
+  font-family: var(--f-mono);
+  font-size: 11px;
+}
+
+.car-copy-status:empty { display: none; }
+
+.car-vin-input {
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.car-vin-input::placeholder {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.vin-result {
+  display: grid;
+  gap: 10px;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--signal);
+  border-radius: var(--r);
+  background: var(--panel);
+}
+
+.vin-result[data-state="partial"] { border-left-color: var(--line-strong); }
+.vin-result[data-state="error"] { border-left-color: var(--danger); }
+
+.vin-result-title {
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.vin-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.vin-facts dt {
+  padding-top: 1px;
+  color: var(--faint);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.vin-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.vin-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.vin-note[data-state="warning"] { color: var(--signal); }
+.vin-note[data-state="error"] { color: var(--danger); }
+
+.vin-brand-options,
+.vin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vin-brand-option,
+.vin-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-decoration: none;
+}
+
+.vin-brand-option {
+  font-family: var(--f-sans);
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+
+.vin-brand-option:hover,
+.vin-action:hover {
+  border-color: var(--signal);
+  background: transparent;
+  color: var(--signal);
+}
+
+.vin-brand-option[aria-pressed="true"] {
+  border-color: var(--signal);
+  box-shadow: inset 0 0 0 1px var(--signal);
+  color: var(--signal);
+}
+
+.vin-action.is-primary {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--signal-ink);
+}
+
+.vin-action.is-primary:hover {
+  background: color-mix(in srgb, var(--signal) 86%, #000);
+  color: var(--signal-ink);
+}
+
+.vin-action:disabled {
+  cursor: progress;
+  opacity: .65;
+}
+
+.vin-online-status {
+  color: var(--faint);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.vin-online-status[data-state="success"],
+.vin-online-status[data-state="info"] { color: var(--ink); }
+.vin-online-status[data-state="error"] { color: var(--danger); }
+
+.car-form-section select { background-color: var(--panel); }
+
+.car-specs {
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.car-specs > summary {
+  color: var(--muted);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+.car-specs > summary::-webkit-details-marker { display: none; }
+
+.car-specs > summary::before {
+  content: "+ ";
+  color: var(--signal);
+}
+
+.car-specs[open] > summary::before { content: "− "; }
+.car-specs[open] > summary { margin-bottom: 12px; }
+.car-specs > summary:hover { color: var(--ink); }
+
+#carSpecsCount {
+  color: var(--faint);
+  font-weight: 500;
+}
+
+.car-field-full { grid-column: 1 / -1; }
+
+/* ---------- 35. ДОКУМЕНТЫ И СРОКИ ---------- */
+
+.card-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.card-heading-row h2 { margin: 0; }
+
+.documents-card:focus { outline: none; }
+
+.card-add-button,
+.cluster-cell-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 6px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.card-add-button .icon,
+.cluster-cell-action .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.card-add-button:hover,
+.cluster-cell-action:hover {
+  border-color: var(--signal);
+  background: transparent;
+  color: var(--signal);
+}
+
+.cluster-cell-action {
+  justify-self: start;
+  min-height: 30px;
+  margin-top: 3px;
+  padding: 5px 9px;
+}
+
+.document-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.document-row:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.document-icon {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  color: var(--faint);
+}
+
+.document-row[data-state="soon"] .document-icon,
+.document-row[data-state="soon"] .document-status { color: var(--signal); }
+
+.document-row[data-state="expired"] .document-icon,
+.document-row[data-state="expired"] .document-status { color: var(--danger); }
+
+.document-info { min-width: 0; }
+
+.document-name {
+  display: block;
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.document-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+}
+
+.document-status {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.document-note {
+  font-family: var(--f-sans);
+  overflow-wrap: anywhere;
+}
+
+.document-actions {
+  display: flex;
+  gap: 2px;
+  margin-top: -5px;
+}
+
+.document-terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: -4px;
+  color: var(--faint);
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.document-terms button {
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  font-size: 11.5px;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+.document-terms button:hover {
+  border-color: var(--signal);
+  background: transparent;
+  color: var(--signal);
+}
+
+/* ---------- 36. ПРОБЕГ И РЕЗЕРВНАЯ КОПИЯ ---------- */
+
+.odometer-current {
+  margin-top: -4px;
+  color: var(--faint);
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+}
+
+.odometer-current:empty { display: none; }
+
+.backup-status {
+  margin-top: 12px;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-strong);
+  color: var(--muted);
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.backup-status:empty { display: none; }
+
+.backup-status[data-state="warning"] {
+  border-left-color: var(--signal);
+  color: var(--ink);
+}
+
+/* ---------- 37. МЕТРИКИ ЗАПРАВОК ---------- */
+
+.journal-metrics-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 760px) {
+  .journal-metrics-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .vin-actions > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* узкие окна подтверждения и пробега на компьютере */
+@media (min-width: 761px) {
+  dialog.confirm-dialog,
+  dialog.odometer-dialog { width: min(440px, calc(100% - 24px)); }
+}
+
+/* ---------- 38. АВТОРЫ И ЛИЦЕНЗИЯ ---------- */
+
+.app-version {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 4px;
+}
+
+.app-version-separator { opacity: .7; }
+
+.authors-dialog { width: min(560px, calc(100% - 24px)); }
+
+.author-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+}
+
+.author-avatar {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--signal-soft);
+  color: var(--signal);
+}
+
+.author-avatar .icon { width: 24px; height: 24px; }
+
+.author-info h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.author-info p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.author-telegram {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  min-height: 46px;
+  padding: 10px 16px;
+  border-radius: var(--r);
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 140ms linear;
+}
+
+.author-telegram:hover {
+  background: color-mix(in srgb, var(--signal) 86%, #000);
+}
+
+.author-telegram:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+.author-telegram small {
+  font-weight: 400;
+  opacity: .8;
+}
+
+.author-note {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+.license-block {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.license-block h3 {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.license-block p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.license-block .license-copyright {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.license-block strong { color: var(--ink); }

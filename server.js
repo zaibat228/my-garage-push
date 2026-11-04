@@ -1,3 +1,5 @@
+// © 2026 Андрей Морозов. Все права защищены. См. LICENSE.md.
+// Сервер push-уведомлений «Мой гараж».
 require("dotenv").config();
 
 const crypto = require("node:crypto");

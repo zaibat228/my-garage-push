@@ -1,10 +1,18 @@
 <!DOCTYPE html>
+<!--
+  «Мой гараж» — сервисная книжка автомобиля.
+  © 2026 Андрей Морозов. Все права защищены.
+  Копирование, публикация и изменение кода и дизайна без письменного
+  разрешения автора запрещены. Условия — в файле LICENSE.md.
+-->
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Мой гараж</title>
   <meta name="description" content="Сервисная книжка автомобиля: ТО, заправки, расходы и каталог запчастей.">
+  <meta name="author" content="Андрей Морозов">
+  <meta name="copyright" content="© 2026 Андрей Морозов. Все права защищены.">
   <meta name="theme-color" content="#0e1012">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +20,7 @@
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <link rel="manifest" href="./site.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=0.0.008">
+  <link rel="stylesheet" href="./app.css?v=0.0.010">
 </head>
 <body data-theme="graphite">
   <script>
@@ -155,6 +163,17 @@
       <path d="M5 19l1.1-4.2L15.6 5.3a1.9 1.9 0 0 1 2.7 0l.4.4a1.9 1.9 0 0 1 0 2.7L9.2 17.9z"/>
       <path d="M13.8 7.1l3.1 3.1"/>
     </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8.3" r="3.6"/><path d="M5 19.6a7 7 0 0 1 14 0"/>
+    </symbol>
+    <symbol id="i-telegram" viewBox="0 0 24 24">
+      <path d="M20.6 4.4 3.9 10.9c-.8.3-.8 1.4.1 1.6l4.2 1.2 1.6 5c.2.7 1.1.9 1.6.3l2.3-2.5 4.3 3.1c.6.5 1.5.1 1.6-.6l2.3-13.4c.2-.8-.6-1.5-1.3-1.2z"/>
+      <path d="m8.2 13.7 9-6.1-6.8 7.4"/>
+    </symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24">
+      <path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5z"/>
+      <path d="M14 3.5v4h4M9 12h6M9 15.5h4"/>
+    </symbol>
   </svg>
 
   <main>
@@ -216,24 +235,40 @@
         </div>
       </section>
 
-      <section class="car-summary" aria-labelledby="carTitle">
+      <section class="car-summary is-empty" id="carSummary"
+        aria-labelledby="carTitle">
         <div class="car-summary-copy">
           <span class="label">МОЙ АВТОМОБИЛЬ</span>
-          <h2 class="car-summary-title" id="carTitle">Volkswagen</h2>
-          <p class="car-summary-note">
-            Персональная карточка и история твоего автомобиля
+          <h2 class="car-summary-title" id="carTitle">Добавь свой автомобиль</h2>
+          <ul class="car-summary-specs" id="carSpecsList"
+            aria-label="Характеристики автомобиля" hidden></ul>
+          <div class="car-summary-ids" id="carIds" hidden>
+            <span class="plate-badge" id="carPlateBadge" role="img" hidden></span>
+            <span class="car-vin" id="carVinBox" hidden>
+              <span class="car-vin-label">VIN</span>
+              <span class="car-vin-value" id="carVinValue"></span>
+              <button class="icon-button car-vin-copy" id="copyCarVin"
+                type="button" aria-label="Скопировать VIN" title="Скопировать VIN">
+                <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-copy"/></svg>
+              </button>
+            </span>
+            <span class="car-copy-status" id="carCopyStatus" role="status"
+              aria-live="polite"></span>
+          </div>
+          <p class="car-summary-note" id="carSummaryNote">
+            Укажи марку и модель или просто введи VIN — марку и год определим сами.
           </p>
           <button class="car-summary-edit" id="openCarDialog" type="button"
             aria-haspopup="dialog" aria-controls="carDialog">
-            Изменить автомобиль
-            <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-edit"/></svg>
+            <span id="openCarDialogLabel">Добавить автомобиль</span>
+            <svg class="icon" width="18" height="18" aria-hidden="true"><use id="openCarDialogIcon" href="#i-plus"/></svg>
           </button>
         </div>
         <div class="car-summary-visual">
           <img class="car-photo" id="carPhoto" alt="" hidden>
-          <canvas class="car-illustration" id="carIllustration" width="626"
-            height="626" role="img"
-            aria-label="Спортивный автомобиль, вид сзади"></canvas>
+          <canvas class="car-illustration" id="carIllustration" width="864"
+            height="622" role="img"
+            aria-label="Иллюстрация автомобиля, вид спереди"></canvas>
         </div>
       </section>
 
@@ -241,7 +276,13 @@
         <section class="cluster-cell">
           <span class="label">ТЕКУЩИЙ ПРОБЕГ</span>
           <strong class="amount" id="homeOdometer">—</strong>
-          <span class="muted" id="homeOdometerHint">Добавь заправку с пробегом</span>
+          <span class="muted" id="homeOdometerHint">Добавь заправку или укажи пробег</span>
+          <button class="cluster-cell-action" id="openOdometerDialog" type="button"
+            aria-haspopup="dialog" aria-controls="odometerDialog"
+            aria-label="Обновить текущий пробег">
+            <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-pencil"/></svg>
+            Обновить
+          </button>
         </section>
         <section class="cluster-cell">
           <span class="label">ТРАТЫ ЗА ВСЁ ВРЕМЯ</span>
@@ -263,6 +304,19 @@
           </span>
         </section>
       </div>
+
+      <section class="card documents-card" id="documentsCard"
+        aria-labelledby="documentsTitle" tabindex="-1">
+        <div class="card-heading-row">
+          <h2 id="documentsTitle">Документы и сроки</h2>
+          <button class="card-add-button" id="openDocumentDialog" type="button"
+            aria-haspopup="dialog" aria-controls="documentDialog">
+            <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-plus"/></svg>
+            Добавить
+          </button>
+        </div>
+        <div class="documents-list" id="documentsList"></div>
+      </section>
 
       <section class="card event-history-card">
         <h2>Последние записи</h2>
@@ -331,7 +385,7 @@
         </button>
       </div>
       <section class="card">
-        <div class="journal-metrics">
+        <div class="journal-metrics journal-metrics-4">
           <div class="journal-metric">
             <span class="muted">Заправок</span>
             <strong id="fuelEntryCount">0</strong>
@@ -343,6 +397,10 @@
           <div class="journal-metric">
             <span class="muted">Средний расход</span>
             <strong id="fuelTabConsumption">—</strong>
+          </div>
+          <div class="journal-metric">
+            <span class="muted">Топливо на 1 км</span>
+            <strong id="fuelCostPerKm">—</strong>
           </div>
         </div>
       </section>
@@ -448,12 +506,17 @@
         <button class="more-action" id="openMoreCar" type="button">
           <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-car"/></svg>
           <span><strong>Информация об автомобиле</strong>
-            <small>Марка, модель, цвет и фотография</small></span>
+            <small>VIN, госномер, характеристики и фото</small></span>
         </button>
         <button class="more-action" id="openMoreParts" type="button">
           <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-parts"/></svg>
           <span><strong>Каталог запчастей</strong>
             <small id="morePartsHint">Артикулы деталей и расходников</small></span>
+        </button>
+        <button class="more-action" id="openMoreDocuments" type="button">
+          <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-doc"/></svg>
+          <span><strong>Документы и сроки</strong>
+            <small id="moreDocumentsHint">ОСАГО, техосмотр и права — сроки действия</small></span>
         </button>
         <button class="more-action" id="themeToggle" type="button"
           aria-haspopup="dialog" aria-controls="themeDialog"
@@ -472,7 +535,7 @@
         <button class="more-action" id="exportGarageData" type="button">
           <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-export"/></svg>
           <span><strong>Экспорт данных</strong>
-            <small>Резервная копия в JSON, включая фото и запчасти</small></span>
+            <small>Резервная копия в JSON: записи, фото, документы</small></span>
         </button>
         <button class="more-action" id="importGarageData" type="button"
           aria-haspopup="dialog" aria-controls="importDialog">
@@ -490,6 +553,12 @@
           <span><strong>История обновлений</strong>
             <small>Что менялось в приложении</small></span>
         </button>
+        <button class="more-action" id="openMoreAuthors" type="button"
+          aria-haspopup="dialog" aria-controls="authorsDialog">
+          <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-user"/></svg>
+          <span><strong>Авторы</strong>
+            <small>Связь с автором в Telegram, права и лицензия</small></span>
+        </button>
       </div>
       <input class="visually-hidden" id="importFileInput" type="file"
         accept="application/json,.json" tabindex="-1" aria-hidden="true">
@@ -499,6 +568,7 @@
           Записи хранятся только в этом браузере. Периодически делай экспорт —
           из файла можно восстановить данные или перенести их на другое устройство.
         </p>
+        <p class="backup-status" id="backupStatus"></p>
         <p class="data-status" id="dataStatus" role="status" aria-live="polite"></p>
       </section>
       <section class="card event-history-card">
@@ -511,7 +581,10 @@
 
   <footer class="app-version muted">
     <button class="version-link" id="openUpdateDialog" type="button"
-      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.008</button>
+      aria-haspopup="dialog" aria-controls="updateDialog">test 0.0.010</button>
+    <span class="app-version-separator" aria-hidden="true">·</span>
+    <button class="version-link" id="openAuthorsDialog" type="button"
+      aria-haspopup="dialog" aria-controls="authorsDialog">© 2026 Андрей Морозов</button>
   </footer>
 
   <dialog class="entry-dialog settings-dialog" id="themeDialog"
@@ -679,14 +752,27 @@
       <button class="dialog-close" type="button" data-close-dialog
         aria-label="Закрыть окно">×</button>
     </div>
-    <form id="carForm">
+    <form id="carForm" novalidate>
       <fieldset class="car-form-section">
         <legend>Автомобиль</legend>
+        <div class="car-field car-vin-field">
+          <label for="carVinInput"><span class="field-caption">VIN или номер кузова
+            <span class="muted">(необязательно)</span></span></label>
+          <input class="car-vin-input" id="carVinInput" maxlength="24"
+            autocomplete="off" autocapitalize="characters" spellcheck="false"
+            placeholder="17 символов из СТС или ПТС"
+            aria-describedby="carVinHelp">
+          <p class="muted car-photo-help" id="carVinHelp">
+            По VIN определим марку, страну сборки и год модели — прямо на телефоне,
+            без интернета.
+          </p>
+          <div class="vin-result" id="vinResult" hidden></div>
+        </div>
         <div class="car-fields-grid">
           <div class="car-field">
             <label for="carMakeInput">Марка</label>
             <input id="carMakeInput" list="carMakes" maxlength="60"
-              placeholder="Введите или выберите марку" required>
+              autocomplete="off" placeholder="Введите или выберите марку">
             <datalist id="carMakes">
               <option value="Toyota"></option>
               <option value="Volkswagen"></option>
@@ -727,19 +813,69 @@
             </datalist>
           </div>
           <div class="car-field">
-            <label for="carModelInput">Модель</label>
-            <input id="carModelInput" maxlength="80"
+            <label for="carModelInput"><span class="field-caption">Модель
+              <span class="muted">(необязательно)</span></span></label>
+            <input id="carModelInput" maxlength="80" autocomplete="off"
               placeholder="Например, Passat B6">
           </div>
+          <div class="car-field">
+            <label for="carYearInput"><span class="field-caption">Год выпуска
+              <span class="muted">(необязательно)</span></span></label>
+            <input id="carYearInput" type="number" inputmode="numeric"
+              min="1900" max="2100" step="1" placeholder="Например, 2016">
+          </div>
+          <div class="car-field">
+            <label for="carPlateInput"><span class="field-caption">Госномер
+              <span class="muted">(необязательно)</span></span></label>
+            <input id="carPlateInput" maxlength="12" autocomplete="off"
+              autocapitalize="characters" spellcheck="false"
+              placeholder="Например, А123ВС 70">
+          </div>
         </div>
+        <details class="car-specs" id="carSpecs">
+          <summary>Характеристики <span id="carSpecsCount"></span></summary>
+          <div class="car-fields-grid">
+            <div class="car-field car-field-full">
+              <label for="carEngineInput">Двигатель</label>
+              <input id="carEngineInput" maxlength="60" autocomplete="off"
+                placeholder="Например, 1,6 л, 110 л.с.">
+            </div>
+            <div class="car-field">
+              <label for="carFuelInput">Топливо</label>
+              <select id="carFuelInput"></select>
+            </div>
+            <div class="car-field">
+              <label for="carTransmissionInput">Коробка передач</label>
+              <select id="carTransmissionInput"></select>
+            </div>
+            <div class="car-field">
+              <label for="carDriveInput">Привод</label>
+              <select id="carDriveInput"></select>
+            </div>
+            <div class="car-field">
+              <label for="carBodyInput">Кузов</label>
+              <select id="carBodyInput"></select>
+            </div>
+          </div>
+        </details>
       </fieldset>
       <fieldset class="car-form-section">
         <legend>Внешний вид</legend>
         <div class="car-field car-color-field" id="carColorField">
           <label for="carColorInput">Цвет кузова</label>
+          <div class="car-color-preview" id="carColorPreviewFrame">
+            <canvas id="carColorPreview" width="864" height="622" role="img"
+              aria-label="Предпросмотр цвета иллюстрации"></canvas>
+          </div>
           <div class="car-color-picker">
             <div class="car-color-swatches" role="group"
               aria-label="Быстрый выбор цвета">
+              <button class="car-color-swatch" type="button"
+                data-car-color="#f2f0e9" style="--swatch-color:#f2f0e9"
+                aria-label="Белый" aria-pressed="false"></button>
+              <button class="car-color-swatch" type="button"
+                data-car-color="#9ea3a8" style="--swatch-color:#9ea3a8"
+                aria-label="Серебристый" aria-pressed="false"></button>
               <button class="car-color-swatch" type="button"
                 data-car-color="#25282b" style="--swatch-color:#25282b"
                 aria-label="Чёрный" aria-pressed="false"></button>
@@ -752,15 +888,12 @@
               <button class="car-color-swatch" type="button"
                 data-car-color="#32618c" style="--swatch-color:#32618c"
                 aria-label="Синий" aria-pressed="false"></button>
-              <button class="car-color-swatch" type="button"
-                data-car-color="#f2f0e9" style="--swatch-color:#f2f0e9"
-                aria-label="Светлый" aria-pressed="false"></button>
             </div>
-            <input id="carColorInput" type="color" value="#32618c"
+            <input id="carColorInput" type="color" value="#f2f0e9"
               aria-label="Выбрать свой цвет">
           </div>
-          <p class="muted car-photo-help">
-            Цвет меняет кузов иллюстрации. Загруженные фотографии не перекрашиваются.
+          <p class="muted car-photo-help" id="carColorHelp">
+            Цвет меняет кузов иллюстрации — фары, стёкла, решётка и шины остаются как есть.
           </p>
         </div>
         <div class="car-field">
@@ -795,6 +928,7 @@
           </div>
         </div>
       </fieldset>
+      <p class="form-error" id="carFormError" role="alert" hidden></p>
       <button type="submit">Сохранить автомобиль</button>
       <button class="confirm-cancel" type="button" data-close-dialog>
         Отмена
@@ -980,6 +1114,84 @@
     </form>
   </dialog>
 
+  <dialog class="entry-dialog document-dialog" id="documentDialog"
+    aria-labelledby="documentDialogTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="label">ДОКУМЕНТЫ И СРОКИ</p>
+        <h2 id="documentDialogTitle">Добавить документ</h2>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть форму документа">×</button>
+    </div>
+    <form id="documentForm" novalidate>
+      <label class="service-field" for="documentType">
+        Документ
+        <select id="documentType"></select>
+      </label>
+      <label class="service-field" for="documentTitle" id="documentTitleField" hidden>
+        Название
+        <input id="documentTitle" maxlength="60" autocomplete="off"
+          placeholder="Например, абонемент на мойку">
+      </label>
+      <label class="service-field" for="documentExpires">
+        Действует до
+        <input id="documentExpires" type="date" min="1990-01-01"
+          max="2100-12-31" required>
+      </label>
+      <div class="document-terms" role="group"
+        aria-label="Срок действия от сегодняшнего дня">
+        <span>Срок от сегодня:</span>
+        <button type="button" data-document-years="1">1 год</button>
+        <button type="button" data-document-years="2">2 года</button>
+        <button type="button" data-document-years="10">10 лет</button>
+      </div>
+      <label class="service-field" for="documentNote">
+        <span class="field-caption">Номер, компания <span class="muted">(необязательно)</span></span>
+        <input id="documentNote" maxlength="80" autocomplete="off"
+          placeholder="Например, ХХХ 0123456789, Ингосстрах">
+      </label>
+      <p class="form-error" id="documentFormError" role="alert" hidden></p>
+      <div class="confirm-actions service-form-actions">
+        <button class="confirm-cancel" type="button" data-close-dialog>
+          Отмена
+        </button>
+        <button type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="entry-dialog odometer-dialog" id="odometerDialog"
+    aria-labelledby="odometerDialogTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="label">ТЕКУЩИЙ ПРОБЕГ</p>
+        <h2 id="odometerDialogTitle">Обновить пробег</h2>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <form id="odometerForm" novalidate>
+      <p class="muted odometer-help" id="odometerHelp">
+        Перепиши показания с приборной панели — по ним считается, когда подойдёт ТО.
+      </p>
+      <label class="service-field" for="odometerValue">
+        Пробег, км
+        <input id="odometerValue" type="number" inputmode="numeric" min="0"
+          max="2000000" step="1" autocomplete="off" placeholder="Например, 123456"
+          aria-describedby="odometerHelp odometerCurrent">
+      </label>
+      <p class="muted odometer-current" id="odometerCurrent"></p>
+      <p class="form-error" id="odometerFormError" role="alert" hidden></p>
+      <div class="confirm-actions service-form-actions">
+        <button class="confirm-cancel" type="button" data-close-dialog>
+          Отмена
+        </button>
+        <button type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog class="entry-dialog import-dialog" id="importDialog"
     aria-labelledby="importDialogTitle" aria-describedby="importDialogText">
     <div class="dialog-heading">
@@ -993,8 +1205,9 @@
     <p id="importDialogText"></p>
     <ul class="import-summary" id="importSummary"></ul>
     <div class="import-modes">
-      <p><strong>Объединить</strong> — добавить новые записи из файла к текущим.
-        Профиль автомобиля и тема останутся прежними.</p>
+      <p><strong>Объединить</strong> — добавить новые записи и документы из файла
+        к текущим. Профиль автомобиля и тема останутся прежними; если профиль ещё
+        не заполнен, возьмём его из файла.</p>
       <p><strong>Заменить всё</strong> — удалить текущие данные<span
         id="importCurrentData"></span> и загрузить файл целиком, включая
         профиль автомобиля и фото.</p>
@@ -1043,6 +1256,62 @@
     </div>
   </dialog>
 
+  <dialog class="entry-dialog authors-dialog" id="authorsDialog"
+    aria-labelledby="authorsDialogTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="label">О ПРИЛОЖЕНИИ</p>
+        <h2 id="authorsDialogTitle">Авторы</h2>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog
+        aria-label="Закрыть окно">×</button>
+    </div>
+    <section class="author-card" aria-labelledby="authorName">
+      <span class="author-avatar" aria-hidden="true">
+        <svg class="icon" width="24" height="24"><use href="#i-user"/></svg>
+      </span>
+      <div class="author-info">
+        <h3 id="authorName">Андрей Морозов</h3>
+        <p>Автор и разработчик «Мой гараж»: идея, дизайн и код.</p>
+      </div>
+      <a class="author-telegram" id="authorTelegramLink"
+        href="https://t.me/andmrz" target="_blank" rel="noopener noreferrer">
+        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-telegram"/></svg>
+        <span>Написать в Telegram</span>
+        <small>@andmrz</small>
+      </a>
+    </section>
+    <p class="muted author-note">Нашёл ошибку или есть идея, что добавить, — пиши в Telegram.</p>
+
+    <section class="license-block" aria-labelledby="licenseTitle">
+      <h3 id="licenseTitle">Права и лицензия</h3>
+      <p class="license-copyright">© 2026 Андрей Морозов. Все права защищены.</p>
+      <p>Приложение «Мой гараж» — код, дизайн, интерфейс, тексты и иллюстрации —
+        охраняется авторским правом (часть IV Гражданского кодекса РФ).</p>
+      <ul class="install-guide-list">
+        <li><strong>Можно:</strong> бесплатно пользоваться приложением для себя,
+          своей семьи и своих автомобилей.</li>
+        <li><strong>Нельзя без письменного разрешения автора:</strong> копировать
+          и публиковать код или дизайн, выпускать изменённые версии и клоны,
+          продавать приложение, встраивать его в свои сервисы и выдавать за своё.</li>
+        <li>Приложение предоставляется «как есть», без гарантий. Автор не отвечает
+          за потерю данных — регулярно сохраняй резервную копию в разделе «Ещё».</li>
+        <li>Названия и логотипы автомобильных марок принадлежат их владельцам
+          и используются только для обозначения автомобилей.</li>
+        <li>Онлайн-характеристики по VIN берутся из открытой базы NHTSA vPIC (США).</li>
+      </ul>
+      <p>По вопросам использования и сотрудничества — пиши автору в Telegram.</p>
+    </section>
+
+    <section class="license-block" aria-labelledby="privacyTitle">
+      <h3 id="privacyTitle">Твои данные</h3>
+      <p>Записи, документы и фото хранятся только на этом устройстве и никуда
+        не отправляются. Если включить push-уведомления, на сервер передаются
+        только подписка браузера, выбранные типы уведомлений и часовой пояс.
+        VIN уходит в базу NHTSA, только когда нажимаешь «Характеристики онлайн».</p>
+    </section>
+  </dialog>
+
   <dialog class="entry-dialog" id="updateDialog"
     aria-labelledby="updateDialogTitle">
     <div class="dialog-heading">
@@ -1051,6 +1320,31 @@
         aria-label="Закрыть окно">×</button>
     </div>
     <div class="update-history">
+      <section class="update-version" aria-labelledby="updateVersion010">
+        <h3 id="updateVersion010">test 0.0.010</h3>
+        <ul class="install-guide-list">
+          <li>Новая стандартная иллюстрация автомобиля — вид спереди, без фона, чёткая на экранах с высокой плотностью.</li>
+          <li>Цвет перекрашивает только кузов: фары, стёкла, решётка, шины и эмблема остаются как есть, тени и блики сохраняются, а с тёмными цветами машина не превращается в сплошной силуэт.</li>
+          <li>В окне автомобиля появился предпросмотр цвета, добавлены белый и серебристый цвета; по умолчанию машина белая.</li>
+          <li>Фото автомобиля в карточке показывается целиком — так, как выбрано при кадрировании; раньше края снимка обрезались.</li>
+          <li>Новый раздел «Авторы» (в «Ещё» и внизу страницы): связь с автором в Telegram, права и лицензия, что происходит с твоими данными.</li>
+        </ul>
+      </section>
+      <section class="update-version" aria-labelledby="updateVersion009">
+        <h3 id="updateVersion009">test 0.0.009</h3>
+        <ul class="install-guide-list">
+          <li>Приложение больше не начинается с готового Volkswagen: на главной кнопка «Добавить автомобиль», а марку можно выбрать из списка или вписать свою.</li>
+          <li>Расшифровка VIN прямо на телефоне, без интернета: марка, страна и завод сборки, год модели и проверка контрольного знака. Марку, модель и год можно подставить в профиль одним нажатием.</li>
+          <li>Кнопка «Характеристики онлайн» ищет двигатель, топливо, коробку и кузов в открытой базе NHTSA (в основном машины рынка США), а «Проверить в ГИБДД» копирует VIN и открывает сайт проверки.</li>
+          <li>В профиле появились год выпуска, госномер — он показан как настоящий номерной знак — и характеристики: двигатель, топливо, коробка, привод, кузов.</li>
+          <li>Новая карточка «Документы и сроки» на главной: ОСАГО, диагностическая карта, права, КАСКО, медсправка и свои документы с подсветкой истекающих и просроченных.</li>
+          <li>Текущий пробег можно обновить вручную кнопкой «Обновить», не добавляя заправку или ТО.</li>
+          <li>«Ближайшее ТО» показывает, сколько осталось: через сколько километров или дней.</li>
+          <li>В заправках появилась стоимость топлива на 1 км, а средний расход теперь считается по всей истории.</li>
+          <li>В разделе «Ещё» видно, когда делалась последняя резервная копия. Экспорт сохраняет VIN, документы и пробег; при замене данных разделы, которых нет в файле, не стираются.</li>
+          <li>На телефоне фото автомобиля стоит ровно по центру карточки, а кадрирование нового фото начинается с центра снимка.</li>
+        </ul>
+      </section>
       <section class="update-version" aria-labelledby="updateVersion008">
         <h3 id="updateVersion008">test 0.0.008</h3>
         <ul class="install-guide-list">
@@ -1138,7 +1432,33 @@
   const carPhotoCropStorageKey = "my-garage-car-photo-crop-v1";
   const themeStorageKey = "my-garage-theme-v1";
   const partsStorageKey = "my-garage-parts-v1";
-  const appVersion = "test 0.0.008";
+  const carDetailsStorageKey = "my-garage-car-details-v1";
+  const documentsStorageKey = "my-garage-documents-v1";
+  const odometerStorageKey = "my-garage-odometer-v1";
+  const lastExportStorageKey = "my-garage-last-export-v1";
+  const carSpecOptions = {
+    fuel: ["Бензин", "Дизель", "Газ / бензин", "Гибрид", "Электро"],
+    transmission: ["Механика", "Автомат", "Робот", "Вариатор"],
+    drive: ["Передний", "Задний", "Полный"],
+    body: [
+      "Седан", "Хэтчбек", "Универсал", "Лифтбек", "Кроссовер", "Внедорожник",
+      "Минивэн", "Купе", "Кабриолет", "Пикап", "Фургон"
+    ]
+  };
+  const documentTypes = [
+    { id: "osago", label: "ОСАГО", short: "ОСАГО" },
+    { id: "diagnostic", label: "Диагностическая карта (техосмотр)", short: "Техосмотр" },
+    { id: "license", label: "Водительское удостоверение", short: "Права" },
+    { id: "kasko", label: "КАСКО", short: "КАСКО" },
+    { id: "medical", label: "Медицинская справка", short: "Медсправка" },
+    { id: "other", label: "Другой документ", short: "Документ" }
+  ];
+  const plateLatinToCyrillic = {
+    A: "А", B: "В", E: "Е", K: "К", M: "М", H: "Н", O: "О", P: "Р",
+    C: "С", T: "Т", Y: "У", X: "Х"
+  };
+  const dayCountForms = ["день", "дня", "дней"];
+  const appVersion = "test 0.0.010";
   const partCategories = [
     "Двигатель", "Фильтры", "Масла и жидкости", "Тормоза",
     "Подвеска и рулевое", "Трансмиссия", "Электрика", "Кузов и оптика",
@@ -1266,11 +1586,16 @@
   const carIllustrationContext = carIllustration.getContext(
     "2d", { willReadFrequently: true }
   );
+  const carColorPreview = document.getElementById("carColorPreview");
+  const carColorPreviewContext = carColorPreview.getContext("2d");
+  const carColorHelp = document.getElementById("carColorHelp");
+  const carSummaryVisual = document.querySelector(".car-summary-visual");
   const carIllustrationImage = new Image();
+  const carPaintMaskImage = new Image();
+  const defaultCarColor = "#f2f0e9";
   let carIllustrationBaseData = null;
-  let carBodyMaskData = null;
-  let carRoofMaskData = null;
-  let carTireMaskData = null;
+  // Маска окраски: 0 — деталь не красим, 255 — кузов полностью
+  let carPaintMask = null;
   const carCropEditor = document.getElementById("carCropEditor");
   const carCropCanvas = document.getElementById("carCropCanvas");
   const carCropContext = carCropCanvas.getContext("2d");
@@ -1805,7 +2130,7 @@
     "click", () => updateDialog.showModal()
   );
   document.getElementById("openMoreCar").addEventListener(
-    "click", () => carDialog.showModal()
+    "click", () => openCarProfileDialog()
   );
   document.getElementById("openServiceDialog").addEventListener(
     "click", () => openServiceEntryDialog()
@@ -1816,6 +2141,12 @@
   document.getElementById("openMoreUpdates").addEventListener(
     "click", () => updateDialog.showModal()
   );
+  const authorsDialog = document.getElementById("authorsDialog");
+  ["openMoreAuthors", "openAuthorsDialog"].forEach(id => {
+    document.getElementById(id).addEventListener(
+      "click", () => authorsDialog.showModal()
+    );
+  });
   document.getElementById("exportGarageData").addEventListener(
     "click", exportGarageData
   );
@@ -1837,11 +2168,12 @@
   });
 
   // Резервная копия: экспорт и импорт
-  const exportFormatVersion = 2;
+  const exportFormatVersion = 3;
   const expenseCountForms = ["запись расходов и ТО", "записи расходов и ТО",
     "записей расходов и ТО"];
   const fuelCountForms = ["заправка", "заправки", "заправок"];
   const partCountForms = ["запчасть", "запчасти", "запчастей"];
+  const documentCountForms = ["документ", "документа", "документов"];
   let pendingImport = null;
 
   function setDataStatus(message, state = "") {
@@ -1864,12 +2196,13 @@
     return `${formatNumber(bytes / 1024 / 1024, 1)} МБ`;
   }
 
-  function describeDataCounts(expenseCount, fuelCount, partCount) {
+  function describeDataCounts(expenseCount, fuelCount, partCount, documentCount = 0) {
     return [
       countLabel(expenseCount, expenseCountForms),
       countLabel(fuelCount, fuelCountForms),
-      countLabel(partCount, partCountForms)
-    ].join(", ");
+      countLabel(partCount, partCountForms),
+      documentCount ? countLabel(documentCount, documentCountForms) : ""
+    ].filter(Boolean).join(", ");
   }
 
   function exportGarageData() {
@@ -1884,12 +2217,15 @@
         color: carColor,
         photo: carPhoto || null,
         photoSource: carPhotoSource || null,
-        photoCrop: carPhotoCrop
+        photoCrop: carPhotoCrop,
+        ...carDetails
       },
       settings: { theme: selectedTheme },
       expenses,
       fuelEntries,
-      parts
+      parts,
+      documents: carDocuments,
+      odometer: manualOdometer
     };
     const fileName = `my-garage-${getLocalDateStamp()}.json`;
     const file = new Blob(
@@ -1906,10 +2242,13 @@
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 4000);
     setDataStatus(
       `Файл ${fileName} (${formatFileSize(file.size)}) готов: ` +
-      describeDataCounts(expenses.length, fuelEntries.length, parts.length) +
+      describeDataCounts(
+        expenses.length, fuelEntries.length, parts.length, carDocuments.length
+      ) +
       (carPhoto ? ", фото автомобиля." : "."),
       "success"
     );
+    markBackupDone();
   }
 
   function readFileAsText(file) {
@@ -2035,6 +2374,89 @@
       : null;
   }
 
+  // Госномер: латиница, похожая на кириллицу, заменяется (А123ВС70)
+  function normalizePlate(value) {
+    const text = String(value || "").toUpperCase().replace(/Ё/g, "Е");
+    const compact = text.replace(/[^0-9A-ZА-Я]+/g, "").replace(/(RUS|РУС)$/, "");
+    const cyrillic = compact.replace(
+      /[ABEKMHOPCTYX]/g, letter => plateLatinToCyrillic[letter]
+    );
+    if (/^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{2,3}$/.test(cyrillic)) {
+      return cyrillic;
+    }
+    return text.replace(/\s+/g, " ").trim().slice(0, 12);
+  }
+
+  function getPlateParts(plate) {
+    const match = /^([АВЕКМНОРСТУХ])(\d{3})([АВЕКМНОРСТУХ]{2})(\d{2,3})$/
+      .exec(plate || "");
+    return match
+      ? { main: `${match[1]} ${match[2]} ${match[3]}`, region: match[4] }
+      : null;
+  }
+
+  function createEmptyCarDetails() {
+    return {
+      vin: "",
+      year: null,
+      plate: "",
+      engine: "",
+      fuel: "",
+      transmission: "",
+      drive: "",
+      body: ""
+    };
+  }
+
+  function sanitizeCarDetails(value) {
+    const details = createEmptyCarDetails();
+    if (!value || typeof value !== "object") return details;
+    if (typeof value.vin === "string") {
+      details.vin = value.vin.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 24);
+    }
+    const year = Number(value.year);
+    if (value.year !== null && value.year !== "" && Number.isInteger(year) &&
+        year >= 1900 && year <= new Date().getFullYear() + 1) {
+      details.year = year;
+    }
+    if (typeof value.plate === "string") details.plate = normalizePlate(value.plate);
+    details.engine = cleanText(value.engine, 60);
+    Object.keys(carSpecOptions).forEach(key => {
+      details[key] = carSpecOptions[key].includes(value[key]) ? value[key] : "";
+    });
+    return details;
+  }
+
+  function sanitizeDocument(item) {
+    if (!item || typeof item !== "object" || !isValidDateString(item.expires)) {
+      return null;
+    }
+    const type = documentTypes.some(entry => entry.id === item.type)
+      ? item.type
+      : "other";
+    const title = cleanText(item.title, 60);
+    if (type === "other" && !title) return null;
+    return {
+      id: cleanId(item.id),
+      type,
+      title: type === "other" ? title : "",
+      expires: item.expires,
+      note: cleanText(item.note, 80),
+      createdAt: cleanTimestamp(item.createdAt),
+      updatedAt: cleanTimestamp(item.updatedAt || item.createdAt)
+    };
+  }
+
+  function sanitizeOdometer(value) {
+    if (!value || typeof value !== "object") return null;
+    const odometer = cleanNumber(value.value, 0, 2000000);
+    if (odometer === null || !Number.isInteger(odometer)) return null;
+    return {
+      value: odometer,
+      date: isValidDateString(value.date) ? value.date : ""
+    };
+  }
+
   function sanitizeVehicle(value) {
     if (!value || typeof value !== "object") return null;
     const make = cleanText(value.make, 60);
@@ -2048,12 +2470,17 @@
       model: cleanText(value.model, 80),
       color: /^#[0-9a-f]{6}$/i.test(value.color || "")
         ? value.color.toLowerCase()
-        : "#32618c",
+        : defaultCarColor,
       photo,
       photoSource,
       photoCrop: photo ? sanitizePhotoCrop(value.photoCrop) : null,
       // В старых экспортах фото не было — тогда текущее фото не трогаем
-      photoProvided: Object.prototype.hasOwnProperty.call(value, "photo")
+      photoProvided: Object.prototype.hasOwnProperty.call(value, "photo"),
+      details: sanitizeCarDetails(value),
+      // VIN и характеристики появились в формате 3
+      detailsProvided: ["vin", "year", "plate", "engine", "fuel",
+        "transmission", "drive", "body"].some(key =>
+        Object.prototype.hasOwnProperty.call(value, key))
     };
   }
 
@@ -2079,6 +2506,7 @@
     const hasData = Array.isArray(raw.expenses) ||
       Array.isArray(raw.fuelEntries) ||
       Array.isArray(raw.parts) ||
+      Array.isArray(raw.documents) ||
       (raw.vehicle && typeof raw.vehicle === "object");
     if (!hasData) return null;
     const report = { rejected: 0 };
@@ -2091,6 +2519,11 @@
       expenses: sanitizeList(raw.expenses, sanitizeExpense, report),
       fuelEntries: sanitizeList(raw.fuelEntries, sanitizeFuelEntry, report),
       parts: sanitizeList(raw.parts, sanitizePart, report),
+      partsProvided: Array.isArray(raw.parts),
+      documents: sanitizeList(raw.documents, sanitizeDocument, report),
+      documentsProvided: Array.isArray(raw.documents),
+      odometer: sanitizeOdometer(raw.odometer),
+      odometerProvided: Object.prototype.hasOwnProperty.call(raw, "odometer"),
       vehicle: sanitizeVehicle(raw.vehicle),
       theme: normalizeTheme(raw.settings?.theme),
       rejected: report.rejected
@@ -2146,10 +2579,21 @@
       : "нет данных";
     const rows = [
       ["Расходы и ТО", String(data.expenses.length)],
-      ["Заправки", String(data.fuelEntries.length)],
-      ["Запчасти", String(data.parts.length)],
-      ["Автомобиль", vehicleLabel]
+      ["Заправки", String(data.fuelEntries.length)]
     ];
+    if (data.partsProvided) {
+      rows.push(["Запчасти", String(data.parts.length)]);
+    }
+    if (data.documentsProvided) {
+      rows.push(["Документы", String(data.documents.length)]);
+    }
+    rows.push(["Автомобиль", vehicleLabel]);
+    if (data.odometer) {
+      rows.push([
+        "Пробег вручную",
+        `${data.odometer.value.toLocaleString("ru-RU")} км`
+      ]);
+    }
     if (data.rejected > 0) {
       rows.push(["Повреждённые записи (пропустим)", String(data.rejected)]);
     }
@@ -2165,7 +2609,9 @@
       })
     );
     document.getElementById("importCurrentData").textContent =
-      ` (${describeDataCounts(expenses.length, fuelEntries.length, parts.length)})`;
+      ` (${describeDataCounts(
+        expenses.length, fuelEntries.length, parts.length, carDocuments.length
+      )})`;
     showImportError("");
     importDialog.showModal();
   }
@@ -2177,6 +2623,11 @@
       normalizeSearchText(item.name).trim(),
       Number(item.price)
     ].join("|");
+  }
+
+  function getDocumentSignature(item) {
+    return [item.type, normalizeSearchText(item.title).trim(), item.expires]
+      .join("|");
   }
 
   function getPartSignature(item) {
@@ -2210,7 +2661,9 @@
     const isReplace = mode === "replace";
     let nextExpenses = data.expenses;
     let nextFuelEntries = data.fuelEntries;
-    let nextParts = data.parts;
+    let nextParts = data.partsProvided ? data.parts : parts;
+    let nextDocuments = data.documentsProvided ? data.documents : carDocuments;
+    let nextOdometer = data.odometerProvided ? data.odometer : manualOdometer;
     let added = null;
     let skipped = 0;
     if (!isReplace) {
@@ -2221,20 +2674,34 @@
         fuelEntries, data.fuelEntries, item => String(item.odometer)
       );
       const mergedParts = mergeRecords(parts, data.parts, getPartSignature);
+      const mergedDocuments = mergeRecords(
+        carDocuments, data.documents, getDocumentSignature
+      );
       nextExpenses = mergedExpenses.result;
       nextFuelEntries = mergedFuel.result;
       nextParts = mergedParts.result;
-      added = [mergedExpenses.added, mergedFuel.added, mergedParts.added];
+      nextDocuments = mergedDocuments.result;
+      nextOdometer = data.odometer &&
+        (!manualOdometer || data.odometer.value > manualOdometer.value)
+        ? data.odometer
+        : manualOdometer;
+      added = [
+        mergedExpenses.added, mergedFuel.added, mergedParts.added,
+        mergedDocuments.added
+      ];
       skipped = mergedExpenses.skipped + mergedFuel.skipped +
-        mergedParts.skipped;
+        mergedParts.skipped + mergedDocuments.skipped;
     }
-    const nextVehicle = isReplace ? data.vehicle : null;
+    // При объединении профиль берём из файла, только если свой не заполнен
+    const nextVehicle = isReplace || !carMake ? data.vehicle : null;
     const replacePhoto = Boolean(nextVehicle && nextVehicle.photoProvided);
+    const replaceDetails = Boolean(nextVehicle && nextVehicle.detailsProvided);
     const nextTheme = isReplace ? data.theme : "";
     const keys = [
       storageKey, fuelStorageKey, partsStorageKey, carMakeStorageKey,
       carModelStorageKey, carColorStorageKey, carPhotoStorageKey,
-      carPhotoSourceStorageKey, carPhotoCropStorageKey, themeStorageKey
+      carPhotoSourceStorageKey, carPhotoCropStorageKey, themeStorageKey,
+      carDetailsStorageKey, documentsStorageKey, odometerStorageKey
     ];
     const snapshot = new Map();
     try {
@@ -2248,6 +2715,17 @@
       localStorage.setItem(storageKey, JSON.stringify(nextExpenses));
       localStorage.setItem(fuelStorageKey, JSON.stringify(nextFuelEntries));
       localStorage.setItem(partsStorageKey, JSON.stringify(nextParts));
+      localStorage.setItem(documentsStorageKey, JSON.stringify(nextDocuments));
+      if (nextOdometer) {
+        localStorage.setItem(odometerStorageKey, JSON.stringify(nextOdometer));
+      } else {
+        localStorage.removeItem(odometerStorageKey);
+      }
+      if (replaceDetails) {
+        localStorage.setItem(
+          carDetailsStorageKey, JSON.stringify(nextVehicle.details)
+        );
+      }
       if (nextVehicle) {
         localStorage.setItem(carMakeStorageKey, nextVehicle.make);
         localStorage.setItem(carModelStorageKey, nextVehicle.model);
@@ -2285,6 +2763,9 @@
     expenses = nextExpenses;
     fuelEntries = nextFuelEntries;
     parts = nextParts;
+    carDocuments = nextDocuments;
+    manualOdometer = nextOdometer;
+    if (replaceDetails) carDetails = nextVehicle.details;
     if (nextVehicle) {
       carMake = nextVehicle.make;
       carModel = nextVehicle.model;
@@ -2307,17 +2788,18 @@
     if (isReplace) {
       setDataStatus(
         `Данные заменены: ${describeDataCounts(
-          expenses.length, fuelEntries.length, parts.length
+          expenses.length, fuelEntries.length, parts.length, carDocuments.length
         )}.`,
         "success"
       );
     } else {
       const addedTotal = added.reduce((sum, value) => sum + value, 0);
       setDataStatus(
-        addedTotal
+        (addedTotal
           ? `Импорт завершён, добавлено: ${describeDataCounts(...added)}` +
             (skipped ? `. Уже были в приложении: ${skipped}.` : ".")
-          : "Новых записей в файле нет — всё уже есть в приложении.",
+          : "Новых записей в файле нет — всё уже есть в приложении.") +
+          (nextVehicle ? " Профиль автомобиля взят из файла." : ""),
         "success"
       );
     }
@@ -2429,7 +2911,7 @@
     "click", openExpenseEntryDialog
   );
   document.getElementById("openCarDialog").addEventListener(
-    "click", () => carDialog.showModal()
+    "click", () => openCarProfileDialog()
   );
   function openFuelEntryDialog() {
     setDeviceDate(fuelDate, fuelDateWheels);
@@ -2513,8 +2995,19 @@
       updateCarColorPreview();
     });
   });
-  carIllustrationImage.addEventListener("load", initializeCarIllustration);
-  carIllustrationImage.src = "assets/car-front-transparent.png";
+  Promise.allSettled([
+    loadCarIllustrationAsset(carIllustrationImage, "assets/car-default.png"),
+    loadCarIllustrationAsset(carPaintMaskImage, "assets/car-default-paint.png")
+  ]).then(([base, mask]) => {
+    if (base.status !== "fulfilled") {
+      console.warn("Не удалось загрузить иллюстрацию автомобиля");
+      return;
+    }
+    if (mask.status !== "fulfilled") {
+      console.warn("Не удалось загрузить маску окраски — показываем без цвета");
+    }
+    initializeCarIllustration(mask.status === "fulfilled");
+  });
   carCropZoomInput.addEventListener("input", () => {
     cropZoom = Number(carCropZoomInput.value);
     renderCarCrop();
@@ -2597,8 +3090,8 @@
       if (selectionId !== photoSelectionId) return;
       pendingCarPhoto = undefined;
       cropZoom = 1;
-      cropCenterX = image.naturalWidth / 2;
-      cropCenterY = image.naturalHeight / 2;
+      cropCenterX = pendingCarImage.naturalWidth / 2;
+      cropCenterY = pendingCarImage.naturalHeight / 2;
       carCropZoomInput.value = String(cropZoom);
       carCropEditor.hidden = false;
       renderCarCrop();
@@ -2628,16 +3121,419 @@
     showCarPhoto("");
   });
 
+  // 1а. VIN: расшифровка без интернета (марка, страна, год, модель)
+  // Таблица кодов производителей (первые три символа VIN).
+  // «JT*» — запасной вариант по первым двум символам.
+  const vinBrandTable = {
+    "Acura": "19U 19V 2HH 2HN 5FR 5J8 JAE JH4",
+    "Alfa Romeo": "ZAA ZAR ZAS",
+    "Audi": "93U 93V 99A AAA TRU WA1 WAU WAV WMB WU1 WUA WA*",
+    "BAIC": "LNB",
+    "BMW": "3AV 3MW 4US 5UM 5UX 5YM 98M 99Z ABM BAB DAB KRX LBV MHH MMF NC0 PAF PM1 RLF WB5 WB6 WBA WBS WBX WBY X4X ZBA ZBI ZBM ZBP ZBT WB*",
+    "BYD": "92V LC0 LGX LPE",
+    "Bentley": "SCB SJA",
+    "Brilliance": "LSY",
+    "Bugatti": "VF9 ZA9",
+    "Buick": "1G4 2G4 3G4 3G5 5GA KL4 L4C LRB",
+    "Cadillac": "1G6 1GE 1GY 2G6 2GE 3GY LRE YSC",
+    "Chery": "98R 9UJ LVV PRH",
+    "Chevrolet": "1G1 1GA 1GB 1GC 1GN 2C1 2CN 2G1 2G8 2GC 2GN 3G1 3GC 3GN 3GV 8AG 8GG 93C 9BG 9GA MMM XUU Z3B",
+    "Chrysler": "1A4 1A8 1C3 1C8 2A4 2A8 2C3 2C8 2E3 3A4 3A8 3C8 4C3",
+    "Citroen": "8BC 935 9V7 FV7 VF7 VFG VFZ VR7 VS7 WF7",
+    "DS": "LPA VR1",
+    "Dacia": "UU1",
+    "Daewoo": "5GD LGL SUL SUP UU6",
+    "Daihatsu": "JD1 JD2 JD4 JDA",
+    "Dodge": "1B3 1B4 1B7 1D3 1D4 1D7 1D8 2B3 2B4 2B5 2B6 2B7 2B8 2D3 2D4 2D6 2D7 2D8 3B3 3B4 3B6 3B7 3D3 3D4 3D7 4B3",
+    "Dongfeng": "LGJ",
+    "FAW": "AAK LFB",
+    "Ferrari": "ZDF ZFF",
+    "Fiat": "3E4 8AP 93W 9BD DAA JC1 MAH SUF ZAF ZFA ZFB ZSA",
+    "Ford": "1F1 1FA 1FC 1FM 1FT 2FA 2FM 2FT 3FA 3FC 3FM 3FN 3FR 3FT 6F1 6FP 8AF 8XD 9BF AFA JC0 JC2 KNJ LFA LJX MAJ MNA MNB MNC MPB NM0 PE1 PR8 RHA RL0 SBC SFA VF0 VS6 WE0 WF0 WS0 WV0 X9F Z6F",
+    "GAC": "LMG PRN",
+    "GMC": "1G5 1GD 1GJ 1GK 1GT 2CT 2G5 2GK 2GT 3GD 3GK 3GT GKA",
+    "Geely": "LB3",
+    "Genesis": "KMT KMU",
+    "Great Wall": "8L4 92Z X9X XBB Y7C",
+    "Haima": "LH1",
+    "Haval": "XZG",
+    "Honda": "19X 1HG 2HG 2HJ 2HK 3CZ 3HG 4S6 5FN 5FP 5J6 5KB 7FA 8C3 93H 9C2 AHM JHL JHM LHG LUC LVH MAK MH1 MHR MRH NFB NLA PAD PMH RKT RLH SAH SHH SHS SNT YC1 ZDC JH*",
+    "Hummer": "5GN 5GR 5GT",
+    "Hyundai": "2HM 5NM 5NP 5NT 9BH AC5 KM8 KME KMF LBE MAL MX3 NLH NLJ PL8 PP3 TMA TMC ZK5 KM*",
+    "Infiniti": "3PC 5N3 JNK JNR",
+    "Isuzu": "1GG ACV ADM JAA JAB JAC JAM JR2 LET LWL LZE M3G MP1 MPA NNA PAB PLZ RLE SED",
+    "JAC": "LJ1",
+    "Jaguar": "SAD SAJ",
+    "Jeep": "1J4 1J8",
+    "Kia": "5XX 9UW KNA KNC KND KNE KNG LJD MS0 MZB U5Y U6Y USY KN*",
+    "Lada": "XTA Z0X",
+    "Lamborghini": "ZHW ZPB",
+    "Lancia": "2E4 VYC ZLA",
+    "Land Rover": "SAL",
+    "Lexus": "2T2 58A JT6 JT8 JTH JTJ",
+    "Lifan": "LLV",
+    "Lincoln": "1CN 1L1 1LN 2L1 2LM 2LN 3LN 5L1 5LM 5LT KLM",
+    "MG": "LSJ MML MZ7 SDP",
+    "Maserati": "ZAM ZN6",
+    "Mazda": "1YV 3MD 3MV 3MZ 4F2 4F4 7MM 8LF 9FC AFB JM0 JM1 JM2 JM3 JM6 JM7 JMZ LVR MM8 MP2 PE3 PP1 YCM JM*",
+    "Mercedes-Benz": "1MB LE4 W1K W1N W1T W1V W1W W1Y WBD WDB WDC WDD WDF WMX WD* W1*",
+    "Mercury": "1ME 2ME 2MR 3ME 4M2 6MP FM2",
+    "Mini": "TW7 TX5 WMW WMZ",
+    "Mitsubishi": "1Z3 1Z7 4A3 4A4 4P3 6MM ABJ JA3 JA4 JA7 JE4 JMA JMB JMF JMY JW6 KPH LL6 MA7 MK2 ML3 MMA MMB MMC MMD MMT RLA TYB XMC XNC",
+    "Nissan": "1JN 1N4 1N6 3N1 3N8 4N2 5BZ 5NA 6F4 8AN 94D ADN JN6 JNC JNE JNT JNX JPC KN1 LGB LJN MBH MDH MNT PN8 SJN VNV VSK VWA JN*",
+    "Opel": "1G0 V0L VSX VXE VXK W00 W0L W0S W0V Z12",
+    "Peugeot": "8AD 8AE 8GD 936 9V8 FV3 SDB VF3 VFF VGA VR3 VS3 VS8 WF3",
+    "Polestar": "LPS YSM",
+    "Pontiac": "1G2 1G7 1GM 2C7 2CG 2G2 2G7 3G2 3G7 5Y2",
+    "Porsche": "WP0 WP1 WP*",
+    "Ram": "ZFC",
+    "Renault": "8A1 8G1 93Y 9FB ADR CF1 FV1 GA1 L56 MEE NM1 SDG TW3 VF1 VFB VFJ VMK VN1 VS5 VSY VW1 WF1 X7L",
+    "Rolls-Royce": "SCA SLA",
+    "Rover": "SAX SAZ",
+    "SEAT": "VSS VSZ WSS",
+    "Saab": "YK1 YS3 YTN",
+    "Saturn": "3GS 5GZ",
+    "Skoda": "TMB TNB Y6U YMB",
+    "Smart": "R4N TCC W1A WME",
+    "SsangYong": "KPA KPB KPT WAX",
+    "Subaru": "1F2 4S3 4S4 JF1 JF2 JF3 JFS MMR PLP JF*",
+    "Suzuki": "2S2 2S3 5Z6 8AK 9CD JS2 JS3 LVF MA3 MHY MLC MMS MS3 PPP TSM VSE JS*",
+    "Tesla": "5YJ 7G2 7SA LRW SFZ XP7",
+    "Toyota": "1NX 2T1 2T3 3MY 3TM 3TY 4T1 4T3 4T4 4TA 5TB 5TD 5TE 5TF 5YF 6T1 7MU 7SV 8AJ 93R 9BR AHT JT2 JT3 JT4 JTD JTE JTF JTG JTK JTL JTM JTN JTS LFM LTV LVG MBJ MHF MMK MR0 MR1 MR2 NMT PN1 PN2 RKL RL4 SB1 STE TW1 VNK WNK WZ1 XW7 YAR JT*",
+    "Vauxhall": "SKA",
+    "Volkswagen": "1VW 2V4 2V8 3VV 3VW 8AW 9BW AAV PPV VW2 VWG VWV WUW WV1 WV2 WV3 WVG WVM WVW WVZ WYG WYW WZW WV*",
+    "Volvo": "LVY LYV PNV XLB YV1 YV4 YV*",
+    "Zotye": "LJ8",
+    "ГАЗ": "X96 XTH",
+    "ЗАЗ": "XTE Y6D",
+    "ИЖ": "XTK XWK",
+    "Москвич": "XTB",
+    "ТагАЗ": "X7M",
+    "УАЗ": "XTT",
+    "Changan|Suzuki": "LS5",
+    "Chevrolet|Daewoo": "KL1 KL7 KL8",
+    "Chevrolet|Lada": "X9L",
+    "Chevrolet|Opel": "XUF",
+    "Chrysler|Dodge": "2C4 3C4",
+    "Chrysler|Fiat": "3C3",
+    "Daewoo|Chevrolet": "KLA",
+    "FAW|Hongqi": "LFP",
+    "Fiat|Jeep": "LWV",
+    "Ford|Mazda": "LVS",
+    "Geely|Belgee": "Y4K",
+    "Geely|Zeekr": "L6T",
+    "Hyundai|Genesis": "KMH",
+    "Hyundai|Kia": "Z94",
+    "Jeep|Fiat": "ZAC",
+    "Kia|Hyundai": "3KP 5XY XWE",
+    "Land Rover|Jaguar": "L2C",
+    "Mazda|Ford": "MM0 MM6 MM7",
+    "Nissan|Infiniti": "5N1 JN1 JN8 SJK",
+    "Opel|Chevrolet": "XWF",
+    "Peugeot|Citroen": "LDC",
+    "Ram|Dodge": "1C6 3C6 3C7",
+    "Renault|Nissan": "KNM",
+    "Rover|MG": "SAR",
+    "Skoda|Volkswagen": "MEX",
+    "Toyota|Daihatsu": "MHK",
+    "Volkswagen|Audi": "LFV",
+    "Volkswagen|Skoda": "LSV",
+    "Chevrolet|Buick|Cadillac": "LSG",
+    "Chevrolet|Ravon|Daewoo": "XWB",
+    "Chrysler|Dodge|Jeep": "1C4",
+    "Haval|Great Wall|Tank": "LGW",
+    "Mitsubishi|Peugeot|Citroen": "Z8T",
+    "Volkswagen|Skoda|Audi": "XW8",
+    "Nissan|Datsun": "Z8N"
+  };
+  const vinPlantNames = {
+    XTA: ["АвтоВАЗ, Тольятти", "Россия"],
+    Z0X: ["LADA Sport, Тольятти", "Россия"],
+    X9L: ["GM-АвтоВАЗ, Тольятти", "Россия"],
+    XTT: ["УАЗ, Ульяновск", "Россия"],
+    XTH: ["ГАЗ, Нижний Новгород", "Россия"],
+    X96: ["ГАЗ, Нижний Новгород", "Россия"],
+    XTB: ["АЗЛК, Москва", "Россия"],
+    XTK: ["ИжАвто, Ижевск", "Россия"],
+    XWK: ["ИжАвто, Ижевск", "Россия"],
+    XW8: ["Volkswagen Group Rus, Калуга", "Россия"],
+    XW7: ["Toyota Motor Manufacturing Russia, Санкт-Петербург", "Россия"],
+    Z94: ["Hyundai Motor Manufacturing Rus, Санкт-Петербург", "Россия"],
+    XWE: ["Автотор, Калининград", "Россия"],
+    XWF: ["Автотор, Калининград", "Россия"],
+    X4X: ["Автотор, Калининград", "Россия"],
+    XUU: ["Автотор, Калининград", "Россия"],
+    XUF: ["GM Russia, Санкт-Петербург", "Россия"],
+    X7L: ["Renault Россия, Москва", "Россия"],
+    Z8N: ["Nissan Manufacturing Rus, Санкт-Петербург", "Россия"],
+    Z8T: ["ПСМА Рус, Калуга", "Россия"],
+    X9F: ["Ford, Всеволожск", "Россия"],
+    Z6F: ["Ford Sollers", "Россия"],
+    XZG: ["Haval Motor Manufacturing Rus, Тульская область", "Россия"],
+    X9X: ["Автотрейд-12, Московская область", "Россия"],
+    X7M: ["ТагАЗ, Таганрог", "Россия"],
+    XTE: ["ЗАЗ, Запорожье", "Украина"],
+    Y6D: ["ЗАЗ, Запорожье", "Украина"],
+    Y4K: ["БелДжи, Борисов", "Беларусь"],
+    XWB: ["UzAuto Motors, Асака", "Узбекистан"]
+  };
+  // Страна по первым двум символам (ISO 3780)
+  const vinCountryRanges = [
+    ["AA", "AH", "ЮАР"], ["J", "", "Япония"], ["KF", "KH", "Израиль"],
+    ["KL", "KR", "Южная Корея"], ["K1", "K3", "Южная Корея"],
+    ["K5", "K5", "Киргизия"], ["L", "", "Китай"], ["H", "", "Китай"],
+    ["MA", "ME", "Индия"], ["MF", "MK", "Индонезия"], ["ML", "MR", "Таиланд"],
+    ["MX", "MX", "Казахстан"], ["MY", "M0", "Индия"], ["NA", "NE", "Иран"],
+    ["NF", "NG", "Пакистан"], ["NL", "NR", "Турция"],
+    ["NS", "NT", "Узбекистан"], ["NV", "NV", "Азербайджан"],
+    ["NY", "NY", "Армения"], ["N1", "N5", "Иран"], ["N7", "N8", "Турция"],
+    ["PA", "PC", "Филиппины"], ["PF", "PG", "Сингапур"],
+    ["PL", "PR", "Малайзия"], ["RA", "RB", "ОАЭ"], ["RF", "RK", "Тайвань"],
+    ["RL", "RN", "Вьетнам"], ["RS", "RT", "Саудовская Аравия"],
+    ["E", "", "Россия"], ["SA", "SM", "Великобритания"],
+    ["SN", "ST", "Германия"], ["SU", "SZ", "Польша"], ["S1", "S2", "Латвия"],
+    ["S3", "S3", "Грузия"], ["TA", "TH", "Швейцария"], ["TJ", "TP", "Чехия"],
+    ["TR", "TV", "Венгрия"], ["TW", "T2", "Португалия"],
+    ["T3", "T5", "Сербия"], ["T7", "T8", "Нидерланды"], ["UA", "UC", "Испания"],
+    ["UH", "UM", "Дания"], ["UN", "UR", "Ирландия"], ["UU", "UX", "Румыния"],
+    ["U5", "U7", "Словакия"], ["VA", "VE", "Австрия"], ["VF", "VR", "Франция"],
+    ["VS", "VW", "Испания"], ["VX", "V2", "Франция"], ["V3", "V5", "Хорватия"],
+    ["V6", "V8", "Эстония"], ["W", "", "Германия"], ["XA", "XC", "Болгария"],
+    ["XD", "XE", "Россия"], ["XF", "XH", "Греция"], ["XJ", "XK", "Россия"],
+    ["XL", "XR", "Нидерланды"], ["XS", "XW", "Россия"],
+    ["XX", "XY", "Люксембург"], ["XZ", "X1", "Россия"], ["YA", "YE", "Бельгия"],
+    ["YF", "YK", "Финляндия"], ["YS", "YW", "Швеция"], ["YX", "Y2", "Норвегия"],
+    ["Y3", "Y5", "Беларусь"], ["Y6", "Y9", "Украина"], ["ZA", "ZU", "Италия"],
+    ["ZX", "ZZ", "Словения"], ["Z3", "Z5", "Литва"], ["Z6", "Z0", "Россия"],
+    ["1", "", "США"], ["4", "", "США"], ["5", "", "США"], ["7", "", "США"],
+    ["2", "", "Канада"], ["3A", "3X", "Мексика"], ["6", "", "Австралия"],
+    ["8A", "8E", "Аргентина"], ["8F", "8G", "Чили"], ["9A", "9E", "Бразилия"],
+    ["91", "90", "Бразилия"], ["9F", "9G", "Колумбия"], ["9S", "9V", "Уругвай"]
+  ];
+  // Коды моделей концерна Volkswagen (7–8-й символы европейского VIN)
+  const vinGroupModels = {
+    Volkswagen: {
+      "1J": "Golf IV", "1K": "Golf V", "5K": "Golf VI", "5M": "Golf Plus",
+      AU: "Golf VII", "5G": "Golf VII", CD: "Golf VIII", "9N": "Polo IV",
+      "6R": "Polo V", "6C": "Polo V", AW: "Polo VI", "61": "Polo седан",
+      CK: "Polo лифтбек", "3B": "Passat B5", "3C": "Passat B6/B7",
+      "3G": "Passat B8", "5N": "Tiguan", AD: "Tiguan II",
+      AX: "Tiguan Allspace", "7L": "Touareg", "7P": "Touareg II",
+      CR: "Touareg III", "1T": "Touran", "5T": "Touran II", "2K": "Caddy",
+      "7H": "Transporter T5", "2H": "Amarok", "13": "Scirocco",
+      "7N": "Sharan", "5C": "Beetle", "9C": "New Beetle", "3H": "Arteon",
+      A1: "T-Roc", C1: "T-Cross", AA: "up!", "3D": "Phaeton", "1F": "Eos"
+    },
+    Skoda: {
+      "1U": "Octavia Tour", "1Z": "Octavia A5", "5E": "Octavia A7",
+      NE: "Octavia A7", NX: "Octavia A8", "6Y": "Fabia",
+      "5J": "Fabia II / Roomster", NJ: "Fabia III", PJ: "Fabia IV",
+      "3U": "Superb", "3T": "Superb II", "3V": "Superb III", "5L": "Yeti",
+      NH: "Rapid", NS: "Kodiaq", NU: "Karoq", NW: "Scala / Kamiq",
+      AA: "Citigo"
+    },
+    Audi: {
+      "8L": "A3", "8P": "A3", "8V": "A3", "8Y": "A3", "8D": "A4 B5",
+      "8E": "A4 B6/B7", "8K": "A4 B8", "8W": "A4 B9", "8T": "A5", F5: "A5",
+      "4B": "A6 C5", "4F": "A6 C6", "4G": "A6/A7 C7", "4K": "A6/A7 C8",
+      "4D": "A8 D2", "4E": "A8 D3", "4H": "A8 D4", "4N": "A8 D5", "8X": "A1",
+      GB: "A1", "8U": "Q3", F3: "Q3", "8R": "Q5", FY: "Q5", "4L": "Q7",
+      "4M": "Q7/Q8", "8N": "TT", "8J": "TT", FV: "TT", "42": "R8"
+    }
+  };
+  const vinLadaModels = {
+    "1111": "Ока", "2101": "2101", "2102": "2102", "2103": "2103",
+    "2104": "2104", "2105": "2105", "2106": "2106", "2107": "2107",
+    "2108": "2108", "2109": "2109", "2110": "2110", "2111": "2111",
+    "2112": "2112", "2113": "2113", "2114": "2114", "2115": "2115",
+    "2120": "Надежда", "2121": "Niva (4x4)", "2131": "Niva (4x4)",
+    "2123": "Niva Travel", "2170": "Priora", "2171": "Priora",
+    "2172": "Priora", "1117": "Kalina", "1118": "Kalina", "1119": "Kalina",
+    "2190": "Granta", "2191": "Granta", "2180": "Vesta"
+  };
+  // Европейские VIN этих производителей не хранят год в 10-м символе
+  const vinNoYearWmi = new Set([
+    "WDB", "WDC", "WDD", "WDF", "W1K", "W1N", "W1V", "WME", "VF1", "VF3",
+    "VF7", "UU1", "VR3", "VR7", "ZFA"
+  ]);
+  const vinCharOrder = "ABCDEFGHJKLMNPRSTUVWXYZ1234567890";
+  const vinYearCodes = "ABCDEFGHJKLMNPRSTVWXY123456789";
+  const vinLetterValues = {
+    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, J: 1, K: 2, L: 3, M: 4,
+    N: 5, P: 7, R: 9, S: 2, T: 3, U: 4, V: 5, W: 6, X: 7, Y: 8, Z: 9
+  };
+  const vinWeights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
+  const latinLookAlikes = {
+    "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O",
+    "Р": "P", "С": "C", "Т": "T", "Х": "X", "У": "Y"
+  };
+  let vinBrandIndex = null;
+
+  function getVinBrandIndex() {
+    if (vinBrandIndex) return vinBrandIndex;
+    vinBrandIndex = new Map();
+    Object.entries(vinBrandTable).forEach(([brands, codes]) => {
+      const list = brands.split("|");
+      codes.split(" ").forEach(code => vinBrandIndex.set(code, list));
+    });
+    return vinBrandIndex;
+  }
+
+  // Заглавные латинские буквы; кириллица, похожая на латиницу, заменяется
+  function cleanVinInput(value) {
+    return String(value || "")
+      .toUpperCase()
+      .replace(/[АВЕКМНОРСТХУ]/g, letter => latinLookAlikes[letter])
+      .replace(/\s+/g, "")
+      .slice(0, 24);
+  }
+
+  function getVinCheckDigit(vin) {
+    let sum = 0;
+    for (let index = 0; index < 17; index += 1) {
+      const char = vin[index];
+      const value = /\d/.test(char) ? Number(char) : vinLetterValues[char];
+      if (value === undefined) return "";
+      sum += value * vinWeights[index];
+    }
+    const remainder = sum % 11;
+    return remainder === 10 ? "X" : String(remainder);
+  }
+
+  function getVinCountry(vin) {
+    const second = vinCharOrder.indexOf(vin[1]);
+    const range = vinCountryRanges.find(([from, to]) => {
+      if (from[0] !== vin[0]) return false;
+      if (from.length === 1) return true;
+      return second >= vinCharOrder.indexOf(from[1]) &&
+        second <= vinCharOrder.indexOf(to[1]);
+    });
+    return range ? range[2] : "";
+  }
+
+  function getVinModelYears(vin, northAmerica, checkValid) {
+    const index = vinYearCodes.indexOf(vin[9]);
+    if (index < 0) return null;
+    const early = 1980 + index;
+    const late = early + 30;
+    const maxYear = new Date().getFullYear() + 1;
+    if (northAmerica && checkValid) {
+      // В Северной Америке буква на 7-й позиции означает 2010–2039 годы
+      return { year: /\d/.test(vin[6]) || late > maxYear ? early : late };
+    }
+    if (late > maxYear) return { year: early };
+    return late >= maxYear - 3 ? { year: late, alternative: early } : { year: late };
+  }
+
+  function getVinModel(vin, brands, year) {
+    const wmi = vin.slice(0, 3);
+    if (brands.includes("Lada") || wmi === "X9L") {
+      const code = vin.slice(3, 7);
+      if (/^\d{4}$/.test(code)) {
+        if (code === "2109" && vin[7] === "9") return { brand: "Lada", model: "21099" };
+        if (code === "2123" && wmi === "X9L") {
+          return year && year >= 2021
+            ? { brand: "Lada", model: "Niva Travel" }
+            : { brand: "Chevrolet", model: "Niva" };
+        }
+        if (code === "2192" || code === "2194") {
+          return { brand: "Lada", model: year && year >= 2018 ? "Granta" : "Kalina" };
+        }
+        return vinLadaModels[code]
+          ? { brand: "Lada", model: vinLadaModels[code] }
+          : null;
+      }
+      if (vin[4] === "F") return { brand: "Lada", model: "Vesta" };
+      if (vin[4] === "A") return { brand: "Lada", model: "XRAY" };
+      return null;
+    }
+    const groupBrands = brands.filter(brand => vinGroupModels[brand]);
+    if (!groupBrands.length) return null;
+    const alwaysCoded = wmi === "XW8" || wmi === "TMB";
+    if (!alwaysCoded && vin.slice(3, 6) !== "ZZZ") return null;
+    const code = vin.slice(6, 8);
+    const matches = groupBrands.filter(brand => vinGroupModels[brand][code]);
+    if (matches.length !== 1) return code && groupBrands.length === 1
+      ? { brand: groupBrands[0], model: "", code }
+      : null;
+    return { brand: matches[0], model: vinGroupModels[matches[0]][code], code };
+  }
+
+  // Разбор VIN без сети. Возвращает тип ввода и найденные данные.
+  function decodeVin(rawValue) {
+    const value = cleanVinInput(rawValue);
+    if (!value) return { kind: "empty", value };
+    if (/[^A-Z0-9-]/.test(value)) {
+      return {
+        kind: "error",
+        value,
+        message: "В VIN допустимы только латинские буквы и цифры."
+      };
+    }
+    const compact = value.replace(/-/g, "");
+    if (compact.length !== 17) {
+      if (/^[A-Z0-9]{2,9}-\d{3,8}$/.test(value)) return { kind: "frame", value };
+      if (compact.length > 17) {
+        return {
+          kind: "error",
+          value,
+          message: `В VIN 17 символов, а введено ${compact.length}.`
+        };
+      }
+      return { kind: "partial", value, missing: 17 - compact.length };
+    }
+    const corrected = /[IOQ]/.test(compact);
+    const vin = compact.replace(/[OQ]/g, "0").replace(/I/g, "1");
+    const wmi = vin.slice(0, 3);
+    const index = getVinBrandIndex();
+    let brands = index.get(wmi) ||
+      (wmi[2] !== "9" && index.get(vin.slice(0, 2) + "*")) || [];
+    brands = [...brands];
+    const plant = vinPlantNames[wmi] || null;
+    const country = plant ? plant[1] : getVinCountry(vin);
+    const checkDigit = getVinCheckDigit(vin);
+    const checkValid = Boolean(checkDigit) && vin[8] === checkDigit;
+    const northAmerica = /^[1-5]/.test(vin);
+    const years = vinNoYearWmi.has(wmi) && !checkValid
+      ? null
+      : getVinModelYears(vin, northAmerica, checkValid);
+    const modelInfo = getVinModel(vin, brands, years?.year || null);
+    if (modelInfo && modelInfo.brand && brands.includes(modelInfo.brand)) {
+      brands = [modelInfo.brand, ...brands.filter(brand => brand !== modelInfo.brand)];
+      if (modelInfo.model) brands = [modelInfo.brand];
+    }
+    return {
+      kind: "vin",
+      value: vin,
+      vin,
+      corrected,
+      wmi,
+      brands,
+      country,
+      plant: plant ? plant[0] : "",
+      year: years ? years.year : null,
+      yearAlternative: years?.alternative || null,
+      checkValid,
+      checkWarning: northAmerica && !checkValid,
+      model: modelInfo?.model || "",
+      modelCode: modelInfo?.code || ""
+    };
+  }
+
   // 2. Загружаем сохранённые данные
   let expenses = [];
   let fuelEntries = [];
   let parts = [];
-  let carMake = "Volkswagen";
+  let carMake = "";
   let carModel = "";
-  let carColor = "#32618c";
+  let carColor = defaultCarColor;
   let carPhoto = "";
   let carPhotoSource = "";
   let carPhotoCrop = null;
+  let carDetails = createEmptyCarDetails();
+  let carDocuments = [];
+  let manualOdometer = null;
+  let lastExportAt = null;
   let pendingCarPhoto;
   let pendingCarImage = null;
   let pendingCarImageSource = "";
@@ -2688,6 +3584,9 @@
     ) {
       carPhotoCrop = savedCarPhotoCrop;
     }
+    carDetails = sanitizeCarDetails(
+      JSON.parse(localStorage.getItem(carDetailsStorageKey) || "null")
+    );
   } catch (error) {
     console.warn("Не удалось загрузить данные автомобиля", error);
   }
@@ -2717,6 +3616,31 @@
     }
   } catch (error) {
     console.warn("Не удалось загрузить каталог запчастей", error);
+  }
+
+  try {
+    const savedDocuments = JSON.parse(
+      localStorage.getItem(documentsStorageKey) || "[]"
+    );
+    if (Array.isArray(savedDocuments)) {
+      carDocuments = savedDocuments.map(sanitizeDocument).filter(Boolean);
+    }
+  } catch (error) {
+    console.warn("Не удалось загрузить документы", error);
+  }
+
+  try {
+    manualOdometer = sanitizeOdometer(
+      JSON.parse(localStorage.getItem(odometerStorageKey) || "null")
+    );
+    const savedExportTime = Date.parse(
+      localStorage.getItem(lastExportStorageKey) || ""
+    );
+    lastExportAt = Number.isFinite(savedExportTime)
+      ? new Date(savedExportTime)
+      : null;
+  } catch (error) {
+    console.warn("Не удалось загрузить пробег и дату резервной копии", error);
   }
 
   // 3. Форматируем деньги, числа и даты
@@ -2840,16 +3764,795 @@
     }
   }
 
+  // 4б. Профиль автомобиля: VIN, госномер и характеристики
+  const carSummary = document.getElementById("carSummary");
+  const carTitle = document.getElementById("carTitle");
+  const carSummaryNote = document.getElementById("carSummaryNote");
+  const carSpecsList = document.getElementById("carSpecsList");
+  const carIds = document.getElementById("carIds");
+  const carPlateBadge = document.getElementById("carPlateBadge");
+  const carVinBox = document.getElementById("carVinBox");
+  const carVinValue = document.getElementById("carVinValue");
+  const carCopyStatus = document.getElementById("carCopyStatus");
+  const openCarDialogLabel = document.getElementById("openCarDialogLabel");
+  const openCarDialogIcon = document.getElementById("openCarDialogIcon");
+  const carDialogTitle = document.getElementById("carDialogTitle");
+  const carFormError = document.getElementById("carFormError");
+  const carVinInput = document.getElementById("carVinInput");
+  const vinResult = document.getElementById("vinResult");
+  const carYearInput = document.getElementById("carYearInput");
+  const carPlateInput = document.getElementById("carPlateInput");
+  const carSpecsDetails = document.getElementById("carSpecs");
+  const carSpecsCount = document.getElementById("carSpecsCount");
+  const carEngineInput = document.getElementById("carEngineInput");
+  const carSpecSelects = {
+    fuel: document.getElementById("carFuelInput"),
+    transmission: document.getElementById("carTransmissionInput"),
+    drive: document.getElementById("carDriveInput"),
+    body: document.getElementById("carBodyInput")
+  };
+  const vinOnlineUrl =
+    "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/";
+  const gibddCheckUrl = "https://xn--90adear.xn--p1ai/check/auto";
+  const maxCarYear = new Date().getFullYear() + 1;
+  const nhtsaCountryNames = {
+    "UNITED STATES (USA)": "США",
+    "CANADA": "Канада",
+    "MEXICO": "Мексика",
+    "JAPAN": "Япония",
+    "SOUTH KOREA": "Южная Корея",
+    "KOREA (SOUTH)": "Южная Корея",
+    "REPUBLIC OF KOREA": "Южная Корея",
+    "CHINA": "Китай",
+    "GERMANY": "Германия",
+    "UNITED KINGDOM (UK)": "Великобритания",
+    "FRANCE": "Франция",
+    "ITALY": "Италия",
+    "SPAIN": "Испания",
+    "SWEDEN": "Швеция",
+    "BELGIUM": "Бельгия",
+    "AUSTRIA": "Австрия",
+    "HUNGARY": "Венгрия",
+    "SLOVAKIA": "Словакия",
+    "CZECH REPUBLIC": "Чехия",
+    "CZECHIA": "Чехия",
+    "FINLAND": "Финляндия",
+    "NETHERLANDS": "Нидерланды",
+    "PORTUGAL": "Португалия",
+    "POLAND": "Польша",
+    "TURKEY": "Турция",
+    "INDIA": "Индия",
+    "THAILAND": "Таиланд",
+    "BRAZIL": "Бразилия",
+    "ARGENTINA": "Аргентина",
+    "SOUTH AFRICA": "ЮАР",
+    "AUSTRALIA": "Австралия"
+  };
+  let vinAutoFill = { make: "", model: "", year: "" };
+  // Характеристики, подставленные онлайн-поиском, и VIN, по которому их нашли
+  let vinOnlineFilled = { vin: "", values: {} };
+  let vinOnline = null;
+  let vinLookupController = null;
+  let carCopyTimer = 0;
+
+  carYearInput.max = String(maxCarYear);
+  Object.entries(carSpecSelects).forEach(([key, select]) => {
+    select.append(
+      new Option("Не указано", ""),
+      ...carSpecOptions[key].map(value => new Option(value, value))
+    );
+  });
+
+  // В подсказки марки добавляем все марки из справочника VIN
+  (function extendCarMakeOptions() {
+    const list = document.getElementById("carMakes");
+    const known = new Set(
+      [...list.options].map(option => option.value.toLowerCase())
+    );
+    const extra = [];
+    Object.keys(vinBrandTable).forEach(key => {
+      key.split("|").forEach(brand => {
+        if (known.has(brand.toLowerCase())) return;
+        known.add(brand.toLowerCase());
+        extra.push(brand);
+      });
+    });
+    extra.sort((a, b) => a.localeCompare(b, "ru")).forEach(brand => {
+      const option = document.createElement("option");
+      option.value = brand;
+      list.append(option);
+    });
+  })();
+
+  function formatPlateForInput(plate) {
+    const parts = getPlateParts(plate);
+    return parts
+      ? parts.main.replace(/\s+/g, "") + " " + parts.region
+      : plate || "";
+  }
+
+  function getCarSpecValues() {
+    return {
+      engine: carEngineInput.value.trim(),
+      fuel: carSpecSelects.fuel.value,
+      transmission: carSpecSelects.transmission.value,
+      drive: carSpecSelects.drive.value,
+      body: carSpecSelects.body.value
+    };
+  }
+
+  function updateCarSpecsCount() {
+    const filled = Object.values(getCarSpecValues()).filter(Boolean).length;
+    carSpecsCount.textContent = filled ? `· ${filled} из 5` : "";
+  }
+
+  function showCarFormError(message, field = null) {
+    carFormError.textContent = message;
+    carFormError.hidden = !message;
+    if (field) field.focus();
+    if (message) carFormError.scrollIntoView({ block: "nearest" });
+  }
+
+  function showCarCopyStatus(message) {
+    carCopyStatus.textContent = message;
+    clearTimeout(carCopyTimer);
+    if (message) {
+      carCopyTimer = setTimeout(() => {
+        carCopyStatus.textContent = "";
+      }, 2500);
+    }
+  }
+
+  // Карточка на главной: характеристики, госномер и VIN
+  function renderCarSummaryDetails() {
+    const hasCar = Boolean(carMake);
+    const specs = [
+      carDetails.year ? `${carDetails.year} г.` : "",
+      carDetails.body,
+      carDetails.engine,
+      carDetails.fuel,
+      carDetails.transmission,
+      carDetails.drive ? `${carDetails.drive} привод` : ""
+    ].filter(Boolean);
+    carSpecsList.replaceChildren(...specs.map(text => {
+      const item = document.createElement("li");
+      item.textContent = text;
+      return item;
+    }));
+    carSpecsList.hidden = !hasCar || specs.length === 0;
+
+    const plate = carDetails.plate;
+    const plateParts = getPlateParts(plate);
+    carPlateBadge.replaceChildren();
+    carPlateBadge.classList.toggle("is-plain", !plateParts);
+    if (plateParts) {
+      const main = document.createElement("span");
+      main.className = "plate-main";
+      main.textContent = plateParts.main;
+      const region = document.createElement("span");
+      region.className = "plate-region";
+      region.textContent = plateParts.region;
+      const country = document.createElement("small");
+      country.textContent = "RUS";
+      region.append(country);
+      carPlateBadge.append(main, region);
+    } else if (plate) {
+      const main = document.createElement("span");
+      main.className = "plate-main";
+      main.textContent = plate;
+      carPlateBadge.append(main);
+    }
+    carPlateBadge.hidden = !plate;
+    carPlateBadge.setAttribute("aria-label", plate ? `Госномер ${plate}` : "");
+    carVinValue.textContent = carDetails.vin;
+    carVinBox.hidden = !carDetails.vin;
+    carIds.hidden = !hasCar || (!plate && !carDetails.vin);
+
+    carSummaryNote.hidden = hasCar &&
+      (specs.length > 0 || Boolean(plate) || Boolean(carDetails.vin));
+    carSummaryNote.textContent = hasCar
+      ? "Добавь VIN, госномер и характеристики — они будут под рукой."
+      : "Укажи марку и модель или просто введи VIN — марку и год определим сами.";
+  }
+
+  // Подсказка по VIN: что можно подставить в поля формы
+  function getVinSuggestion(decoded) {
+    if (!decoded || decoded.kind !== "vin") return null;
+    const currentMake = carMakeInput.value.trim().toLowerCase();
+    const make = decoded.brands.length === 1
+      ? decoded.brands[0]
+      : decoded.brands.find(brand => brand.toLowerCase() === currentMake) || "";
+    return {
+      make,
+      model: decoded.model || "",
+      year: decoded.year && !decoded.yearAlternative ? String(decoded.year) : ""
+    };
+  }
+
+  function getVinFields() {
+    return [
+      ["make", carMakeInput],
+      ["model", carModelInput],
+      ["year", carYearInput]
+    ];
+  }
+
+  // Заполняем пустые поля; поля, заполненные по прошлому VIN, обновляем
+  function autoFillFromVin(decoded) {
+    const suggestion = getVinSuggestion(decoded);
+    if (!suggestion) return;
+    getVinFields().forEach(([key, input]) => {
+      const value = suggestion[key];
+      const current = input.value.trim();
+      if (value) {
+        if (!current || current === vinAutoFill[key]) {
+          input.value = value;
+          vinAutoFill[key] = value;
+        }
+      } else if (current && current === vinAutoFill[key]) {
+        input.value = "";
+        vinAutoFill[key] = "";
+      }
+    });
+  }
+
+  function applyVinSuggestion() {
+    const suggestion = getVinSuggestion(decodeVin(carVinInput.value));
+    if (!suggestion) return;
+    getVinFields().forEach(([key, input]) => {
+      if (!suggestion[key]) return;
+      input.value = suggestion[key];
+      vinAutoFill[key] = suggestion[key];
+    });
+    renderVinResult();
+  }
+
+  function hasVinChanges(suggestion) {
+    return Boolean(suggestion) && getVinFields().some(([key, input]) =>
+      suggestion[key] && input.value.trim() !== suggestion[key]
+    );
+  }
+
+  function createVinNote(text, state = "") {
+    const note = document.createElement("p");
+    note.className = "vin-note";
+    if (state) note.dataset.state = state;
+    note.textContent = text;
+    return note;
+  }
+
+  function createVinAction(label, key, primary = false) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "vin-action" + (primary ? " is-primary" : "");
+    button.dataset.vinKey = key;
+    button.textContent = label;
+    return button;
+  }
+
+  function createGibddLink(value) {
+    const link = document.createElement("a");
+    link.className = "vin-action";
+    link.href = gibddCheckUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.dataset.vinKey = "gibdd";
+    link.textContent = "Проверить в ГИБДД ↗";
+    link.title = "Откроется сайт ГИБДД, номер скопируется — вставь его в поле проверки";
+    link.addEventListener("click", () => {
+      copyText(value).then(copied => {
+        vinOnline = {
+          vin: value,
+          status: copied ? "info" : "error",
+          message: copied
+            ? "Номер скопирован — вставь его на сайте ГИБДД в поле «VIN»."
+            : "Не удалось скопировать номер — перепиши его на сайте ГИБДД вручную."
+        };
+        renderVinResult();
+      });
+    });
+    return link;
+  }
+
+  function getVinYearLabel(decoded) {
+    if (!decoded.year) return "в VIN не указан — смотри СТС";
+    return decoded.yearAlternative
+      ? `${decoded.year} или ${decoded.yearAlternative}`
+      : String(decoded.year);
+  }
+
+  function renderVinResult() {
+    const decoded = decodeVin(carVinInput.value);
+    const active = document.activeElement;
+    const focusedKey = vinResult.contains(active) ? active.dataset.vinKey : "";
+    vinResult.replaceChildren();
+    vinResult.dataset.state = decoded.kind;
+    vinResult.hidden = decoded.kind === "empty";
+    if (decoded.kind === "empty") return;
+
+    if (decoded.kind === "partial") {
+      vinResult.append(createVinNote(
+        `Ещё ${countLabel(decoded.missing, ["символ", "символа", "символов"])} — ` +
+        "в VIN 17 знаков. Номер кузова японской машины вводи через дефис, " +
+        "например NZE141-6012345."
+      ));
+      return;
+    }
+    if (decoded.kind === "error") {
+      vinResult.append(createVinNote(decoded.message, "error"));
+      return;
+    }
+
+    const title = document.createElement("strong");
+    title.className = "vin-result-title";
+    const actions = document.createElement("div");
+    actions.className = "vin-actions";
+
+    if (decoded.kind === "frame") {
+      title.textContent = "Номер кузова";
+      vinResult.append(
+        title,
+        createVinNote(
+          "Такие номера бывают у машин японского рынка. Марку по нему " +
+          "не определить — укажи марку и модель вручную."
+        )
+      );
+      actions.append(createGibddLink(decoded.value));
+      vinResult.append(actions);
+      appendVinOnlineStatus(decoded.value, false);
+      restoreVinFocus(focusedKey);
+      return;
+    }
+
+    title.textContent = [
+      decoded.brands.length ? decoded.brands.join(" / ") : "Марка не определена",
+      decoded.year && !decoded.yearAlternative ? String(decoded.year) : ""
+    ].filter(Boolean).join(" · ");
+    vinResult.append(title);
+
+    const facts = document.createElement("dl");
+    facts.className = "vin-facts";
+    const addFact = (label, value) => {
+      if (!value) return;
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const detail = document.createElement("dd");
+      detail.textContent = value;
+      facts.append(term, detail);
+    };
+    addFact("Сборка", decoded.country || "не определена");
+    addFact("Завод", decoded.plant);
+    if (decoded.model) {
+      addFact(
+        "Модель",
+        decoded.model + (decoded.modelCode ? ` (код ${decoded.modelCode})` : "")
+      );
+    } else if (decoded.modelCode) {
+      addFact("Код модели", decoded.modelCode);
+    }
+    addFact("Год модели", getVinYearLabel(decoded));
+    if (decoded.checkValid) addFact("Контрольный знак", "совпадает");
+    vinResult.append(facts);
+
+    if (decoded.corrected) {
+      vinResult.append(createVinNote(
+        "Буквы I, O и Q в VIN не используются — заменили их на 1 и 0."
+      ));
+    }
+    if (decoded.checkWarning) {
+      vinResult.append(createVinNote(
+        "Контрольный 9-й знак не сходится — проверь VIN на опечатку.",
+        "warning"
+      ));
+    }
+    if (decoded.brands.length > 1) {
+      vinResult.append(createVinNote(
+        `Код ${decoded.wmi} используют несколько марок — выбери свою:`
+      ));
+      const options = document.createElement("div");
+      options.className = "vin-brand-options";
+      options.setAttribute("role", "group");
+      options.setAttribute("aria-label", "Марка по VIN");
+      const currentMake = carMakeInput.value.trim().toLowerCase();
+      decoded.brands.forEach(brand => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "vin-brand-option";
+        option.dataset.vinKey = `brand:${brand}`;
+        option.textContent = brand;
+        option.setAttribute(
+          "aria-pressed", String(brand.toLowerCase() === currentMake)
+        );
+        option.addEventListener("click", () => {
+          carMakeInput.value = brand;
+          vinAutoFill.make = brand;
+          renderVinResult();
+        });
+        options.append(option);
+      });
+      vinResult.append(options);
+    } else if (decoded.brands.length === 0) {
+      vinResult.append(createVinNote(
+        `Код производителя ${decoded.wmi} не найден в справочнике — ` +
+        "укажи марку вручную."
+      ));
+    }
+
+    const suggestion = getVinSuggestion(decoded);
+    if (hasVinChanges(suggestion)) {
+      const apply = createVinAction("Подставить в профиль", "apply", true);
+      apply.addEventListener("click", applyVinSuggestion);
+      actions.append(apply);
+    }
+    const loading = vinOnline && vinOnline.vin === decoded.vin &&
+      vinOnline.status === "loading";
+    const online = createVinAction(
+      loading ? "Ищем характеристики…" : "Характеристики онлайн",
+      "online"
+    );
+    online.disabled = loading;
+    online.title = "Запрос в открытую базу NHTSA (США)";
+    online.addEventListener("click", lookupVinOnline);
+    actions.append(online, createGibddLink(decoded.vin));
+    vinResult.append(actions);
+    appendVinOnlineStatus(decoded.vin);
+    restoreVinFocus(focusedKey);
+  }
+
+  function appendVinOnlineStatus(value, showHint = true) {
+    const matches = vinOnline && vinOnline.vin === value;
+    if (!matches && !showHint) return;
+    const status = document.createElement("p");
+    status.className = "vin-online-status";
+    status.setAttribute("role", "status");
+    if (matches) {
+      status.dataset.state = vinOnline.status;
+      status.textContent = vinOnline.status === "loading"
+        ? "Запрашиваем открытую базу NHTSA…"
+        : vinOnline.message;
+    } else {
+      status.textContent =
+        "Онлайн-поиск отправит VIN в открытую базу NHTSA (США): " +
+        "там есть данные в основном о машинах американского рынка.";
+    }
+    vinResult.append(status);
+  }
+
+  function restoreVinFocus(key) {
+    if (!key) return;
+    const target = [...vinResult.querySelectorAll("[data-vin-key]")]
+      .find(element => element.dataset.vinKey === key);
+    if (target && !target.disabled) target.focus();
+  }
+
+  function resetVinState() {
+    if (vinLookupController) vinLookupController.abort();
+    vinLookupController = null;
+    vinOnline = null;
+    vinAutoFill = { make: "", model: "", year: "" };
+    vinOnlineFilled = { vin: "", values: {} };
+  }
+
+  // Если VIN сменился, убираем характеристики, найденные по прошлому VIN
+  function clearStaleOnlineSpecs(vin) {
+    if (!vinOnlineFilled.vin || vinOnlineFilled.vin === vin) return;
+    const inputs = { engine: carEngineInput, ...carSpecSelects };
+    Object.entries(vinOnlineFilled.values).forEach(([key, value]) => {
+      if (inputs[key] && inputs[key].value === value) inputs[key].value = "";
+    });
+    vinOnlineFilled = { vin: "", values: {} };
+    updateCarSpecsCount();
+  }
+
+  // Поле VIN: заглавные латинские буквы, без пробелов, курсор на месте
+  function syncVinInputValue() {
+    const raw = carVinInput.value;
+    const clean = cleanVinInput(raw);
+    if (clean === raw) return;
+    const caret = carVinInput.selectionStart ?? raw.length;
+    const position = cleanVinInput(raw.slice(0, caret)).length;
+    carVinInput.value = clean;
+    try {
+      carVinInput.setSelectionRange(position, position);
+    } catch (error) {
+      // у некоторых полей выделение недоступно — это не мешает
+    }
+  }
+
+  function toTitleCase(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/(^|[\s\-(/])([a-zа-яё])/g,
+        (match, start, letter) => start + letter.toUpperCase());
+  }
+
+  function matchKnownMake(name) {
+    const target = String(name || "").trim().toLowerCase();
+    if (!target) return "";
+    const known = [...document.getElementById("carMakes").options]
+      .map(option => option.value)
+      .find(value => value.toLowerCase() === target);
+    return known || toTitleCase(target);
+  }
+
+  function mapNhtsaBody(value) {
+    const text = String(value || "").toLowerCase();
+    if (!text) return "";
+    if (text.includes("sedan")) return "Седан";
+    if (text.includes("hatchback")) return "Хэтчбек";
+    if (text.includes("wagon")) return "Универсал";
+    if (text.includes("coupe")) return "Купе";
+    if (/convertible|cabriolet|roadster/.test(text)) return "Кабриолет";
+    if (/crossover|sport utility/.test(text)) return "Кроссовер";
+    if (text.includes("minivan")) return "Минивэн";
+    if (text.includes("pickup")) return "Пикап";
+    if (text.includes("van")) return "Фургон";
+    return "";
+  }
+
+  function mapNhtsaFuel(row) {
+    const primary = String(row.FuelTypePrimary || "").toLowerCase();
+    const secondary = String(row.FuelTypeSecondary || "").toLowerCase();
+    const electrification = String(row.ElectrificationLevel || "").toLowerCase();
+    if (electrification.includes("bev") ||
+        (primary.includes("electric") && !secondary)) return "Электро";
+    if (electrification.includes("hev") || electrification.includes("hybrid") ||
+        primary.includes("electric") || secondary.includes("electric")) {
+      return "Гибрид";
+    }
+    if (primary.includes("diesel")) return "Дизель";
+    if (/natural gas|petroleum gas|propane|lpg|cng/.test(primary)) {
+      return "Газ / бензин";
+    }
+    if (/gasoline|flexible|ethanol/.test(primary)) return "Бензин";
+    return "";
+  }
+
+  function mapNhtsaDrive(value) {
+    const text = String(value || "").toUpperCase();
+    if (/FWD|FRONT/.test(text)) return "Передний";
+    if (/RWD|REAR/.test(text)) return "Задний";
+    if (/AWD|4WD|4X4|ALL[- ]WHEEL|4-WHEEL/.test(text)) return "Полный";
+    return "";
+  }
+
+  function mapNhtsaTransmission(value) {
+    const text = String(value || "").toLowerCase();
+    if (/cvt|continuously/.test(text)) return "Вариатор";
+    if (/dual-clutch|dct|automated manual|amt/.test(text)) return "Робот";
+    if (/manual|standard/.test(text)) return "Механика";
+    if (text.includes("automatic")) return "Автомат";
+    return "";
+  }
+
+  function mapNhtsaEngine(row) {
+    const parts = [];
+    const liters = Number(row.DisplacementL);
+    if (Number.isFinite(liters) && liters >= 0.5 && liters < 10) {
+      parts.push(formatDecimal(Math.round(liters * 10) / 10, 1) + " л");
+    }
+    const horsepower = Number(row.EngineHP);
+    const kilowatts = Number(row.EngineKW);
+    if (Number.isFinite(horsepower) && horsepower > 20 && horsepower < 2000) {
+      parts.push(`${Math.round(horsepower)} л.с.`);
+    } else if (Number.isFinite(kilowatts) && kilowatts > 10 && kilowatts < 1500) {
+      parts.push(`${Math.round(kilowatts)} кВт`);
+    }
+    let text = parts.join(", ");
+    const code = String(row.EngineModel || "").trim();
+    if (code && code.length <= 16 && /^[A-Za-z0-9 .\-/]+$/.test(code)) {
+      text = text ? `${text} (${code})` : code;
+    }
+    return text.slice(0, 60);
+  }
+
+  function mapNhtsaResult(row) {
+    if (!row || typeof row !== "object") return null;
+    const errorCodes = String(row.ErrorCode || "").split(",")
+      .map(code => code.trim());
+    const year = Number(row.ModelYear);
+    const result = {
+      make: matchKnownMake(row.Make),
+      model: String(row.Model || "").trim().slice(0, 80),
+      trim: String(row.Trim || "").trim().slice(0, 40),
+      year: errorCodes[0] === "0" && Number.isInteger(year) &&
+        year >= 1950 && year <= maxCarYear ? String(year) : "",
+      body: mapNhtsaBody(row.BodyClass),
+      fuel: mapNhtsaFuel(row),
+      transmission: mapNhtsaTransmission(row.TransmissionStyle),
+      drive: mapNhtsaDrive(row.DriveType),
+      engine: mapNhtsaEngine(row),
+      plant: [
+        toTitleCase(row.PlantCity),
+        nhtsaCountryNames[String(row.PlantCountry || "").trim().toUpperCase()] ||
+          toTitleCase(row.PlantCountry)
+      ].filter(Boolean).join(", ")
+    };
+    result.hasData = Boolean(result.make || result.model || result.body ||
+      result.fuel || result.transmission || result.drive || result.engine);
+    return result;
+  }
+
+  async function lookupVinOnline() {
+    const decoded = decodeVin(carVinInput.value);
+    if (decoded.kind !== "vin") return;
+    const vin = decoded.vin;
+    if (navigator.onLine === false) {
+      vinOnline = {
+        vin,
+        status: "error",
+        message: "Нет подключения к интернету. Расшифровка без сети уже показана выше."
+      };
+      renderVinResult();
+      return;
+    }
+    if (vinLookupController) vinLookupController.abort();
+    const controller = new AbortController();
+    vinLookupController = controller;
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 15000);
+    vinOnline = { vin, status: "loading" };
+    renderVinResult();
+    try {
+      const response = await fetch(
+        `${vinOnlineUrl}${encodeURIComponent(vin)}?format=json`,
+        {
+          signal: controller.signal,
+          credentials: "omit",
+          referrerPolicy: "no-referrer"
+        }
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      if (vinLookupController !== controller) return;
+      const info = mapNhtsaResult(
+        Array.isArray(data?.Results) ? data.Results[0] : null
+      );
+      if (decodeVin(carVinInput.value).vin !== vin) {
+        vinOnline = null;
+        return;
+      }
+      if (!info || !info.hasData) {
+        vinOnline = {
+          vin,
+          status: "empty",
+          message:
+            "В базе NHTSA нет данных по этому VIN — она охватывает в основном " +
+            "машины рынка США. Характеристики можно указать вручную."
+        };
+        return;
+      }
+      const filled = [];
+      const specValues = {};
+      const fill = (input, value, label, key, isSpec = false) => {
+        if (!value || input.value.trim()) return;
+        input.value = value;
+        filled.push(label);
+        if (isSpec) specValues[key] = value;
+        else vinAutoFill[key] = value;
+      };
+      fill(carMakeInput, info.make, "марка", "make");
+      fill(carModelInput, info.model, "модель", "model");
+      fill(carYearInput, info.year, "год", "year");
+      const specsBefore = filled.length;
+      fill(carEngineInput, info.engine, "двигатель", "engine", true);
+      fill(carSpecSelects.fuel, info.fuel, "топливо", "fuel", true);
+      fill(carSpecSelects.transmission, info.transmission, "коробка", "transmission", true);
+      fill(carSpecSelects.drive, info.drive, "привод", "drive", true);
+      fill(carSpecSelects.body, info.body, "кузов", "body", true);
+      if (Object.keys(specValues).length) {
+        vinOnlineFilled = {
+          vin,
+          values: vinOnlineFilled.vin === vin
+            ? { ...vinOnlineFilled.values, ...specValues }
+            : specValues
+        };
+      }
+      if (filled.length > specsBefore) carSpecsDetails.open = true;
+      updateCarSpecsCount();
+      const found = [
+        [info.make, info.model, info.trim].filter(Boolean).join(" "),
+        info.year ? `${info.year} г.` : "",
+        info.plant ? `завод: ${info.plant}` : ""
+      ].filter(Boolean).join(", ");
+      vinOnline = {
+        vin,
+        status: "success",
+        message: `Найдено в базе NHTSA: ${found || "есть данные"}. ` + (filled.length
+          ? `Заполнено: ${filled.join(", ")}. Проверь и сохрани автомобиль.`
+          : "Поля уже заполнены — ничего не меняли.")
+      };
+    } catch (error) {
+      if (vinLookupController !== controller) return;
+      console.warn("Не удалось получить данные по VIN", error);
+      vinOnline = {
+        vin,
+        status: "error",
+        message: timedOut
+          ? "База NHTSA не ответила за 15 секунд — попробуй позже."
+          : "Не удалось получить данные — проверь интернет и попробуй ещё раз."
+      };
+    } finally {
+      clearTimeout(timer);
+      if (vinLookupController === controller) {
+        vinLookupController = null;
+        renderVinResult();
+      }
+    }
+  }
+
+  function openCarProfileDialog() {
+    renderVinResult();
+    carDialog.showModal();
+  }
+
+  carVinInput.addEventListener("input", event => {
+    if (event.isComposing) return;
+    syncVinInputValue();
+    const decoded = decodeVin(carVinInput.value);
+    if (decoded.kind === "vin") {
+      autoFillFromVin(decoded);
+      clearStaleOnlineSpecs(decoded.vin);
+    }
+    if (vinOnline && vinOnline.vin !== decoded.value) vinOnline = null;
+    renderVinResult();
+  });
+  carVinInput.addEventListener("compositionend", () => {
+    syncVinInputValue();
+    renderVinResult();
+  });
+  [carMakeInput, carModelInput, carYearInput].forEach(input => {
+    input.addEventListener("input", () => {
+      if (!vinResult.hidden) renderVinResult();
+    });
+  });
+  carPlateInput.addEventListener("blur", () => {
+    carPlateInput.value = formatPlateForInput(normalizePlate(carPlateInput.value));
+  });
+  [carEngineInput, ...Object.values(carSpecSelects)].forEach(input => {
+    input.addEventListener(
+      input.tagName === "SELECT" ? "change" : "input",
+      updateCarSpecsCount
+    );
+  });
+  document.getElementById("copyCarVin").addEventListener("click", async () => {
+    const copied = await copyText(carDetails.vin);
+    showCarCopyStatus(copied ? "VIN скопирован" : "Не удалось скопировать");
+  });
+
   function renderCar() {
     photoSelectionId++;
-    document.getElementById("carTitle").textContent =
-      [carMake, carModel].filter(Boolean).join(" ");
-    carPhotoElement.alt = [
-      "Фотография автомобиля",
-      [carMake, carModel].filter(Boolean).join(" ")
-    ].filter(Boolean).join(": ");
+    const carName = [carMake, carModel].filter(Boolean).join(" ");
+    const hasCar = Boolean(carMake);
+    carTitle.textContent = hasCar ? carName : "Добавь свой автомобиль";
+    carSummary.classList.toggle("is-empty", !hasCar);
+    carPhotoElement.alt = carName
+      ? `Фотография автомобиля: ${carName}`
+      : "Фотография автомобиля";
+    openCarDialogLabel.textContent = hasCar
+      ? "Изменить автомобиль"
+      : "Добавить автомобиль";
+    openCarDialogIcon.setAttribute("href", hasCar ? "#i-edit" : "#i-plus");
+    carDialogTitle.textContent = hasCar ? "Мой автомобиль" : "Новый автомобиль";
+    renderCarSummaryDetails();
     carMakeInput.value = carMake;
     carModelInput.value = carModel;
+    carVinInput.value = carDetails.vin;
+    carYearInput.value = carDetails.year ? String(carDetails.year) : "";
+    carPlateInput.value = formatPlateForInput(carDetails.plate);
+    carEngineInput.value = carDetails.engine;
+    Object.entries(carSpecSelects).forEach(([key, select]) => {
+      select.value = carDetails[key];
+    });
+    carSpecsDetails.open = Object.values(getCarSpecValues()).some(Boolean);
+    updateCarSpecsCount();
+    showCarFormError("");
+    resetVinState();
+    renderVinResult();
     carColorInput.value = carColor;
     carPhotoInput.value = "";
     carPhotoInput.disabled = false;
@@ -2878,216 +4581,99 @@
     renderCarIllustration();
   }
 
-  function renderCarIllustration() {
-    const width = carIllustration.width;
-    const height = carIllustration.height;
-    if (!carIllustrationBaseData || !carBodyMaskData || !carRoofMaskData) {
-      return;
+  function loadCarIllustrationAsset(image, source) {
+    return new Promise((resolve, reject) => {
+      image.addEventListener("load", () => resolve(image), { once: true });
+      image.addEventListener("error", reject, { once: true });
+      image.src = source;
+    });
+  }
+
+  function getCarPaintColor(value) {
+    const color = /^#[0-9a-f]{6}$/i.test(value) ? value : defaultCarColor;
+    let rgb = [1, 3, 5].map(offset => parseInt(color.slice(offset, offset + 2), 16));
+    const luminance = (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114) / 255;
+    // Совсем тёмный цвет слегка осветляем, иначе чёрные контуры кузова пропадут
+    if (luminance < 0.2) {
+      const lift = (0.2 - luminance) / (1 - luminance);
+      rgb = rgb.map(channel => channel + (255 - channel) * lift);
     }
+    return rgb;
+  }
+
+  function renderCarIllustration() {
+    if (!carIllustrationBaseData) return;
+    const { width, height } = carIllustrationBaseData;
     const imageData = new ImageData(
       new Uint8ClampedArray(carIllustrationBaseData.data),
       width,
       height
     );
-    const [targetRed, targetGreen, targetBlue] = [
-      1, 3, 5
-    ].map(offset => parseInt(carColorInput.value.slice(offset, offset + 2), 16));
-    const mask = carBodyMaskData;
-    const roofMask = carRoofMaskData;
-    const tireMask = carTireMaskData;
-    const pixels = imageData.data;
-
-    for (let pixel = 0; pixel < pixels.length; pixel += 4) {
-      if (tireMask[pixel + 3] && pixels[pixel + 3]) {
-        pixels[pixel] = 8;
-        pixels[pixel + 1] = 8;
-        pixels[pixel + 2] = 8;
-        continue;
+    if (carPaintMask) {
+      const [red, green, blue] = getCarPaintColor(carColorInput.value);
+      const pixels = imageData.data;
+      // Умножение на цвет сохраняет блики, тени и контуры рисунка
+      for (let index = 0; index < carPaintMask.length; index++) {
+        const weight = carPaintMask[index];
+        if (weight === 0) continue;
+        const pixel = index * 4;
+        const shade = (
+          pixels[pixel] * 0.299 +
+          pixels[pixel + 1] * 0.587 +
+          pixels[pixel + 2] * 0.114
+        ) / 255;
+        const mix = weight / 255;
+        pixels[pixel] += (red * shade - pixels[pixel]) * mix;
+        pixels[pixel + 1] += (green * shade - pixels[pixel + 1]) * mix;
+        pixels[pixel + 2] += (blue * shade - pixels[pixel + 2]) * mix;
       }
-      const isRoof = roofMask[pixel + 3] > 0;
-      if ((!mask[pixel + 3] && !isRoof) || pixels[pixel + 3] === 0) {
-        continue;
-      }
-      const red = pixels[pixel];
-      const green = pixels[pixel + 1];
-      const blue = pixels[pixel + 2];
-      const darkest = Math.min(red, green, blue);
-      const brightest = Math.max(red, green, blue);
-      if (brightest - darkest > 48 || brightest < 24) {
-        continue;
-      }
-
-      const luminance = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
-      const shade = (isRoof ? 0.2 : 0.3) + luminance * 0.7;
-      pixels[pixel] = Math.round(targetRed * shade);
-      pixels[pixel + 1] = Math.round(targetGreen * shade);
-      pixels[pixel + 2] = Math.round(targetBlue * shade);
     }
-
     carIllustrationContext.putImageData(imageData, 0, 0);
+    carColorPreviewContext.clearRect(
+      0, 0, carColorPreview.width, carColorPreview.height
+    );
+    carColorPreviewContext.drawImage(
+      carIllustration, 0, 0, carColorPreview.width, carColorPreview.height
+    );
   }
 
-  function initializeCarIllustration() {
-    const width = carIllustration.width;
-    const height = carIllustration.height;
-    carIllustrationContext.drawImage(
-      carIllustrationImage, 0, 0, width, height
-    );
+  function initializeCarIllustration(hasPaintMask) {
+    const width = carIllustrationImage.naturalWidth;
+    const height = carIllustrationImage.naturalHeight;
+    carIllustration.width = width;
+    carIllustration.height = height;
+    carColorPreview.width = width;
+    carColorPreview.height = height;
+    carIllustrationContext.clearRect(0, 0, width, height);
+    carIllustrationContext.drawImage(carIllustrationImage, 0, 0, width, height);
     carIllustrationBaseData = carIllustrationContext.getImageData(
       0, 0, width, height
     );
-    const tireCanvas = document.createElement("canvas");
-    tireCanvas.width = width;
-    tireCanvas.height = height;
-    const tireContext = tireCanvas.getContext(
-      "2d", { willReadFrequently: true }
-    );
-    const fillTire = points => {
-      tireContext.beginPath();
-      points.forEach(([x, y], index) => {
-        if (index === 0) tireContext.moveTo(x, y);
-        else tireContext.lineTo(x, y);
-      });
-      tireContext.closePath();
-      tireContext.fill();
-    };
-    const leftTire = [
-      [46, 446], [62, 449], [78, 454], [96, 460], [111, 465],
-      [117, 473], [105, 478], [80, 477], [62, 470], [49, 460]
-    ];
-    fillTire(leftTire);
-    fillTire(leftTire.map(([x, y]) => [width - x, y]));
-    carTireMaskData = tireContext.getImageData(
-      0, 0, width, height
-    ).data;
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const pixel = (y * width + x) * 4;
-        const red = carIllustrationBaseData.data[pixel];
-        const green = carIllustrationBaseData.data[pixel + 1];
-        const blue = carIllustrationBaseData.data[pixel + 2];
-        const brightest = Math.max(red, green, blue);
-        const darkest = Math.min(red, green, blue);
-        const isSpoilerGap = y >= 182 && y <= 211 &&
-          ((x >= 84 && x <= 158) || (x >= width - 158 && x <= width - 84));
-        const isTire = carTireMaskData[pixel + 3] > 0;
-        const isShadow = y >= 450 && brightest < 200 &&
-          brightest - darkest <= 35;
-        if (y >= 478 || (isShadow && !isTire) ||
-            (isSpoilerGap && brightest >= 190 && brightest - darkest <= 20)) {
-          carIllustrationBaseData.data[pixel + 3] = 0;
-        }
+    carPaintMask = null;
+    if (hasPaintMask) {
+      const maskCanvas = document.createElement("canvas");
+      maskCanvas.width = width;
+      maskCanvas.height = height;
+      const maskContext = maskCanvas.getContext(
+        "2d", { willReadFrequently: true }
+      );
+      maskContext.drawImage(carPaintMaskImage, 0, 0, width, height);
+      const maskPixels = maskContext.getImageData(0, 0, width, height).data;
+      carPaintMask = new Uint8Array(width * height);
+      for (let index = 0; index < carPaintMask.length; index++) {
+        carPaintMask[index] = maskPixels[index * 4];
       }
     }
-
-    const maskCanvas = document.createElement("canvas");
-    maskCanvas.width = width;
-    maskCanvas.height = height;
-    const maskContext = maskCanvas.getContext(
-      "2d", { willReadFrequently: true }
-    );
-    const fillMaskPolygon = points => {
-      maskContext.beginPath();
-      points.forEach(([x, y], index) => {
-        if (index === 0) maskContext.moveTo(x, y);
-        else maskContext.lineTo(x, y);
-      });
-      maskContext.closePath();
-      maskContext.fill();
-    };
-    const bodyOutline = [
-      [75, 215], [160, 200], [230, 193], [396, 193], [466, 200],
-      [520, 220], [557, 230], [577, 260], [582, 320], [577, 365],
-      [565, 393], [550, 407], [490, 407], [136, 407], [105, 397],
-      [72, 380], [55, 350], [48, 300], [55, 255]
-    ];
-    const upperSide = [
-      [121, 218], [130, 194], [146, 171], [160, 151], [174, 136],
-      [191, 128], [188, 141], [179, 153], [169, 171], [157, 192],
-      [143, 216]
-    ];
-    const lowerSide = [
-      [42, 374], [96, 393], [137, 405], [178, 408], [175, 432],
-      [158, 453], [125, 463], [84, 457], [49, 443]
-    ];
-    fillMaskPolygon(bodyOutline);
-    fillMaskPolygon(upperSide);
-    fillMaskPolygon(upperSide.map(([x, y]) => [width - x, y]));
-    fillMaskPolygon(lowerSide);
-    fillMaskPolygon(lowerSide.map(([x, y]) => [width - x, y]));
-    fillMaskPolygon([
-      [154, 405], [472, 405], [503, 449], [490, 476],
-      [136, 476], [123, 449]
-    ]);
-    const leftBumper = [
-      [42, 365], [60, 367], [82, 377], [111, 384], [140, 395],
-      [178, 405], [174, 418], [138, 410], [108, 401], [78, 393],
-      [55, 384], [43, 380]
-    ];
-    fillMaskPolygon(leftBumper);
-    fillMaskPolygon(leftBumper.map(([x, y]) => [width - x, y]));
-    const bumperEdge = [
-      [38, 374], [58, 375], [76, 389], [82, 419], [96, 446],
-      [86, 459], [62, 455], [45, 445], [38, 430]
-    ];
-    fillMaskPolygon(bumperEdge);
-    fillMaskPolygon(bumperEdge.map(([x, y]) => [width - x, y]));
-    const lowerCorner = [
-      [44, 414], [78, 419], [91, 449], [100, 468], [82, 467],
-      [62, 455], [47, 445]
-    ];
-    fillMaskPolygon(lowerCorner);
-    fillMaskPolygon(lowerCorner.map(([x, y]) => [width - x, y]));
-    fillMaskPolygon([
-      [86, 163], [96, 165], [536, 165], [540, 162],
-      [540, 179], [530, 181], [96, 181], [86, 180]
-    ]);
-    const spoilerEnd = [
-      [86, 164], [98, 167], [101, 190], [95, 196], [88, 189]
-    ];
-    fillMaskPolygon(spoilerEnd);
-    fillMaskPolygon(spoilerEnd.map(([x, y]) => [width - x, y]));
-
-    maskContext.globalCompositeOperation = "destination-out";
-    [
-      [110, 260, 29], [169, 269, 26], [456, 269, 26], [515, 260, 29],
-      [104, 416, 19], [142, 416, 19], [484, 416, 19], [522, 416, 19]
-    ].forEach(([x, y, radius]) => {
-      maskContext.beginPath();
-      maskContext.arc(x, y, radius, 0, Math.PI * 2);
-      maskContext.fill();
-    });
-    maskContext.globalCompositeOperation = "source-over";
-    carBodyMaskData = maskContext.getImageData(
-      0, 0, width, height
-    ).data;
-
-    const roofCanvas = document.createElement("canvas");
-    roofCanvas.width = width;
-    roofCanvas.height = height;
-    const roofContext = roofCanvas.getContext(
-      "2d", { willReadFrequently: true }
-    );
-    roofContext.beginPath();
-    [
-      [178, 136], [186, 128], [198, 123], [300, 117], [428, 123],
-      [440, 128], [448, 136], [468, 169], [484, 205], [450, 212],
-      [176, 212], [142, 205], [158, 169]
-    ].forEach(([x, y], index) => {
-      if (index === 0) roofContext.moveTo(x, y);
-      else roofContext.lineTo(x, y);
-    });
-    roofContext.closePath();
-    roofContext.fill();
-    carRoofMaskData = roofContext.getImageData(
-      0, 0, width, height
-    ).data;
     renderCarIllustration();
   }
 
   function showCarPhoto(photo) {
     carPhotoElement.hidden = !photo;
     carIllustration.toggleAttribute("hidden", Boolean(photo));
+    carSummaryVisual.classList.toggle("has-photo", Boolean(photo));
+    carColorHelp.textContent = photo
+      ? "Цвет применяется к иллюстрации — она показывается, если удалить фото. Сами фотографии не перекрашиваются."
+      : "Цвет меняет кузов иллюстрации — фары, стёкла, решётка и шины остаются как есть.";
     if (photo) carPhotoElement.src = photo;
     else carPhotoElement.removeAttribute("src");
     if (pendingCarImage) {
@@ -3205,13 +4791,42 @@
 
   carForm.addEventListener("submit", event => {
     event.preventDefault();
+    showCarFormError("");
 
-    const nextMake = carMakeInput.value.trim();
-    const nextModel = carModelInput.value.trim();
+    const nextMake = carMakeInput.value.trim().replace(/\s+/g, " ").slice(0, 60);
+    const nextModel = carModelInput.value.trim().replace(/\s+/g, " ").slice(0, 80);
     if (!nextMake) {
-      alert("Введи или выбери марку автомобиля.");
+      showCarFormError(
+        "Укажи марку автомобиля — введи её вручную или определи по VIN.",
+        carMakeInput
+      );
       return;
     }
+    const vinDecoded = decodeVin(carVinInput.value);
+    if (vinDecoded.kind === "error") {
+      showCarFormError(
+        "Проверь VIN: " +
+          vinDecoded.message.replace(/^./, letter => letter.toLowerCase()),
+        carVinInput
+      );
+      return;
+    }
+    const yearText = carYearInput.value.trim();
+    const yearValue = yearText ? Number(yearText) : null;
+    if (carYearInput.validity.badInput || (yearText && (
+      !Number.isInteger(yearValue) || yearValue < 1900 || yearValue > maxCarYear
+    ))) {
+      showCarFormError(
+        `Год выпуска — число от 1900 до ${maxCarYear}.`, carYearInput
+      );
+      return;
+    }
+    const nextDetails = sanitizeCarDetails({
+      vin: vinDecoded.kind === "vin" ? vinDecoded.vin : vinDecoded.value,
+      year: yearValue,
+      plate: carPlateInput.value,
+      ...getCarSpecValues()
+    });
 
     const previousMake = carMake;
     const previousModel = carModel;
@@ -3219,11 +4834,19 @@
     const previousPhoto = carPhoto;
     const previousPhotoSource = carPhotoSource;
     const previousPhotoCrop = carPhotoCrop;
+    const previousDetails = carDetails;
+    const carStorageKeys = [
+      carMakeStorageKey, carModelStorageKey, carColorStorageKey,
+      carPhotoStorageKey, carPhotoSourceStorageKey, carPhotoCropStorageKey,
+      carDetailsStorageKey
+    ];
+    const carSnapshot = new Map();
     let nextPhoto;
     let nextPhotoSource;
     let nextPhotoCrop;
 
     try {
+      carStorageKeys.forEach(key => carSnapshot.set(key, localStorage.getItem(key)));
       nextPhoto = pendingCarImage
         ? createCroppedCarPhoto()
         : pendingCarPhoto === undefined
@@ -3243,9 +4866,10 @@
         : pendingCarPhoto === null
           ? null
           : carPhotoCrop;
-      localStorage.setItem(carMakeStorageKey, nextMake.slice(0, 60));
-      localStorage.setItem(carModelStorageKey, nextModel.slice(0, 80));
+      localStorage.setItem(carMakeStorageKey, nextMake);
+      localStorage.setItem(carModelStorageKey, nextModel);
       localStorage.setItem(carColorStorageKey, carColorInput.value);
+      localStorage.setItem(carDetailsStorageKey, JSON.stringify(nextDetails));
       if (nextPhoto) {
         localStorage.setItem(carPhotoStorageKey, nextPhoto);
         localStorage.setItem(carPhotoSourceStorageKey, nextPhotoSource);
@@ -3258,23 +4882,37 @@
         localStorage.removeItem(carPhotoSourceStorageKey);
         localStorage.removeItem(carPhotoCropStorageKey);
       }
-      carMake = nextMake.slice(0, 60);
-      carModel = nextModel.slice(0, 80);
+      carMake = nextMake;
+      carModel = nextModel;
       carColor = carColorInput.value;
       carPhoto = nextPhoto;
       carPhotoSource = nextPhotoSource;
       carPhotoCrop = nextPhotoCrop;
+      carDetails = nextDetails;
       renderCar();
       carDialog.close();
+      renderBackupStatus();
     } catch (error) {
+      console.warn("Не удалось сохранить автомобиль", error);
+      carSnapshot.forEach((value, key) => {
+        try {
+          if (value === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, value);
+        } catch (restoreError) {
+          console.warn("Не удалось восстановить", key, restoreError);
+        }
+      });
       carMake = previousMake;
       carModel = previousModel;
       carColor = previousColor;
       carPhoto = previousPhoto;
       carPhotoSource = previousPhotoSource;
       carPhotoCrop = previousPhotoCrop;
-      alert("Не удалось сохранить данные автомобиля.");
-      renderCar();
+      carDetails = previousDetails;
+      showCarFormError(
+        "Не удалось сохранить автомобиль — возможно, в браузере закончилось " +
+        "место. Попробуй фото поменьше или убери его."
+      );
     }
   });
 
@@ -3323,6 +4961,8 @@
     renderServicePlan();
     renderEventHistory();
     renderParts();
+    renderDocuments();
+    renderBackupStatus();
   }
 
   function createExpenseRow(item) {
@@ -3564,13 +5204,7 @@
 
   // 6. Показываем историю заправок и расход топлива
   function getCurrentOdometer() {
-    return [...fuelEntries, ...expenses.filter(item => item.kind === "service")]
-      .reduce((latest, item) => {
-        const odometer = toOptionalNumber(item.odometer);
-        return Number.isFinite(odometer) && odometer >= 0
-          ? Math.max(latest, odometer)
-          : latest;
-      }, -1);
+    return getOdometerInfo().value;
   }
 
   function renderFuel() {
@@ -3591,15 +5225,13 @@
 
     const latest = sorted[sorted.length - 1];
     const previous = sorted[sorted.length - 2];
-    const currentOdometer = getCurrentOdometer();
+    const odometerInfo = getOdometerInfo();
     document.getElementById("homeOdometer").textContent =
-      currentOdometer >= 0
-      ? currentOdometer.toLocaleString("ru-RU") + " км"
+      odometerInfo.value >= 0
+      ? odometerInfo.value.toLocaleString("ru-RU") + " км"
       : "—";
     document.getElementById("homeOdometerHint").textContent =
-      currentOdometer >= 0
-      ? "По последним записям"
-      : "Добавь заправку с пробегом";
+      getOdometerHint(odometerInfo);
 
     if (latest && previous) {
       const distance = latest.odometer - previous.odometer;
@@ -3622,13 +5254,39 @@
     const currentFuelConsumption = consumption.textContent;
     document.getElementById("fuelEntryCount").textContent =
       String(fuelEntries.length);
+    let averageConsumption = null;
+    if (sorted.length >= 2) {
+      const totalDistance = sorted[sorted.length - 1].odometer - sorted[0].odometer;
+      const totalLiters = sorted.slice(1).reduce((sum, item) => {
+        const liters = Number(item.liters);
+        return Number.isFinite(liters) && liters > 0 ? sum + liters : sum;
+      }, 0);
+      if (totalDistance > 0 && totalLiters > 0) {
+        averageConsumption = totalLiters / totalDistance * 100;
+      }
+    }
     document.getElementById("fuelTabConsumption").textContent =
-      currentFuelConsumption;
+      averageConsumption === null
+        ? currentFuelConsumption
+        : formatDecimal(averageConsumption, 2) + " л/100 км";
     const fuelTotal = fuelEntries.reduce((sum, item) => {
       const amount = Number(item.liters) * Number(item.pricePerLiter);
       return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
     }, 0);
     document.getElementById("fuelSpendTotal").textContent = money(fuelTotal);
+    // Стоимость километра: топливо, залитое после первой заправки, на пройденный путь
+    let costPerKm = null;
+    if (sorted.length >= 2) {
+      const distance = sorted[sorted.length - 1].odometer - sorted[0].odometer;
+      const cost = sorted.slice(1).reduce((sum, item) => {
+        const amount = Number(item.liters) * Number(item.pricePerLiter);
+        return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+      }, 0);
+      if (distance > 0 && cost > 0) costPerKm = cost / distance;
+    }
+    document.getElementById("fuelCostPerKm").textContent = costPerKm === null
+      ? "—"
+      : `${formatDecimal(costPerKm, 2)} ₽`;
 
     const sortedByDate = [...fuelEntries].sort((a, b) =>
       String(b.date || "").localeCompare(String(a.date || "")) ||
@@ -3953,6 +5611,7 @@
         intervalMonths,
         dueDate,
         remainingKm,
+        remainingDays,
         overdue,
         status: status.join(" · ")
       });
@@ -4034,12 +5693,31 @@
     const homeDue = document.getElementById("homeServiceDue");
     const homeHint = document.getElementById("homeServiceHint");
     const nearest = upcoming[0];
-    homeDue.textContent = nearest
-      ? nearest.overdue ? "Срок подошёл" : "Запланировано"
-      : "—";
-    homeHint.textContent = nearest
-      ? `${nearest.item.name} · ${nearest.status}`
-      : "Добавь выполненную работу с интервалом.";
+    if (!nearest) {
+      homeDue.textContent = "—";
+      homeHint.textContent = "Добавь выполненную работу с интервалом.";
+    } else if (nearest.overdue) {
+      homeDue.textContent = "Срок подошёл";
+      homeHint.textContent = `${nearest.item.name} · ${nearest.status}`;
+    } else {
+      const dueDateLabel = nearest.dueDate
+        ? `до ${nearest.dueDate.toLocaleDateString("ru-RU")}`
+        : "";
+      if (nearest.remainingKm !== null) {
+        homeDue.textContent =
+          `через ${nearest.remainingKm.toLocaleString("ru-RU")} км`;
+        homeHint.textContent = [nearest.item.name, dueDateLabel]
+          .filter(Boolean).join(" · ");
+      } else if (nearest.remainingDays !== null) {
+        homeDue.textContent =
+          `через ${countLabel(nearest.remainingDays, dayCountForms)}`;
+        homeHint.textContent = [nearest.item.name, dueDateLabel]
+          .filter(Boolean).join(" · ");
+      } else {
+        homeDue.textContent = "Запланировано";
+        homeHint.textContent = `${nearest.item.name} · ${nearest.status}`;
+      }
+    }
 
     if (serviceEntries.length === 0) {
       appendEmpty(historyElement, "Записей пока нет.");
@@ -4961,6 +6639,430 @@
     catalog.scrollIntoView({ behavior: "smooth", block: "start" });
     catalog.focus({ preventScroll: true });
   });
+
+  // 10б. Документы и сроки, пробег вручную, резервная копия
+  const documentsList = document.getElementById("documentsList");
+  const documentDialog = document.getElementById("documentDialog");
+  const documentForm = document.getElementById("documentForm");
+  const documentDialogTitle = document.getElementById("documentDialogTitle");
+  const documentTypeInput = document.getElementById("documentType");
+  const documentTitleField = document.getElementById("documentTitleField");
+  const documentTitleInput = document.getElementById("documentTitle");
+  const documentExpiresInput = document.getElementById("documentExpires");
+  const documentNoteInput = document.getElementById("documentNote");
+  const documentFormError = document.getElementById("documentFormError");
+  const odometerDialog = document.getElementById("odometerDialog");
+  const odometerForm = document.getElementById("odometerForm");
+  const odometerValueInput = document.getElementById("odometerValue");
+  const odometerCurrent = document.getElementById("odometerCurrent");
+  const odometerFormError = document.getElementById("odometerFormError");
+  const backupStatus = document.getElementById("backupStatus");
+  let editingDocumentId = null;
+  let storagePersisted = false;
+
+  documentTypeInput.append(
+    ...documentTypes.map(type => new Option(type.label, type.id))
+  );
+  [documentDialog, odometerDialog].forEach(dialog => {
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+
+  function parseDateStamp(value) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function getDaysUntil(value) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((parseDateStamp(value) - today) / 86400000);
+  }
+
+  function getDocumentLabel(item, short = false) {
+    if (item.type === "other") return item.title || "Документ";
+    const type = documentTypes.find(entry => entry.id === item.type);
+    if (!type) return "Документ";
+    return short ? type.short : type.label;
+  }
+
+  function getDocumentStatus(expires) {
+    const days = getDaysUntil(expires);
+    if (days < 0) {
+      return {
+        days,
+        state: "expired",
+        text: days === -1
+          ? "истёк вчера"
+          : `истёк ${countLabel(-days, dayCountForms)} назад`
+      };
+    }
+    if (days === 0) return { days, state: "expired", text: "истекает сегодня" };
+    if (days === 1) return { days, state: "soon", text: "истекает завтра" };
+    if (days <= 30) {
+      return {
+        days,
+        state: "soon",
+        text: `осталось ${countLabel(days, dayCountForms)}`
+      };
+    }
+    if (days <= 60) {
+      return { days, state: "ok", text: `осталось ${countLabel(days, dayCountForms)}` };
+    }
+    const months = Math.round(days / 30.44);
+    if (months < 12) return { days, state: "ok", text: `осталось ≈ ${months} мес.` };
+    const years = Math.floor(days / 365.25);
+    return {
+      days,
+      state: "ok",
+      text: years < 1
+        ? "осталось ≈ 1 год"
+        : years === 1
+          ? "осталось больше года"
+          : `осталось больше ${countLabel(years, ["года", "лет", "лет"])}`
+    };
+  }
+
+  function getSortedDocuments() {
+    return [...carDocuments].sort((a, b) =>
+      a.expires.localeCompare(b.expires) ||
+      getDocumentLabel(a).localeCompare(getDocumentLabel(b), "ru")
+    );
+  }
+
+  function saveDocuments() {
+    try {
+      localStorage.setItem(documentsStorageKey, JSON.stringify(carDocuments));
+      return true;
+    } catch (error) {
+      alert("Не удалось сохранить документы. Возможно, в браузере закончилось место.");
+      return false;
+    }
+  }
+
+  function createDocumentRow(item) {
+    const label = getDocumentLabel(item);
+    const status = getDocumentStatus(item.expires);
+    const row = document.createElement("article");
+    row.className = "document-row";
+    row.dataset.state = status.state;
+    const icon = createIcon("i-doc");
+    icon.classList.add("document-icon");
+    const info = document.createElement("div");
+    info.className = "document-info";
+    const title = document.createElement("strong");
+    title.className = "document-name";
+    title.textContent = label;
+    const meta = document.createElement("div");
+    meta.className = "document-meta";
+    const statusText = document.createElement("span");
+    statusText.className = "document-status";
+    statusText.textContent = status.text;
+    const due = document.createElement("span");
+    due.textContent = `до ${formatDate(item.expires)}`;
+    meta.append(statusText, due);
+    if (item.note) {
+      const note = document.createElement("span");
+      note.className = "document-note";
+      note.textContent = item.note;
+      meta.append(note);
+    }
+    info.append(title, meta);
+    const actions = document.createElement("div");
+    actions.className = "document-actions";
+    const edit = createIconButton("i-pencil", `Изменить «${label}»`, "part-action");
+    edit.addEventListener("click", () => openDocumentDialog(item));
+    const remove = createIconButton("i-trash", `Удалить «${label}»`);
+    remove.addEventListener("click", () => {
+      confirmDelete(`Документ «${label}» будет удалён из списка сроков.`, () => {
+        const previous = carDocuments;
+        carDocuments = carDocuments.filter(entry => entry.id !== item.id);
+        if (saveDocuments()) renderDocuments();
+        else carDocuments = previous;
+      });
+    });
+    actions.append(edit, remove);
+    row.append(icon, info, actions);
+    return row;
+  }
+
+  function renderDocuments() {
+    const sorted = getSortedDocuments();
+    documentsList.replaceChildren(...sorted.map(createDocumentRow));
+    if (sorted.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent =
+        "Добавь ОСАГО, диагностическую карту или права — здесь будет видно, " +
+        "сколько дней осталось до конца срока.";
+      documentsList.append(empty);
+    }
+    const hint = document.getElementById("moreDocumentsHint");
+    const nearest = sorted[0];
+    hint.textContent = nearest
+      ? `${getDocumentLabel(nearest, true)}: ${getDocumentStatus(nearest.expires).text}`
+      : "ОСАГО, техосмотр и права — сроки действия";
+  }
+
+  function showDocumentError(message, field = null) {
+    documentFormError.textContent = message;
+    documentFormError.hidden = !message;
+    if (field) field.focus();
+  }
+
+  function syncDocumentTitleField() {
+    const isOther = documentTypeInput.value === "other";
+    documentTitleField.hidden = !isOther;
+    documentTitleInput.required = isOther;
+  }
+
+  function openDocumentDialog(item = null) {
+    editingDocumentId = item ? item.id : null;
+    documentForm.reset();
+    showDocumentError("");
+    documentDialogTitle.textContent = item ? "Изменить документ" : "Добавить документ";
+    const usedTypes = new Set(carDocuments.map(entry => entry.type));
+    const firstFree = documentTypes.find(type =>
+      type.id !== "other" && !usedTypes.has(type.id)
+    );
+    documentTypeInput.value = item ? item.type : (firstFree || documentTypes[0]).id;
+    documentTitleInput.value = item?.title || "";
+    documentExpiresInput.value = item?.expires || "";
+    documentNoteInput.value = item?.note || "";
+    syncDocumentTitleField();
+    documentDialog.showModal();
+  }
+
+  documentTypeInput.addEventListener("change", syncDocumentTitleField);
+  document.querySelectorAll("[data-document-years]").forEach(button => {
+    button.addEventListener("click", () => {
+      const years = Number(button.dataset.documentYears);
+      const today = new Date();
+      const target = new Date(
+        today.getFullYear() + years, today.getMonth(), today.getDate() - 1
+      );
+      documentExpiresInput.value = getLocalDateStamp(target);
+      showDocumentError("");
+    });
+  });
+
+  documentForm.addEventListener("submit", event => {
+    event.preventDefault();
+    const type = documentTypes.some(entry => entry.id === documentTypeInput.value)
+      ? documentTypeInput.value
+      : "other";
+    const title = type === "other"
+      ? documentTitleInput.value.trim().replace(/\s+/g, " ").slice(0, 60)
+      : "";
+    const expires = documentExpiresInput.value;
+    const note = documentNoteInput.value.trim().replace(/\s+/g, " ").slice(0, 80);
+    if (type === "other" && !title) {
+      showDocumentError("Укажи название документа.", documentTitleInput);
+      return;
+    }
+    if (!isValidDateString(expires)) {
+      showDocumentError("Укажи, до какой даты действует документ.", documentExpiresInput);
+      return;
+    }
+    const year = Number(expires.slice(0, 4));
+    if (year < 1990 || year > 2100) {
+      showDocumentError("Проверь дату окончания: год от 1990 до 2100.", documentExpiresInput);
+      return;
+    }
+    const now = new Date().toISOString();
+    const previous = carDocuments;
+    const isEditing = Boolean(editingDocumentId);
+    carDocuments = isEditing
+      ? carDocuments.map(item => item.id === editingDocumentId
+        ? { ...item, type, title, expires, note, updatedAt: now }
+        : item)
+      : [...carDocuments, {
+        id: createId(),
+        type,
+        title,
+        expires,
+        note,
+        createdAt: now,
+        updatedAt: now
+      }];
+    if (!saveDocuments()) {
+      carDocuments = previous;
+      return;
+    }
+    documentDialog.close();
+    renderDocuments();
+    renderBackupStatus();
+  });
+  documentDialog.addEventListener("close", () => {
+    editingDocumentId = null;
+  });
+  document.getElementById("openDocumentDialog").addEventListener(
+    "click", () => openDocumentDialog()
+  );
+  document.getElementById("openMoreDocuments").addEventListener("click", () => {
+    setActiveTab("home");
+    const card = document.getElementById("documentsCard");
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    card.focus({ preventScroll: true });
+  });
+
+  // Пробег: самый большой из записей или указанный вручную
+  function getRecordsOdometerInfo() {
+    let best = { value: -1, date: "", source: "" };
+    const consider = (item, source) => {
+      const value = toOptionalNumber(item.odometer);
+      if (!Number.isFinite(value) || value < 0) return;
+      const date = isValidDateString(item.date) ? item.date : "";
+      if (value > best.value || (value === best.value && date > best.date)) {
+        best = { value, date, source };
+      }
+    };
+    fuelEntries.forEach(item => consider(item, "fuel"));
+    expenses
+      .filter(item => item.kind === "service")
+      .forEach(item => consider(item, "service"));
+    return best;
+  }
+
+  function getOdometerInfo() {
+    const records = getRecordsOdometerInfo();
+    if (manualOdometer && manualOdometer.value >= records.value) {
+      return { ...manualOdometer, source: "manual" };
+    }
+    return records;
+  }
+
+  function getOdometerHint(info) {
+    if (info.value < 0) return "Добавь заправку или укажи пробег";
+    const date = info.date ? formatDate(info.date) : "";
+    if (info.source === "manual") {
+      return date ? `Указан вручную ${date}` : "Указан вручную";
+    }
+    if (info.source === "fuel") {
+      return date ? `По заправке ${date}` : "По последней заправке";
+    }
+    return date ? `По записи ТО ${date}` : "По последней записи ТО";
+  }
+
+  function showOdometerError(message) {
+    odometerFormError.textContent = message;
+    odometerFormError.hidden = !message;
+    if (message) odometerValueInput.focus();
+  }
+
+  function openOdometerDialog() {
+    const info = getOdometerInfo();
+    odometerForm.reset();
+    showOdometerError("");
+    odometerValueInput.value = info.value >= 0 ? String(info.value) : "";
+    odometerCurrent.textContent = info.value >= 0
+      ? `Сейчас: ${info.value.toLocaleString("ru-RU")} км · ` +
+        getOdometerHint(info).replace(/^./, letter => letter.toLowerCase())
+      : "Пробег ещё не указан.";
+    odometerDialog.showModal();
+    odometerValueInput.focus();
+    odometerValueInput.select();
+  }
+
+  odometerForm.addEventListener("submit", event => {
+    event.preventDefault();
+    const text = odometerValueInput.value.trim();
+    const value = Number(text);
+    if (!text || odometerValueInput.validity.badInput ||
+        !Number.isInteger(value) || value < 0 || value > 2000000) {
+      showOdometerError("Укажи пробег целым числом от 0 до 2 000 000 км.");
+      return;
+    }
+    const records = getRecordsOdometerInfo();
+    if (value < records.value) {
+      showOdometerError(
+        `В записях уже есть пробег ${records.value.toLocaleString("ru-RU")} км — ` +
+        "новое значение не может быть меньше. Если в записи ошибка, исправь её в журнале."
+      );
+      return;
+    }
+    const next = { value, date: getLocalDateStamp() };
+    try {
+      localStorage.setItem(odometerStorageKey, JSON.stringify(next));
+    } catch (error) {
+      showOdometerError("Не удалось сохранить пробег — в браузере закончилось место.");
+      return;
+    }
+    manualOdometer = next;
+    odometerDialog.close();
+    render();
+  });
+  document.getElementById("openOdometerDialog").addEventListener(
+    "click", openOdometerDialog
+  );
+
+  // Резервная копия: когда делали последний экспорт
+  function hasGarageData() {
+    return Boolean(carMake) || expenses.length > 0 || fuelEntries.length > 0 ||
+      parts.length > 0 || carDocuments.length > 0;
+  }
+
+  function renderBackupStatus() {
+    const hasData = hasGarageData();
+    let text;
+    let warning = false;
+    if (!lastExportAt) {
+      text = hasData
+        ? "Резервную копию ещё не делали — сохрани файл, чтобы не потерять записи."
+        : "Резервную копию ещё не делали.";
+      warning = hasData;
+    } else {
+      const exportDay = new Date(lastExportAt);
+      exportDay.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const days = Math.max(0, Math.round((today - exportDay) / 86400000));
+      const ago = days === 0
+        ? "сегодня"
+        : days === 1
+          ? "вчера"
+          : `${countLabel(days, dayCountForms)} назад`;
+      text = `Последняя копия: ${lastExportAt.toLocaleDateString("ru-RU")} (${ago}).`;
+      if (days > 30 && hasData) {
+        text += " Пора сделать новую.";
+        warning = true;
+      }
+    }
+    if (storagePersisted) text += " Браузер не будет удалять данные сам.";
+    backupStatus.textContent = text;
+    backupStatus.dataset.state = warning ? "warning" : "";
+  }
+
+  // Просим браузер не очищать данные приложения при нехватке места
+  async function requestPersistentStorage() {
+    if (!navigator.storage || typeof navigator.storage.persist !== "function") return;
+    try {
+      storagePersisted = await navigator.storage.persisted() ||
+        await navigator.storage.persist();
+    } catch (error) {
+      storagePersisted = false;
+    }
+    renderBackupStatus();
+  }
+
+  function markBackupDone() {
+    lastExportAt = new Date();
+    try {
+      localStorage.setItem(lastExportStorageKey, lastExportAt.toISOString());
+    } catch (error) {
+      console.warn("Не удалось запомнить дату резервной копии", error);
+    }
+    renderBackupStatus();
+    requestPersistentStorage();
+  }
+
+  if (navigator.storage && typeof navigator.storage.persisted === "function") {
+    navigator.storage.persisted().then(value => {
+      storagePersisted = value;
+      renderBackupStatus();
+    }).catch(() => {});
+  }
 
   // 11. Первый показ страницы
   render();
