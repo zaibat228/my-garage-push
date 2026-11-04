@@ -19,6 +19,16 @@ const vapidSubject = process.env.VAPID_SUBJECT;
 const adminToken = process.env.ADMIN_TOKEN;
 const maxRequestBytes = 64 * 1024;
 const reminderInterval = 3 * 60 * 60 * 1000;
+// Тихие часы: с 22:00 до 9:00 по времени подписчика напоминания не отправляются
+const quietHoursStart = 22;
+const quietHoursEnd = 9;
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_ORIGINS || "https://zaibat228.github.io")
+    .split(",")
+    .map(origin => origin.trim().replace(/\/+$/, ""))
+    .filter(Boolean)
+);
+const startedAt = Date.now();
 
 if (!publicKey || !privateKey || !vapidSubject ||
     !/^(mailto:.+|https:\/\/.+)$/.test(vapidSubject)) {
@@ -32,6 +42,20 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 
 webpush.setVapidDetails(vapidSubject, publicKey, privateKey);
 
+function isValidTimeZone(value) {
+  if (typeof value !== "string" || !value || value.length > 64) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const defaultTimeZone = isValidTimeZone(process.env.DEFAULT_TIME_ZONE)
+  ? process.env.DEFAULT_TIME_ZONE
+  : "Europe/Moscow";
+
 let subscriptions = [];
 let persistenceQueue = Promise.resolve();
 let reminderCycleRunning = false;
@@ -43,13 +67,13 @@ class HttpError extends Error {
   }
 }
 
-function sendJson(response, status, value) {
+function sendJson(response, status, value, headOnly = false) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff"
   });
-  response.end(JSON.stringify(value));
+  response.end(headOnly ? undefined : JSON.stringify(value));
 }
 
 function readJson(request) {
@@ -91,8 +115,24 @@ function validateSettings(value) {
     reminders: typeof value.reminders === "boolean"
       ? value.reminders
       : value.daily || value.weekly,
-    updates: value.updates
+    updates: value.updates,
+    quietHours: value.quietHours !== false
   };
+}
+
+function getLocalHour(timeZone, now = new Date()) {
+  const hour = new Intl.DateTimeFormat("en-GB", {
+    timeZone: isValidTimeZone(timeZone) ? timeZone : defaultTimeZone,
+    hour: "2-digit",
+    hourCycle: "h23"
+  }).format(now);
+  return Number(hour) % 24;
+}
+
+function isQuietTime(entry, now = new Date()) {
+  if (entry.settings.quietHours === false) return false;
+  const hour = getLocalHour(entry.timeZone, now);
+  return hour >= quietHoursStart || hour < quietHoursEnd;
 }
 
 function saveSubscriptions() {
@@ -118,8 +158,18 @@ async function loadSubscriptions() {
     }
     const now = Date.now();
     let changed = false;
-    subscriptions = value.map(entry => {
-      const settings = validateSettings(entry.settings);
+    subscriptions = value.flatMap(entry => {
+      let settings;
+      try {
+        if (!entry?.subscription?.endpoint) {
+          throw new Error("нет адреса подписки");
+        }
+        settings = validateSettings(entry.settings);
+      } catch (error) {
+        console.warn("Пропущена повреждённая подписка:", error.message);
+        changed = true;
+        return [];
+      }
       const lastReminderAt = Number.isFinite(entry.lastReminderAt)
         ? entry.lastReminderAt
         : now;
@@ -127,7 +177,7 @@ async function loadSubscriptions() {
           lastReminderAt !== entry.lastReminderAt) {
         changed = true;
       }
-      return { ...entry, settings, lastReminderAt };
+      return [{ ...entry, settings, lastReminderAt }];
     });
     if (changed) await saveSubscriptions();
   } catch (error) {
@@ -177,13 +227,16 @@ async function runReminderCycle() {
     const reminders = [];
     for (const entry of [...subscriptions]) {
       if (entry.settings.reminders &&
-          now - entry.lastReminderAt >= reminderInterval) {
+          now - entry.lastReminderAt >= reminderInterval &&
+          !isQuietTime(entry, new Date(now))) {
         entry.lastReminderAt = now;
         reminders.push([
           entry,
           {
             title: "Напоминание My Garage",
-            body: "Загляни в гараж: добавь расходы, заправки или записи об обслуживании."
+            body: "Загляни в гараж: добавь расходы, заправки или записи об обслуживании.",
+            tag: "my-garage-reminder",
+            url: "./"
           }
         ]);
       }
@@ -211,6 +264,16 @@ function hasValidAdminToken(request) {
 }
 
 async function handleApi(request, response, pathname) {
+  if ((request.method === "GET" || request.method === "HEAD") &&
+      (pathname === "/api/health" || pathname === "/api/push/health")) {
+    // Для проверки работы сервера и внешнего «пинга» на бесплатном Render
+    sendJson(response, 200, {
+      ok: true,
+      uptimeSeconds: Math.round((Date.now() - startedAt) / 1000)
+    }, request.method === "HEAD");
+    return;
+  }
+
   if (request.method === "GET" && pathname === "/api/push/public-key") {
     sendJson(response, 200, { publicKey });
     return;
@@ -240,6 +303,11 @@ async function handleApi(request, response, pathname) {
     const existing = subscriptions.find(
       entry => entry.subscription.endpoint === subscription.endpoint
     );
+    const timeZone = isValidTimeZone(body.timeZone)
+      ? body.timeZone
+      : isValidTimeZone(existing?.timeZone)
+        ? existing.timeZone
+        : defaultTimeZone;
     const entry = {
       subscription: {
         endpoint: subscription.endpoint,
@@ -250,14 +318,20 @@ async function handleApi(request, response, pathname) {
         }
       },
       settings,
+      timeZone,
       lastReminderAt: existing?.lastReminderAt || Date.now()
     };
+    // previousEndpoint — старая подписка этого же устройства (после смены ключей)
+    const previousEndpoint = typeof body.previousEndpoint === "string"
+      ? body.previousEndpoint
+      : "";
     subscriptions = subscriptions.filter(
-      item => item.subscription.endpoint !== subscription.endpoint
+      item => item.subscription.endpoint !== subscription.endpoint &&
+        (!previousEndpoint || item.subscription.endpoint !== previousEndpoint)
     );
     subscriptions.push(entry);
     await saveSubscriptions();
-    sendJson(response, 200, { ok: true });
+    sendJson(response, 200, { ok: true, publicKey });
     return;
   }
 
@@ -297,7 +371,12 @@ async function handleApi(request, response, pathname) {
       ? body.url
       : "/";
     const sent = await deliverToSubscribers(
-      { title: body.title.trim(), body: body.body.trim(), url },
+      {
+        title: body.title.trim(),
+        body: body.body.trim(),
+        url,
+        tag: "my-garage-update"
+      },
       entry => entry.settings.updates
     );
     sendJson(response, 200, { ok: true, sent });
@@ -314,17 +393,25 @@ const mimeTypes = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".manifest": "application/manifest+json; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".png": "image/png",
   ".svg": "image/svg+xml"
 };
 const publicFiles = new Set([
+  "app.css",
+  "assets/car-front-transparent.png",
   "icon-180.png",
   "icon-192.png",
   "icon-512.png",
+  "icon-badge-96.png",
   "icon.svg",
   "index.html",
   "site.webmanifest",
   "sw.js"
+]);
+// Эти файлы меняются с каждой версией — браузер должен их перепроверять
+const revalidatedExtensions = new Set([
+  ".css", ".html", ".js", ".webmanifest"
 ]);
 
 function isAllowedPushHost(hostname) {
@@ -363,11 +450,9 @@ async function serveStatic(request, response, pathname) {
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "strict-origin-when-cross-origin"
     };
-    if (path.basename(filename) === "sw.js" ||
-        path.extname(filename) === ".html" ||
-        path.basename(filename) === "site.webmanifest") {
-      headers["Cache-Control"] = "no-cache";
-    }
+    headers["Cache-Control"] = revalidatedExtensions.has(path.extname(filename))
+      ? "no-cache"
+      : "public, max-age=86400";
     response.writeHead(200, headers);
     response.end(request.method === "HEAD" ? undefined : contents);
   } catch (error) {
@@ -380,20 +465,20 @@ async function serveStatic(request, response, pathname) {
 }
 
 async function handleRequest(request, response) {
-    const allowedOrigin = "https://zaibat228.github.io";
   const origin = request.headers.origin;
 
-  if (origin === allowedOrigin) {
-    response.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-    response.setHeader("Vary", "Origin");
+  response.setHeader("Vary", "Origin");
+  if (origin && allowedOrigins.has(origin)) {
+    response.setHeader("Access-Control-Allow-Origin", origin);
     response.setHeader(
       "Access-Control-Allow-Methods",
-      "GET, POST, DELETE, OPTIONS"
+      "GET, HEAD, POST, DELETE, OPTIONS"
     );
     response.setHeader(
       "Access-Control-Allow-Headers",
       "Content-Type"
     );
+    response.setHeader("Access-Control-Max-Age", "86400");
   }
 
   if (request.method === "OPTIONS") {
@@ -432,6 +517,7 @@ async function start() {
   });
   server.listen(port, host, () => {
     console.log(`My Garage доступен на http://${host}:${port}`);
+    console.log(`Разрешённые сайты (CORS): ${[...allowedOrigins].join(", ")}`);
   });
   setInterval(() => void runReminderCycle(), 15_000);
 }
