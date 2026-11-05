@@ -21,6 +21,19 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <link rel="manifest" href="./site.webmanifest">
   <link rel="stylesheet" href="./app.css?v=0.0.010">
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=114084171', 'ym');
+
+    ym(114084171, 'init', {ssr:true, webvisor:false, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/114084171" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+  <!-- /Yandex.Metrika counter -->
 </head>
 <body data-theme="graphite">
   <script>
@@ -1309,6 +1322,9 @@
         не отправляются. Если включить push-уведомления, на сервер передаются
         только подписка браузера, выбранные типы уведомлений и часовой пояс.
         VIN уходит в базу NHTSA, только когда нажимаешь «Характеристики онлайн».</p>
+      <p>Посещения считает Яндекс Метрика (использует cookie): она видит тип
+        устройства и браузера, примерный город, источник перехода и действия
+        вроде «добавлена запись» — без содержимого записей.</p>
     </section>
   </dialog>
 
@@ -1421,6 +1437,20 @@
   </dialog>
 
 <script>
+  // Яндекс Метрика: цели (сам счётчик подключён в <head>).
+  // Отправляются только названия действий, без содержимого записей.
+  const metrikaCounterId = 114084171;
+  function trackGoal(goal, params) {
+    try {
+      if (typeof window.ym === "function") {
+        window.ym(metrikaCounterId, "reachGoal", goal, params);
+      }
+    } catch (error) {
+      console.warn("Метрика: не удалось отправить цель", goal, error);
+    }
+  }
+  if (isInstalledApp()) trackGoal("opened_installed");
+
   // 1. Получаем элементы страницы
   const storageKey = "my-garage-expenses-v1";
   const fuelStorageKey = "my-garage-fuel-v1";
@@ -1679,6 +1709,7 @@
   });
 
   window.addEventListener("appinstalled", () => {
+    trackGoal("app_installed");
     installPrompt.hidden = true;
     nativeInstallButton.hidden = true;
     if (installDialog.open) installDialog.close();
@@ -2022,6 +2053,7 @@
         getCurrentPushSettings(),
         previousEndpoint
       );
+      trackGoal("push_enabled");
       pushSettingsPanel.hidden = false;
       pushEnableButton.hidden = true;
       try {
@@ -2240,6 +2272,7 @@
     download.click();
     download.remove();
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 4000);
+    trackGoal("backup_exported");
     setDataStatus(
       `Файл ${fileName} (${formatFileSize(file.size)}) готов: ` +
       describeDataCounts(
@@ -4892,6 +4925,7 @@
       renderCar();
       carDialog.close();
       renderBackupStatus();
+      trackGoal("car_saved");
     } catch (error) {
       console.warn("Не удалось сохранить автомобиль", error);
       carSnapshot.forEach((value, key) => {
@@ -5875,6 +5909,7 @@
       setDeviceDate(expenseDate, expenseDateWheels);
       render();
       expenseDialog.close();
+      trackGoal("record_added", { type: "expense" });
     } else {
       expenses = previous;
     }
@@ -6047,6 +6082,7 @@
       setServiceDateToToday();
       render();
       serviceDialog.close();
+      trackGoal("record_added", { type: "service" });
     } else {
       expenses = previous;
     }
@@ -6290,6 +6326,7 @@
       setDeviceDate(fuelDate, fuelDateWheels);
       render();
       fuelDialog.close();
+      trackGoal("record_added", { type: "fuel" });
     } else {
       fuelEntries = previousEntries;
     }
@@ -6442,7 +6479,7 @@
         : "Не удалось скопировать — выдели артикул вручную.");
     });
     const search = document.createElement("a");
-    search.className = "icon-button part-action";
+    search.className = "icon-button part-action ym-disable-tracklink";
     search.href = getPartSearchUrl(part);
     search.target = "_blank";
     search.rel = "noopener noreferrer";
@@ -6621,6 +6658,7 @@
     lastPartCategory = category;
     partDialog.close();
     renderParts();
+    if (!isEditing) trackGoal("record_added", { type: "part" });
     setPartsStatus(isEditing
       ? `Запчасть «${name}» обновлена.`
       : `Запчасть «${name}» добавлена в каталог.`);
@@ -6893,6 +6931,7 @@
     documentDialog.close();
     renderDocuments();
     renderBackupStatus();
+    if (!isEditing) trackGoal("record_added", { type: "document" });
   });
   documentDialog.addEventListener("close", () => {
     editingDocumentId = null;
@@ -6992,6 +7031,7 @@
     manualOdometer = next;
     odometerDialog.close();
     render();
+    trackGoal("record_added", { type: "odometer" });
   });
   document.getElementById("openOdometerDialog").addEventListener(
     "click", openOdometerDialog
